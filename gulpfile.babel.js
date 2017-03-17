@@ -1,3 +1,5 @@
+'use strict';
+
 // generated on 2017-03-17 using generator-chrome-extension 0.6.1
 import gulp from 'gulp';
 import gulpLoadPlugins from 'gulp-load-plugins';
