@@ -16,11 +16,10 @@
   },
   "permissions": [
     "tabs",
-    "http://*/*",
-    "https://*/*",
     "cookies",
-    "*://*.google.com/",
-    "notifications"
+    "notifications",
+    "https://api.nebenan.de/*",
+    "*://*.google.com/"
   ],
   "options_ui": {
     "page": "options.html",
