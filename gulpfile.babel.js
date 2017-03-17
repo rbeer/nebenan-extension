@@ -8,14 +8,14 @@ import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
 const $ = gulpLoadPlugins();
-
+console.log($.livereload);
 gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
     '!app/scripts.babel',
     '!app/*.json',
-    '!app/*.html',
+    '!app/*.html'
   ], {
     base: 'app',
     dot: true
@@ -45,14 +45,14 @@ gulp.task('images', () => {
       // as hooks for embedding and styling
       svgoPlugins: [{cleanupIDs: false}]
     }))
-    .on('error', function (err) {
+    .on('error', function(err) {
       console.log(err);
       this.end();
     })))
     .pipe(gulp.dest('dist/images'));
 });
 
-gulp.task('html',  () => {
+gulp.task('html', () => {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
@@ -65,20 +65,18 @@ gulp.task('html',  () => {
 
 gulp.task('chromeManifest', () => {
   return gulp.src('app/manifest.json')
-    .pipe($.chromeManifest({
-      buildnumber: true,
-      background: {
-        target: 'scripts/background.js',
-        exclude: [
-          'scripts/chromereload.js'
-        ]
-      }
-  }))
-  .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
-  .pipe($.if('*.js', $.sourcemaps.init()))
-  .pipe($.if('*.js', $.uglify()))
-  .pipe($.if('*.js', $.sourcemaps.write('.')))
-  .pipe(gulp.dest('dist'));
+         .pipe($.chromeManifest({
+           buildnumber: true,
+           background: {
+             target: 'scripts/background.js',
+             exclude: [ 'scripts/chromereload.js' ]
+           }
+         }))
+        .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
+        .pipe($.if('*.js', $.sourcemaps.init()))
+        .pipe($.if('*.js', $.uglify()))
+        .pipe($.if('*.js', $.sourcemaps.write('.')))
+        .pipe(gulp.dest('dist'));
 });
 
 gulp.task('babel', () => {
@@ -91,7 +89,7 @@ gulp.task('babel', () => {
 
 gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
 
-gulp.task('watch', ['lint', 'babel'], () => {
+gulp.task('watch', cb => {
   $.livereload.listen();
 
   gulp.watch([
@@ -100,10 +98,16 @@ gulp.task('watch', ['lint', 'babel'], () => {
     'app/images/**/*',
     'app/styles/**/*',
     'app/_locales/**/*.json'
-  ]).on('change', $.livereload.reload);
+  ]).on('change', $.livereload);
 
-  gulp.watch('app/scripts.babel/**/*.js', ['lint', 'babel']);
+  gulp.watch([
+    'app/scripts.babel/**/*.js',
+    'app/manifest.json'
+  ]).on('change', () => {
+    runSequence('build', $.livereload);
+  });
   gulp.watch('bower.json', ['wiredep']);
+  runSequence('build', cb);
 });
 
 gulp.task('size', () => {
@@ -118,14 +122,14 @@ gulp.task('wiredep', () => {
     .pipe(gulp.dest('app'));
 });
 
-gulp.task('package', function () {
+gulp.task('package', () => {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
       .pipe($.zip('nebenan-' + manifest.version + '.zip'))
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('build', (cb) => {
+gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
     ['html', 'images', 'extras'],
