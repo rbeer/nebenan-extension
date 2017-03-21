@@ -1,6 +1,5 @@
 {
   "parserOptions": {
-    "ecmaVersion": 8,
     "sourceType": "module",
     "ecmaFeatures": {
       "globalReturn": true,
@@ -12,6 +11,8 @@
     "browser": true,
     "node": true,
     "jquery": true,
+    "mocha": true,
+    "es6": true
   },
 
   "globals": {
@@ -26,11 +27,6 @@
     "logInfo": true,
     "logVerbose": true,
     "logDebug": true,
-    "describe": true,
-    "it": true,
-    "before": true,
-    "after": true,
-    "Promise": true,
     "chrome": true
   },
 
