@@ -18,7 +18,7 @@
     "cookies",
     "notifications",
     "https://api.nebenan.de/*",
-    "*://*.google.com/"
+    "https://nebenan.de/"
   ],
   "options_ui": {
     "page": "options.html",
