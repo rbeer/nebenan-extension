@@ -11,12 +11,14 @@
   "background": {
     "scripts": [
       "scripts/build/all.js"
-    ]
+    ],
+    "persistent": false
   },
   "permissions": [
     "tabs",
     "cookies",
     "notifications",
+    "alarms",
     "https://api.nebenan.de/*",
     "https://nebenan.de/"
   ],

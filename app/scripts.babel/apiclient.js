@@ -16,7 +16,7 @@ define(() => {
      * @static
      * @property {string} type       - Request type, e.g. `'GET', 'POST'`
      * @property {string} url        - API endpoint URL to call
-     * @property {bool}   needsToken - Whether to check for and send along auth token.
+     * @property {string} token      - Auth token to send with request
      */
     /**
      * Default XHROptions
@@ -24,8 +24,8 @@ define(() => {
     static get XHR_DEFAULTS() {
       return {
         type: 'GET',
-        url: 'https://api.nebenan.de/',
-        needsToken: false
+        url: 'https://api.nebenan.de/api/v2',
+        token: ''
       };
     }
 
@@ -38,20 +38,36 @@ define(() => {
      */
     static callAPI(options) {
 
-      options = options || APIClient.XHR_DEFAULTS;
+      if (!options) {
+        throw new SyntaxError('First argument must be an XHROptions object.');
+      }
 
       return new Promise((resolve, reject) => {
+
+        // request object
         let xhr = new XMLHttpRequest();
+
+        // response handler
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
             resolve(this.response);
           }
         };
+
+        // error handler
         xhr.onerror = (err) => {
           xhr.abort();
           reject(err);
         };
+
+        // open connection
         xhr.open(options.type, options.url);
+
+        // set request headers
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('X-AUTH-TOKEN', options.token);
+
+        // send
         xhr.send();
       });
     }
@@ -63,7 +79,12 @@ define(() => {
      * @static
      * @return {Promise}
      */
-    static getCounterStats() {}
+    static getCounterStats(token) {
+      let xhrOptions = APIClient.XHR_DEFAULTS;
+      xhrOptions.url += '/profile/counter_stats.json';
+      xhrOptions.token = token;
+      return APIClient.callAPI(xhrOptions);
+    }
   };
 
   return APIClient;
