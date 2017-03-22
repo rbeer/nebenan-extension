@@ -22,6 +22,10 @@ define(['apiclient'], (APIClient) => {
     console.log('details', details);
   });
 
+  // @if DEV=true
+  console.debug('Welcome to debug mode!');
+  window.bgApp = app;
+  // @endif
   return app;
 
 });

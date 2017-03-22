@@ -7,8 +7,11 @@ import del from 'del';
 import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 import gutil from 'gulp-util';
+import preprocess from 'gulp-preprocess';
 
 const $ = gulpLoadPlugins();
+
+let DEV = false;
 
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
@@ -79,13 +82,14 @@ gulp.task('chromeManifest', () => {
 
 gulp.task('babel', () => {
   return gulp.src('app/scripts.babel/**/*.js')
+      .pipe(preprocess({ context: { DEV: DEV } }))
       .pipe($.babel({
         presets: ['es2015']
       }))
       .pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist']));
+gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/scripts']));
 
 gulp.task('watch', cb => {
   $.livereload.listen();
@@ -150,6 +154,7 @@ gulp.task('build', cb => {
 });
 
 gulp.task('dev', cb => {
+  DEV = true;
   runSequence('clean', 'build', 'watch', cb);
 });
 

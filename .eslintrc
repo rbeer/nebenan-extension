@@ -22,12 +22,7 @@
     "navigator": false,
     "unescape": false,
     "window": false,
-    "logError": true,
-    "logWarn": true,
-    "logSuccess": true,
-    "logInfo": true,
-    "logVerbose": true,
-    "logDebug": true,
+    "devlog": true,
     "chrome": true
   },
 
