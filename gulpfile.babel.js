@@ -6,6 +6,7 @@ import gulpLoadPlugins from 'gulp-load-plugins';
 import del from 'del';
 import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
+import gutil from 'gulp-util';
 
 const $ = gulpLoadPlugins();
 
@@ -104,7 +105,7 @@ gulp.task('watch', cb => {
     runSequence('build', $.livereload);
   });
   gulp.watch('bower.json', ['wiredep']);
-  runSequence('build', cb);
+  runSequence('dev', cb);
 });
 
 gulp.task('size', () => {
@@ -127,19 +128,29 @@ gulp.task('package', () => {
 });
 
 gulp.task('rjs', cb => {
-  const exec = require('child_process').exec;
-  exec('r.js', [ '-o', '.rjs' ], cb);
+  const spawn = require('child_process').spawn;
+  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
+
+  let logRjs = (data) => {
+    data.toString()
+        .split('\n')
+        .forEach((line) => line !== '' ? gutil.log(line) : void 0);
+  };
+
+  rjs.stdout.on('data', logRjs);
+  rjs.stderr.on('data', logRjs);
+  rjs.on('close', cb);
 });
 
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
     ['scripts', 'html', 'images', 'extras'],
-    'size', cb);
+    'rjs', 'size', cb);
 });
 
 gulp.task('dev', cb => {
-  runSequence('clean', 'lint', 'babel', 'scripts', 'chromeManifest', cb);
+  runSequence('clean', 'build', 'watch', cb);
 });
 
 gulp.task('default', ['clean'], cb => {
