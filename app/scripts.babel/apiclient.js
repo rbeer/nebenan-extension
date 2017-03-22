@@ -5,17 +5,27 @@ define(() => {
    * @class Client to nebenan.de API
    */
   class APIClient {
+
     constructor() {
-      this.options = APIClient.DEFAULTS;
+      this.options = APIClient.XHR_DEFAULTS;
     }
 
     /**
-     * Default values for CMLHttpRequest
+     * @typedef {XHROptions}
+     * @memberOf APIClient
+     * @static
+     * @property {string} type       - Request type, e.g. `'GET', 'POST'`
+     * @property {string} url        - API endpoint URL to call
+     * @property {bool}   needsToken - Whether to check for and send along auth token.
      */
-    static get DEFAULTS() {
+    /**
+     * Default XHROptions
+     */
+    static get XHR_DEFAULTS() {
       return {
         type: 'GET',
-        url: 'https://api.nebenan.de/'
+        url: 'https://api.nebenan.de/',
+        needsToken: false
       };
     }
 
@@ -23,11 +33,12 @@ define(() => {
      * Executes XMLHttpRequest
      * @memberOf APIClient
      * @static
+     * @param {?APIClient.XHROptions} options - Options passed to XMLHttpRequest
      * @return {Promise}
      */
     static callAPI(options) {
 
-      options = options || APIClient.DEFAULTS;
+      options = options || APIClient.XHR_DEFAULTS;
 
       return new Promise((resolve, reject) => {
         let xhr = new XMLHttpRequest();
