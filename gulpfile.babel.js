@@ -8,7 +8,15 @@ import runSequence from 'run-sequence';
 import {stream as wiredep} from 'wiredep';
 
 const $ = gulpLoadPlugins();
-console.log($.livereload);
+
+gulp.task('scripts', () => {
+  return gulp.src('app/scripts/**/*.js')
+        .pipe($.sourcemaps.init())
+        .pipe($.uglify())
+        .pipe($.sourcemaps.write('.'))
+        .pipe(gulp.dest('dist/scripts'));
+});
+
 gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
@@ -65,17 +73,6 @@ gulp.task('html', () => {
 
 gulp.task('chromeManifest', () => {
   return gulp.src('app/manifest.json')
-         .pipe($.chromeManifest({
-           buildnumber: true,
-           background: {
-             target: 'scripts/background.js',
-             exclude: [ 'scripts/chromereload.js' ]
-           }
-         }))
-        .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
-        .pipe($.if('*.js', $.sourcemaps.init()))
-        .pipe($.if('*.js', $.uglify()))
-        .pipe($.if('*.js', $.sourcemaps.write('.')))
         .pipe(gulp.dest('dist'));
 });
 
@@ -129,11 +126,20 @@ gulp.task('package', () => {
       .pipe(gulp.dest('package'));
 });
 
+gulp.task('rjs', cb => {
+  const exec = require('child_process').exec;
+  exec('r.js', [ '-o', '.rjs' ], cb);
+});
+
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
-    ['html', 'images', 'extras'],
+    ['scripts', 'html', 'images', 'extras'],
     'size', cb);
+});
+
+gulp.task('dev', cb => {
+  runSequence('clean', 'lint', 'babel', 'scripts', 'chromeManifest', cb);
 });
 
 gulp.task('default', ['clean'], cb => {

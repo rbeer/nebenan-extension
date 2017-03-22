@@ -1,8 +1,8 @@
 {
-  "name": "__MSG_appName__",
+  "name": "nebenan.de",
   "version": "0.0.1",
   "manifest_version": 2,
-  "description": "__MSG_appDescription__",
+  "description": "Chrome notify extension for nebenan.de",
   "icons": {
     "16": "images/icon-read_16.png",
     "128": "images/icon_128.png"
@@ -10,7 +10,7 @@
   "default_locale": "en",
   "background": {
     "scripts": [
-      "scripts/background.js"
+      "scripts/build/all.js"
     ]
   },
   "permissions": [
@@ -25,7 +25,7 @@
     "chrome_style": true
   },
   "omnibox": {
-    "keyword": "OMNIBOX-KEYWORD"
+    "keyword": "nebenan"
   },
   "web_accessible_resources": [
     "images/icon_128.png"

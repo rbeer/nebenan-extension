@@ -12,7 +12,8 @@
     "node": true,
     "jquery": true,
     "mocha": true,
-    "es6": true
+    "es6": true,
+    "amd": true
   },
 
   "globals": {
