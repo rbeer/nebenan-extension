@@ -16,6 +16,7 @@ define(['apiclient'], (APIClient) => {
   window.devlog = () => {};
 
   // @if DEV=true
+  console.clear();
   console.debug('Welcome to debug mode!');
   window.bgApp = app;
   let devlog = window.devlog = console.debug;
@@ -41,12 +42,18 @@ define(['apiclient'], (APIClient) => {
   };
 
   chrome.runtime.onInstalled.addListener(details => {
-    console.log('details', details);
+    devlog('onInstalled:', details);
     chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 1 });
+
     chrome.alarms.onAlarm.addListener((alarm) => {
-      devlog(alarm);
+      devlog('Alaram:', alarm);
+      app.getToken().then(app.api.getCounterStats).then((stats) => {
+        let jstats = JSON.parse(stats);
+        devlog(jstats);
+      })
+      .catch((err) => console.error(err));
     });
-    chrome.runtime.onSuspend(() => devlog('suspending'));
+
   });
 
   return app;
