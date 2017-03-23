@@ -1,6 +1,6 @@
 'use strict';
 
-define(['apiclient'], (APIClient) => {
+define(['apiclient', 'livereload'], (APIClient, lreload) => {
 
   /**
    * Background Main App
