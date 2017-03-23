@@ -25,6 +25,7 @@ gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
+    'app/fonts/*.*',
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html'
@@ -69,9 +70,14 @@ gulp.task('html', () => {
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
     .pipe($.sourcemaps.init())
     .pipe($.if('*.js', $.uglify()))
-    .pipe($.if('*.css', $.cleanCss({compatibility: '*'})))
     .pipe($.sourcemaps.write())
     .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
+    .pipe(gulp.dest('dist'));
+});
+
+gulp.task('css', () => {
+  return gulp.src('app/**/*.css')
+    .pipe($.cleanCss({compatibility: '*'}))
     .pipe(gulp.dest('dist'));
 });
 
@@ -95,8 +101,7 @@ gulp.task('watch', cb => {
   $.livereload.listen();
 
   gulp.watch([
-    'app/scripts.babel/**/*.js',
-    'app/manifest.json'
+    'app/**/*.*'
   ]).on('change', () => {
     runSequence('build', () => $.livereload.reload('/var/wwn/nebenan.de/app/scripts/bgapp.js'));
   });
@@ -141,7 +146,7 @@ gulp.task('rjs', cb => {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
-    ['scripts', 'html', 'images', 'extras'],
+    ['scripts', 'html', 'css', 'images', 'extras'],
     'rjs', 'size', cb);
 });
 
