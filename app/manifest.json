@@ -29,6 +29,14 @@
   "omnibox": {
     "keyword": "nebenan"
   },
+  "browser_action": {
+    "default_icon": {
+      "16": "images/icon-read_16.png",
+      "128": "images/icon_128.png"
+    },
+    "default_title": "nebenan.de",
+    "default_popup": "popup.html"
+  },
   "web_accessible_resources": [
     "images/icon_128.png"
   ]
