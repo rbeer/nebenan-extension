@@ -75,10 +75,14 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
 
     let iconPath = `images/icon-${allNew > 0 ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
+
+    chrome.browserAction.setBadgeText({ text: allNew.toString() });
   };
 
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
+
+    chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
     chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 1 });
     chrome.alarms.onAlarm.addListener((alarm) => {
