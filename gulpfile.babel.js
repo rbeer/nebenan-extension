@@ -103,10 +103,11 @@ gulp.task('watch', cb => {
   gulp.watch([
     'app/**/*.*'
   ]).on('change', () => {
-    runSequence('build', () => $.livereload.reload('/var/wwn/nebenan.de/app/scripts/bgapp.js'));
+    runSequence('build',
+      () => $.livereload.reload('/var/wwn/nebenan.de/app/scripts/bgapp.js'));
   });
   gulp.watch('bower.json', ['wiredep']);
-  runSequence('dev', cb);
+  cb();
 });
 
 gulp.task('size', () => {
