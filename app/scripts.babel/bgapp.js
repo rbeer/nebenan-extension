@@ -32,7 +32,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
     return new Promise((resolve, reject) => {
       chrome.cookies.get({ url: 'https://nebenan.de', name: 's' }, (cookie) => {
         if (cookie && cookie.name === 's') {
-          devlog('token cookie:', cookie);
+          devlog('Token cookie:', cookie);
           resolve(cookie.value);
         } else {
           devlog('No auth cookie found:', chrome.runtime.lastError);
@@ -87,7 +87,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    * @param  {number} stats.new_notifications_count
    */
   app.updateBrowserAction = (stats) => {
-    console.log('Updating browser action with:', stats);
+    devlog('Updating browserAction with:', stats);
 
     let newMessages = stats.new_messages_count;
     let newNotifications = stats.new_notifications_count;
@@ -102,12 +102,34 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
 
+    // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
+    // periodical alarm for status updates
     chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 30 });
     chrome.alarms.onAlarm.addListener((alarm) => {
       devlog('Alaram:', alarm);
       app.updateStats().then(app.updateBrowserAction);
+    });
+
+    // listen for runtime messages
+    chrome.runtime.onMessage.addListener((msg, sender, respond) => {
+      devlog('Received runtime message:', msg);
+
+      // messages from browserAction popup
+      if (msg.from === 'popupApp') {
+        // request for online-user/messages/notifications counts
+        if (msg.type === 'counter_stats') {
+
+          let res = {
+            from: msg.to, to: msg.from,
+            type: 'response', counter_stats: app.counter_stats
+          };
+          devlog('... responding with', res);
+          respond(res);
+
+        }
+      }
     });
 
   });
