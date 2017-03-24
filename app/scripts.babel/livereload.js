@@ -1,9 +1,11 @@
 'use strict';
 
 define(() => {
+  let connection = null;
+  // @if DEV=true
   const LIVERELOAD_HOST = 'localhost:';
   const LIVERELOAD_PORT = 35729;
-  const connection = new WebSocket('ws://' + LIVERELOAD_HOST + LIVERELOAD_PORT + '/livereload');
+  connection = new WebSocket('ws://' + LIVERELOAD_HOST + LIVERELOAD_PORT + '/livereload');
 
   connection.onerror = err => devlog('Reload connection got error:', err);
 
@@ -16,6 +18,7 @@ define(() => {
       }
     }
   };
+  // @endif
 
   return connection;
 
