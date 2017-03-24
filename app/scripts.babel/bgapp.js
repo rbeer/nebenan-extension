@@ -7,7 +7,8 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    * @module bgApp
    */
   let app = {
-    api: APIClient
+    api: APIClient,
+    counter_stats: {}
   };
 
   /**
@@ -42,6 +43,24 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
   };
 
   /**
+   * Sanitizes API's counter_stats.json for internal use.
+   * NOTE: Mutates passed object.
+   * @param  {object} stats - Parsed counter_stats.json
+   * @memberOf bgApp
+   */
+  app.sanitizeStats = (stats) => {
+    let nameMap = [
+      [ 'users', 'hood_active_users_count' ],
+      [ 'messages', 'new_messages_count' ],
+      [ 'notifications', 'new_notifications_count' ]
+    ];
+    nameMap.forEach((names) => {
+      stats[names[0]] = stats[names[1]];
+      delete stats[names[1]];
+    });
+  };
+
+  /**
    * Updates local stats counters
    * @return {Promise}
    */
@@ -50,7 +69,8 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
       app.getToken().then(app.api.getCounterStats).then((stats) => {
         try {
           let jstats = JSON.parse(stats);
-          devlog(jstats);
+          app.sanitizeStats(jstats);
+          app.counter_stats = jstats;
           resolve(jstats);
         } catch (err) {
           reject(err);
