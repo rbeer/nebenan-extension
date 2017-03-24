@@ -1,17 +1,11 @@
 <!doctype html>
 <html>
   <head>
-    <!-- build:css styles/options-vendor.css -->
-    <!-- bower:css -->
-    <!-- endbower -->
-    <!-- endbuild -->
-    <!-- build:css styles/main.css -->
     <link href="styles/popup.css" rel="stylesheet">
-    <!-- endbuild -->
   </head>
   <body>
   <div class="header">
-    <div class="logo">
+    <div class="logo" click="clickLogo">
       <div class="logo-icon">
         <i class="na-icon"></i>
       </div>
@@ -31,6 +25,8 @@
       <i class="na-icon"></i><span> {--}</span>
     </div>
   </div>
-    <!-- <script src="scripts/options.js"></script> -->
+  <textarea id="devlog"></textarea>
+  
+  <script src="scripts/popup.js"></script>
   </body>
 </html>

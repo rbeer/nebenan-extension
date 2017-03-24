@@ -84,7 +84,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
 
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
-    chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 1 });
+    chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 30 });
     chrome.alarms.onAlarm.addListener((alarm) => {
       devlog('Alaram:', alarm);
       app.updateStats().then(app.updateBrowserAction);
