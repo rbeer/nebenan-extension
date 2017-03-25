@@ -67,7 +67,8 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
         } catch (err) {
           reject(err);
         }
-      });
+      })
+      .catch(reject);
     });
   };
 
@@ -97,7 +98,10 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
     chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 30 });
     chrome.alarms.onAlarm.addListener((alarm) => {
       devlog('Alaram:', alarm);
-      app.updateStats().then(app.updateBrowserAction);
+      app.updateStats().then(app.updateBrowserAction).catch((err) => {
+        devlog('onAlarm error:', err.code);
+        devlog(err);
+      });
     });
 
     // listen for runtime messages
@@ -109,13 +113,25 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
         // request for online-user/messages/notifications counts
         if (msg.type === 'counter_stats') {
 
-          let res = {
-            from: msg.to, to: msg.from,
-            type: 'response', counter_stats: app.counter_stats
-          };
-          devlog('... responding with', res);
-          respond(res);
-
+          app.updateStats()
+          .then(app.updateBrowserAction)
+          .then(() => {
+            let res = {
+              from: msg.to, to: msg.from,
+              type: 'response', counter_stats: app.counter_stats
+            };
+            devlog('... responding with', res);
+            respond(res);
+          })
+          .catch((err) => {
+            switch(err.code) {
+              case 'ENOTOKEN':
+                // show login UI
+                //chrome.runtime.sendMessage();
+                devlog(err);
+                break;
+            }
+          });
         }
       }
     });

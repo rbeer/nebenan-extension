@@ -22,14 +22,28 @@ define(() => {
     static getToken() {
       return new Promise((resolve, reject) => {
         chrome.cookies.get(Cookies.tokenCookieIdentifier, (cookie) => {
+          devlog('Token cookie:', cookie);
           if (cookie && cookie.name === 's') {
-            devlog('Token cookie:', cookie);
+            devlog('Resolving with:', cookie.value.substr(0, 14) + '...');
             resolve(cookie.value);
           } else {
-            devlog('No auth cookie found:', chrome.runtime.lastError);
-            reject('ENOTOKEN');
+            let err = new Error('No auth token cookie found.');
+            err.code = 'ENOTOKEN';
+            reject(err);
           }
         });
+      });
+    }
+
+    /**
+     * **Deletes cookie with auth token (a/k/a logout)**
+     * *NOTE: This also affects visiting the website directly.*
+     * @memberOf Cookies
+     * @return {Promise}
+     */
+    static removeToken() {
+      return new Promise((resolve) => {
+        chrome.cookies.remove(Cookies.tokenCookieIdentifier, resolve);
       });
     }
   }
