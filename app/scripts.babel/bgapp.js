@@ -1,6 +1,6 @@
 'use strict';
 
-define(['apiclient', 'livereload'], (APIClient, lreload) => {
+define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => {
 
   /**
    * Background Main App
@@ -8,6 +8,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    */
   let app = {
     api: APIClient,
+    cookies: Cookies,
     /**
      * Sanitized counter_stats.json from API
      * @property {number} messages      - \# of unread messages
@@ -31,25 +32,6 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
   window.bgApp = app;
   let devlog = window.devlog = console.debug;
   // @endif
-
-  /**
-   * Gets auth token from cookie
-   * @memberOf module:bgApp
-   * @return {Promise} Resolves with auth token string or rejects
-   */
-  app.getToken = () => {
-    return new Promise((resolve, reject) => {
-      chrome.cookies.get({ url: 'https://nebenan.de', name: 's' }, (cookie) => {
-        if (cookie && cookie.name === 's') {
-          devlog('Token cookie:', cookie);
-          resolve(cookie.value);
-        } else {
-          devlog('No auth cookie found:', chrome.runtime.lastError);
-          reject('ENOTOKEN');
-        }
-      });
-    });
-  };
 
   /**
    * Sanitizes API's counter_stats.json for internal use.
@@ -76,7 +58,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    */
   app.updateStats = () => {
     return new Promise((resolve, reject) => {
-      app.getToken().then(app.api.getCounterStats).then((stats) => {
+      Cookies.getToken().then(app.api.getCounterStats).then((stats) => {
         try {
           let jstats = JSON.parse(stats);
           app.sanitizeStats(jstats);
