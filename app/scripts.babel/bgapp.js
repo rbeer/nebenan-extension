@@ -1,6 +1,6 @@
 'use strict';
 
-define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => {
+define(['alarms', 'apiclient', 'cookies', 'livereload'], (Alarms, APIClient, Cookies, lreload) => {
 
   /**
    * Background Main App
@@ -9,6 +9,7 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
   let app = {
     api: APIClient,
     cookies: Cookies,
+    alarms: null,
     /**
      * Sanitized counter_stats.json from API
      * @property {number} messages      - \# of unread messages
@@ -32,6 +33,9 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
   window.bgApp = app;
   let devlog = window.devlog = console.debug;
   // @endif
+
+  // init Alarms
+  app.alarms = new Alarms(app);
 
   /**
    * Sanitizes API's counter_stats.json for internal use.
@@ -94,15 +98,8 @@ define(['apiclient', 'cookies', 'livereload'], (APIClient, Cookies, lreload) => 
     // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
-    // periodical alarm for status updates
-    chrome.alarms.create('nebenan', { when: Date.now(), periodInMinutes: 30 });
-    chrome.alarms.onAlarm.addListener((alarm) => {
-      devlog('Alaram:', alarm);
-      app.updateStats().then(app.updateBrowserAction).catch((err) => {
-        devlog('onAlarm error:', err.code);
-        devlog(err);
-      });
-    });
+    // activate counter_stats alarm
+    app.alarms.startStatsAlarm();
 
     // listen for runtime messages
     chrome.runtime.onMessage.addListener((msg, sender, respond) => {
