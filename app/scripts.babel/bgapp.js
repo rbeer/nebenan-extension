@@ -110,32 +110,41 @@ define([
       devlog('Received runtime message:', msg);
 
       // messages from browserAction popup
-      if (msg.from === 'popupApp') {
-        // request for online-user/messages/notifications counts
-        if (msg.type === 'counter_stats') {
+      // request for online-user/messages/notifications counts
+      if (msg.from === 'popupApp' && msg.type === 'counter_stats') {
 
-          app.updateStats()
-          .then(app.updateBrowserAction)
-          .then(() => {
-            let res = {
-              from: msg.to, to: msg.from,
-              type: 'response', counter_stats: app.counter_stats
-            };
-            devlog('... responding with', res);
-            respond(res);
-          })
-          .catch((err) => {
-            switch(err.code) {
-              case 'ENOTOKEN':
-                // show login UI
-                //chrome.runtime.sendMessage();
-                devlog(err);
-                app.alarms.stopStats();
-                break;
-            }
-          });
-        }
+        app.updateStats()
+        .then(app.updateBrowserAction)
+        .then(() => {
+          let res = {
+            from: msg.to, to: msg.from,
+            type: 'response', counter_stats: app.counter_stats
+          };
+          devlog('... responding with', res);
+          respond(res);
+        })
+        .catch((err) => {
+          switch(err.code) {
+            // No auth token/cookie
+            case 'ENOTOKEN':
+              devlog(err.message);
+              // tell popup to show login UI
+              let res = {
+                from: msg.to, to: msg.from,
+                type: 'error', solution: 'showLoginUI'
+              };
+              devlog('... responding with', res);
+              respond(res);
+              // stop counter_stats API requests
+              app.alarms.stopStats();
+              break;
+          }
+        });
       }
+
+      // return true from handler to keep respond() channel open
+      // (as in, 'respect muh asynciteeh!')
+      return true;
     });
 
   });
