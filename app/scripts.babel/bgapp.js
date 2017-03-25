@@ -54,9 +54,9 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
       [ 'messages', 'new_messages_count' ],
       [ 'notifications', 'new_notifications_count' ]
     ];
-    nameMap.forEach((names) => {
-      stats[names[0]] = stats[names[1]];
-      delete stats[names[1]];
+    nameMap.forEach((namePair) => {
+      stats[namePair[0]] = parseInt(stats[namePair[1]], 10);
+      delete stats[namePair[1]];
     });
   };
 
@@ -89,9 +89,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
   app.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
 
-    let newMessages = stats.new_messages_count;
-    let newNotifications = stats.new_notifications_count;
-    let allNew = newMessages + newNotifications;
+    let allNew = stats.messages + stats.notifications;
 
     let iconPath = `images/icon-${allNew > 0 ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
