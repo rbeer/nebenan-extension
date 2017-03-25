@@ -32,29 +32,62 @@ define(() => {
        */
       this.statsPeriod = 30;
 
-      chrome.alarms.onAlarm.addListener(this.handleStatsAlarm.bind(this));
+      chrome.alarms.onAlarm.addListener(Alarms.handleAlarms.bind(this));
+    }
+
+    /**
+     * Organizes firing alarms
+     * @memberOf Alarms
+     * @static
+     * @param {Alarm} alarm - Fired alarm
+     */
+    static handleAlarms(alarm) {
+      devlog('Alarm:', alarm);
+
+      if (alarm.name === this.statsName) {
+        this.fireStats();
+      } else {
+        devlog('UNKNOWN ALARM:', alarm);
+      }
     }
 
     /**
      * Schedules periodical alarm for counter_stats
      * @memberOf Alarms
      */
-    startStatsAlarm() {
-      chrome.alarms.create(this.statsName, { when: Date.now(), periodInMinutes: this.statsPeriod });
+    startStats() {
+      devlog('Starting', this.statsName);
+      chrome.alarms.create(this.statsName, {
+        when: Date.now(),
+        periodInMinutes: this.statsPeriod
+      });
     }
 
     /**
      * Handler for counter_stats alarm
-     * @param  {Alarm} alarm - Fired alarm
+     * @memberOf Alarms
      */
-    handleStatsAlarm(alarm) {
-      devlog('Alaram:', alarm);
+    fireStats() {
+      devlog(this.statsName, 'is firing.');
+      let self = this;
       this.parentApp.updateStats()
       .then(this.parentApp.updateBrowserAction)
       .catch((err) => {
-        devlog('onAlarm error:', err.code);
-        devlog(err);
+        if (err.code === 'ENOTOKEN') {
+          devlog(err.message);
+          // stop requesting stats when there is no auth token
+          self.stopStats();
+        }
       });
+    }
+
+    /**
+     * Stops counter_stats requests
+     * @memberOf Alarms
+     */
+    stopStats() {
+      devlog('Stopping', this.statsName);
+      chrome.alarms.clear(this.statsName);
     }
 
   }

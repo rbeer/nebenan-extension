@@ -1,6 +1,10 @@
 'use strict';
 
-define(['alarms', 'apiclient', 'cookies', 'livereload'], (Alarms, APIClient, Cookies, lreload) => {
+define([
+  'alarms',
+  'apiclient',
+  'cookies',
+  'livereload'], (Alarms, APIClient, Cookies, lreload) => {
 
   /**
    * Background Main App
@@ -99,7 +103,7 @@ define(['alarms', 'apiclient', 'cookies', 'livereload'], (Alarms, APIClient, Coo
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
     // activate counter_stats alarm
-    app.alarms.startStatsAlarm();
+    app.alarms.startStats();
 
     // listen for runtime messages
     chrome.runtime.onMessage.addListener((msg, sender, respond) => {
@@ -126,6 +130,7 @@ define(['alarms', 'apiclient', 'cookies', 'livereload'], (Alarms, APIClient, Coo
                 // show login UI
                 //chrome.runtime.sendMessage();
                 devlog(err);
+                app.alarms.stopStats();
                 break;
             }
           });
