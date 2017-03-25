@@ -93,14 +93,14 @@ body {
 
 .status {
   float: right;
-  margin-top: 5px;
+  margin-top: 6px;
   font-weight: bold;
 }
 
 .status div {
   float: left;
   text-shadow: 0.3px 0.6px 0.3px rgba(33, 33, 33, 0.3);
-  padding: 7px;
+  padding: 8px;
 }
 
 .status div i {

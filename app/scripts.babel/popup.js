@@ -30,9 +30,12 @@
     }, (res) => {
       let stats = res.counter_stats;
       let statsEls = pupApp.elements.stats;
-      statsEls.users.textContent = stats.users;
-      statsEls.messages.textContent = stats.messages;
+
       statsEls.notifications.textContent = stats.notifications;
+      statsEls.messages.textContent = stats.messages;
+      statsEls.users.textContent = ((userCount) => {
+        return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
+      })(stats.users);
     });
 
   };
