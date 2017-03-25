@@ -8,7 +8,16 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    */
   let app = {
     api: APIClient,
-    counter_stats: {}
+    /**
+     * Sanitized counter_stats.json from API
+     * @property {number} messages      - \# of unread messages
+     * @property {number} notifications - \# of unread notifications (i.e. feed activity)
+     * @property {number} users         - \# of 'active' users
+     * @property {number} all           - messages + notifications (for display on browserAction badge)
+     * @type {Object}
+     * @memberOf module:bgApp
+     */
+    counter_stats: { messages: 0, notifications: 0, users: 0, all: 0 }
   };
 
   /**
@@ -46,7 +55,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
    * Sanitizes API's counter_stats.json for internal use.
    * NOTE: Mutates passed object.
    * @param  {object} stats - Parsed counter_stats.json
-   * @memberOf bgApp
+   * @memberOf module:bgApp
    */
   app.sanitizeStats = (stats) => {
     let nameMap = [
@@ -62,6 +71,7 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
 
   /**
    * Updates local stats counters
+   * @memberOf module:bgApp
    * @return {Promise}
    */
   app.updateStats = () => {
@@ -81,10 +91,8 @@ define(['apiclient', 'livereload'], (APIClient, lreload) => {
 
   /**
    * Update browserAction icon and badge
-   * @param  {object} stats counter_stats.json, received from API
-   * @param  {number} stats.hood_active_users_count
-   * @param  {number} stats.new_messages_count
-   * @param  {number} stats.new_notifications_count
+   * @param {module:bgApp.counter_stats} stats
+   * @memberOf module:bgApp
    */
   app.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
