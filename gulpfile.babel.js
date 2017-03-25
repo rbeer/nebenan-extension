@@ -144,6 +144,12 @@ gulp.task('rjs', cb => {
   rjs.on('close', cb);
 });
 
+gulp.task('docs', cb => {
+  let config = require('./.jsdoc.json');
+  gulp.src('app/scripts.babel/**/*')
+    .pipe($.jsdoc3(config, cb));
+});
+
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
