@@ -28,6 +28,9 @@
       to: 'bgApp',
       type: 'counter_stats'
     }, (res) => {
+      if (!res) {
+        return console.error(chrome.runtime.lastError);
+      }
       if (res.type === 'error') {
         return pupApp[res.solution]();
       }
