@@ -20,6 +20,7 @@ define([
      * @property {number} notifications - \# of unread notifications (i.e. feed activity)
      * @property {number} users         - \# of 'active' users
      * @property {number} all           - messages + notifications (for display on browserAction badge)
+     * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
      * @type {Object}
      * @memberOf module:bgApp
      */
@@ -29,7 +30,7 @@ define([
   /**
    * DEV/Debug mode injections
    */
-  window.devlog = () => {};
+  window.devlog = () => void 0;
 
   // @if DEV=true
   console.clear();
@@ -40,6 +41,77 @@ define([
 
   // init Alarms
   app.alarms = new Alarms(app);
+
+  /**
+   * Initializes module:bgApp
+   */
+  app.init = () => {
+    devlog('onStartup');
+    // set browserAction badge color
+    chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
+
+    // activate counter_stats alarm
+    app.alarms.startStats();
+
+    // watch for auth token cookie changes
+    app.cookies.watchToken();
+
+    // listen for runtime messages
+    chrome.runtime.onMessage.addListener(app.handleMessages);
+  };
+
+  /**
+   * Handles messages for bgApp receives
+   * @param  {object}   msg     - Any JSON conform object
+   * @param  {Sender}   sender  - Sender of the message
+   * @param  {function} respond - Callback/Response channel
+   * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel by timeout)
+   */
+  app.handleMessages = (msg, sender, respond) => {
+    devlog('Received runtime message:', msg);
+
+    // bail out, if message is not for bgApp
+    if (msg.to !== 'bgApp') {
+      return;
+    }
+
+    // messages from browserAction popup
+    // request for online-user/messages/notifications counts
+    if (msg.from === 'popupApp' && msg.type === 'counter_stats') {
+
+      app.updateStats()
+      .then(app.updateBrowserAction)
+      .then(() => {
+        let res = {
+          from: msg.to, to: msg.from,
+          type: 'response', counter_stats: app.counter_stats
+        };
+        devlog('... responding with', res);
+        respond(res);
+      })
+      .catch((err) => {
+        switch(err.code) {
+          // No auth token/cookie
+          case 'ENOTOKEN':
+            devlog(err.message);
+            // tell popup to show login UI
+            let res = {
+              from: msg.to, to: msg.from,
+              type: 'error', solution: 'showLoginUI'
+            };
+            devlog('... responding with', res);
+            respond(res);
+            // stop counter_stats API requests
+            app.alarms.stopStats();
+            break;
+        }
+      });
+    }
+
+    // return true from handler to keep respond() channel open
+    // (as in, 'respect muh asynciteeh!')
+    return true;
+  };
 
   /**
    * Sanitizes API's counter_stats.json for internal use.
@@ -97,64 +169,15 @@ define([
   };
 
   // fires when extension (i.e. user's profile) starts up
-  chrome.runtime.onStartup.addListener(() => {
-    devlog('onStartup');
-    // set browserAction badge color
-    chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
-
-    // activate counter_stats alarm
-    app.alarms.startStats();
-
-    // watch for auth token cookie changes
-    app.cookies.watchToken();
-
-    // listen for runtime messages
-    chrome.runtime.onMessage.addListener((msg, sender, respond) => {
-      devlog('Received runtime message:', msg);
-
-      // messages from browserAction popup
-      // request for online-user/messages/notifications counts
-      if (msg.from === 'popupApp' && msg.type === 'counter_stats') {
-
-        app.updateStats()
-        .then(app.updateBrowserAction)
-        .then(() => {
-          let res = {
-            from: msg.to, to: msg.from,
-            type: 'response', counter_stats: app.counter_stats
-          };
-          devlog('... responding with', res);
-          respond(res);
-        })
-        .catch((err) => {
-          switch(err.code) {
-            // No auth token/cookie
-            case 'ENOTOKEN':
-              devlog(err.message);
-              // tell popup to show login UI
-              let res = {
-                from: msg.to, to: msg.from,
-                type: 'error', solution: 'showLoginUI'
-              };
-              devlog('... responding with', res);
-              respond(res);
-              // stop counter_stats API requests
-              app.alarms.stopStats();
-              break;
-          }
-        });
-      }
-
-      // return true from handler to keep respond() channel open
-      // (as in, 'respect muh asynciteeh!')
-      return true;
-    });
-  });
+  chrome.runtime.onStartup.addListener(app.init);
 
   // fires when extension is installed or reloaded on extension page
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
-
+// @if DEV=true
+// init app on extension reloads when in dev mode
+    app.init();
+// @endif
   });
 
   return app;
