@@ -96,14 +96,17 @@ define([
     chrome.browserAction.setBadgeText({ text: allNew.toString() });
   };
 
-  chrome.runtime.onInstalled.addListener(details => {
-    devlog('onInstalled:', details);
-
+  // fires when extension (i.e. user's profile) starts up
+  chrome.runtime.onStartup.addListener(() => {
+    devlog('onStartup');
     // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
     // activate counter_stats alarm
     app.alarms.startStats();
+
+    // watch for auth token cookie changes
+    app.cookies.watchToken();
 
     // listen for runtime messages
     chrome.runtime.onMessage.addListener((msg, sender, respond) => {
@@ -146,6 +149,11 @@ define([
       // (as in, 'respect muh asynciteeh!')
       return true;
     });
+  });
+
+  // fires when extension is installed or reloaded on extension page
+  chrome.runtime.onInstalled.addListener(details => {
+    devlog('onInstalled:', details);
 
   });
 
