@@ -1,6 +1,6 @@
 'use strict';
 
-define(() => {
+define([ 'cookies' ], (Cookies) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -74,16 +74,24 @@ define(() => {
 
     /**
      * Requests counter_stats.json
+     * @property {?object} cached - Cached data; undefined if API should be called
      * @see APIClient.callAPI
      * @memberOf APIClient
      * @static
      * @return {Promise}
      */
-    static getCounterStats(token) {
-      let xhrOptions = APIClient.XHR_DEFAULTS;
-      xhrOptions.url += '/profile/counter_stats.json';
-      xhrOptions.token = token;
-      return APIClient.callAPI(xhrOptions);
+    static getCounterStats(cached) {
+      if (cached) {
+        return cached;
+      }
+      return Cookies.getToken()
+      .then((token) => {
+        let xhrOptions = APIClient.XHR_DEFAULTS;
+        xhrOptions.url += '/profile/counter_stats.json';
+        xhrOptions.token = token;
+        return xhrOptions;
+      })
+      .then(APIClient.callAPI);
     }
   };
 

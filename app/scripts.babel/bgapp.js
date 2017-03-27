@@ -3,8 +3,7 @@
 define([
   'alarms',
   'apiclient',
-  'cookies',
-  'livereload'], (Alarms, APIClient, Cookies, lreload) => {
+  'livereload'], (Alarms, APIClient, lreload) => {
 
   /**
    * Background Main App
@@ -12,19 +11,35 @@ define([
    */
   let app = {
     api: APIClient,
-    cookies: Cookies,
     alarms: null,
     /**
-     * Sanitized counter_stats.json from API
-     * @property {number} messages      - \# of unread messages
-     * @property {number} notifications - \# of unread notifications (i.e. feed activity)
-     * @property {number} users         - \# of 'active' users
-     * @property {number} all           - messages + notifications (for display on browserAction badge)
-     * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
-     * @type {Object}
-     * @memberOf module:bgApp
+     * Holds answer data from API requests and their timeout values
+     * @type {object}
      */
-    counter_stats: { messages: 0, notifications: 0, users: 0, all: 0 }
+    requestCaches: {
+      /**
+       * Sanitized counter_stats.json from API
+       * @property {object} data               - Response data
+       * @property {number} data.messages      - \# of unread messages
+       * @property {number} data.notifications - \# of unread notifications (i.e. feed activity)
+       * @property {number} data.users         - \# of 'active' users
+       * @property {number} data.all           - messages + notifications (for display on browserAction badge)
+       * @property {number} lastUpdate         - epoch timestamp of last API request
+       * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
+       * @type {Object}
+       * @memberOf module:bgApp.requestCaches
+       */
+      stats: {
+        data: { messages: 0, notifications: 0, users: 0, all: 0 },
+        lastUpdate: 0
+      },
+      /**
+       * Timeout length for cached API requests in minutes
+       * @type {Number}
+       * @memberOf module:bgApp.requestCaches
+       */
+      timeout: 1
+    }
   };
 
   /**
@@ -53,9 +68,6 @@ define([
     // activate counter_stats alarm
     app.alarms.startStats();
 
-    // watch for auth token cookie changes
-    app.cookies.watchToken();
-
     // listen for runtime messages
     chrome.runtime.onMessage.addListener(app.handleMessages);
   };
@@ -81,15 +93,16 @@ define([
 
       app.updateStats()
       .then(app.updateBrowserAction)
-      .then(() => {
+      .then((stats) => {
         let res = {
           from: msg.to, to: msg.from,
-          type: 'response', counter_stats: app.counter_stats
+          type: 'response', counter_stats: stats
         };
         devlog('... responding with', res);
         respond(res);
       })
       .catch((err) => {
+        devlog(err);
         switch(err.code) {
           // No auth token/cookie
           case 'ENOTOKEN':
@@ -132,18 +145,50 @@ define([
   };
 
   /**
+   * Checks cache timeout for requested data. Resolves with cached data if API should be omitted.
+   * @param  {string} cacheName - Must be member of module:bgApp.
+   * @return {Promise}          - Resolves with cached data if still in request timeout
+   */
+  app.getCachedDataFor = (cacheName) => {
+    let timeoutStamp = app.requestCaches[cacheName].lastUpdate +
+                       app.requestCaches.timeout * 60000000;
+    let data;
+    devlog('now:', Date.now());
+    devlog('timeout:', timeoutStamp);
+    if (Date.now() < timeoutStamp) {
+      devlog('Serving cached data for', cacheName);
+      data = app.requestCaches[cacheName].data;
+    }
+    return data;
+  };
+
+  /**
    * Updates local stats counters
    * @memberOf module:bgApp
    * @return {Promise}
    */
   app.updateStats = () => {
     return new Promise((resolve, reject) => {
-      Cookies.getToken().then(app.api.getCounterStats).then((stats) => {
+
+      // check for cached data and resolve if in reqeuest timeout
+      let cached = app.getCachedDataFor('stats');
+      if (cached) {
+        return resolve(cached);
+      }
+
+      // request data from API otherwise
+      app.api.getCounterStats()
+      .then((counter_stats) => {
         try {
-          let jstats = JSON.parse(stats);
-          app.sanitizeStats(jstats);
-          app.counter_stats = jstats;
-          resolve(jstats);
+          // parse JSON string and sanitize stats
+          let statsObj = JSON.parse(counter_stats);
+          app.sanitizeStats(statsObj);
+          // write to cache
+          app.requestCaches.stats.data = statsObj;
+          // update cache timeout
+          app.requestCaches.stats.lastUpdate = Date.now();
+
+          resolve(statsObj);
         } catch (err) {
           reject(err);
         }
@@ -154,7 +199,7 @@ define([
 
   /**
    * Update browserAction icon and badge
-   * @param {module:bgApp.counter_stats} stats
+   * @param {module:bgApp.requestCaches.stats} stats
    * @memberOf module:bgApp
    */
   app.updateBrowserAction = (stats) => {
@@ -166,6 +211,8 @@ define([
     chrome.browserAction.setIcon({ path: iconPath });
 
     chrome.browserAction.setBadgeText({ text: allNew.toString() });
+
+    return stats;
   };
 
   // fires when extension (i.e. user's profile) starts up

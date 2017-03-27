@@ -4,6 +4,8 @@ define(() => {
 
   /**
    * @class Manages cookie with auth token
+   * **NOTE: The auth token cookie is shared by site and extension.
+   * Whatever the extension does with it, affects the site's behaviour.**
    */
   class Cookies {
 
@@ -36,8 +38,8 @@ define(() => {
     }
 
     /**
-     * **Deletes cookie with auth token (a/k/a logout)**
-     * *NOTE: This also affects visiting the website directly.*
+     * Deletes cookie with auth token (a/k/a logout)
+     * **NOTE:** This also affects visiting the website directly.
      * @memberOf Cookies
      * @return {Promise}
      */
