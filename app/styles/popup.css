@@ -36,6 +36,12 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.blur-container[blur] {
+  filter: url(../images/blur.svg);
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
+}
+
 .header {
   position: absolute;
   top: 0;
@@ -53,12 +59,12 @@ body {
 
 .logo {
   float: none;
-  color: rgb(255, 255, 255);
+  color: #fff;
   cursor: pointer;
   width: 150px;
 }
 .logo:hover {
-  color: rgb(178, 202, 6);
+  color: #b2ca06;
 }
 
 .logo-icon {
@@ -116,4 +122,31 @@ body {
 }
 .status-users i:before {
   content: '\e83a';
+}
+
+.login {
+  position: absolute;
+  z-index: 2;
+  top: 150px;
+  left: 104px;
+  color: #fff;
+  height: 120px;
+  width: 120px;
+}
+
+.login i:before {
+  content: '\e82d';
+  font-size: 120px;
+  text-shadow: 1px 1px 3px #000;
+}
+
+.login-overlay {
+  position: absolute;
+  z-index: 1;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  background: rgba(33, 33, 33, 0.6);
 }
