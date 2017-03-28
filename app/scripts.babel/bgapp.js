@@ -10,7 +10,7 @@ define([
    * Background Main App
    * @module bgApp
    */
-  let app = {
+  let bgApp = {
     api: APIClient,
     alarms: null,
     /**
@@ -52,26 +52,27 @@ define([
   // @if DEV=true
   console.clear();
   console.debug('Welcome to debug mode!');
-  window.bgApp = app;
+  window.bgApp = bgApp;
   let devlog = window.devlog = console.debug;
   // @endif
 
   // init Alarms
-  app.alarms = new Alarms(app);
+  bgApp.alarms = new Alarms(bgApp);
 
   /**
    * Initializes module:bgApp
+   * @memberOf module:bgApp
    */
-  app.init = () => {
+  bgApp.init = () => {
     devlog('onStartup');
     // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
     // activate counter_stats alarm
-    app.alarms.startStats();
+    bgApp.alarms.startStats();
 
     // listen for runtime messages
-    chrome.runtime.onMessage.addListener(app.handleMessages);
+    chrome.runtime.onMessage.addListener(bgApp.handleMessages);
   };
 
   /**
@@ -79,9 +80,10 @@ define([
    * @param  {object}   msg     - Any JSON conform object
    * @param  {Sender}   sender  - Sender of the message
    * @param  {function} respond - Callback/Response channel
+   * @memberOf module:bgApp
    * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel by timeout)
    */
-  app.handleMessages = (msg, sender, respond) => {
+  bgApp.handleMessages = (msg, sender, respond) => {
     devlog('Received runtime message:', msg);
 
     // bail out, if message is not for bgApp
@@ -93,8 +95,8 @@ define([
     // request for online-user/messages/notifications counts
     if (msg.from === 'popupApp' && msg.type === 'stats') {
 
-      app.updateStats()
-      .then(app.updateBrowserAction)
+      bgApp.updateStats()
+      .then(bgAapp.updateBrowserAction)
       .then((stats) => {
         let res = {
           from: msg.to, to: msg.from,
@@ -117,7 +119,7 @@ define([
             devlog('... responding with', res);
             respond(res);
             // stop counter_stats API requests
-            app.alarms.stopStats();
+            bgApp.alarms.stopStats();
             break;
         }
       });
@@ -134,7 +136,7 @@ define([
    * @param  {object} stats - Parsed counter_stats.json
    * @memberOf module:bgApp
    */
-  app.sanitizeStats = (stats) => {
+  bgApp.sanitizeStats = (stats) => {
     let nameMap = [
       [ 'users', 'hood_active_users_count' ],
       [ 'messages', 'new_messages_count' ],
@@ -151,15 +153,15 @@ define([
    * @param  {string} cacheName - Must be member of module:bgApp.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
-  app.getCachedDataFor = (cacheName) => {
-    let timeoutStamp = app.requestCaches[cacheName].lastUpdate +
-                       app.requestCaches.timeout * 60000000;
+  bgApp.getCachedDataFor = (cacheName) => {
+    let timeoutStamp = bgApp.requestCaches[cacheName].lastUpdate +
+                       bgApp.requestCaches.timeout * 60000000;
     let data;
     devlog('now:', Date.now());
     devlog('timeout:', timeoutStamp);
     if (Date.now() < timeoutStamp) {
       devlog('Serving cached data for', cacheName);
-      data = app.requestCaches[cacheName].data;
+      data = bgApp.requestCaches[cacheName].data;
     }
     return data;
   };
@@ -169,11 +171,11 @@ define([
    * @memberOf module:bgApp
    * @return {Promise}
    */
-  app.updateStats = () => {
+  bgApp.updateStats = () => {
     return new Promise((resolve, reject) => {
 
       // check for cached data and resolve if in reqeuest timeout
-      let cached = app.getCachedDataFor('stats');
+      let cached = bgApp.getCachedDataFor('stats');
       if (cached) {
         // check whether user is logged in
         // before sending cached data
@@ -187,18 +189,18 @@ define([
       }
 
       // request data from API otherwise
-      app.api.getCounterStats()
+      bgApp.api.getCounterStats()
       .then((counter_stats) => {
         // always try, when JSON.parsing outside data sources;
         // it's an unforgiving bitch, at times ^_^
         try {
           // parse JSON string and sanitize stats
           let statsObj = JSON.parse(counter_stats);
-          app.sanitizeStats(statsObj);
+          bgApp.sanitizeStats(statsObj);
           // write to cache
-          app.requestCaches.stats.data = statsObj;
+          bgApp.requestCaches.stats.data = statsObj;
           // update cache timeout
-          app.requestCaches.stats.lastUpdate = Date.now();
+          bgApp.requestCaches.stats.lastUpdate = Date.now();
 
           resolve(statsObj);
         } catch (err) {
@@ -214,7 +216,7 @@ define([
    * @param {module:bgApp.requestCaches.stats} stats
    * @memberOf module:bgApp
    */
-  app.updateBrowserAction = (stats) => {
+  bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
 
     let allNew = stats.messages + stats.notifications;
@@ -229,17 +231,17 @@ define([
   };
 
   // fires when extension (i.e. user's profile) starts up
-  chrome.runtime.onStartup.addListener(app.init);
+  chrome.runtime.onStartup.addListener(bgApp.init);
 
   // fires when extension is installed or reloaded on extension page
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
 // @if DEV=true
-// init app on extension reloads when in dev mode
-    app.init();
+// init bgApp on extension reloads when in dev mode
+    bgApp.init();
 // @endif
   });
 
-  return app;
+  return bgApp;
 
 });
