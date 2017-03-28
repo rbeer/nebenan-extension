@@ -30,7 +30,7 @@ define(() => {
        * Timeout period for counter_stats requests in minutes
        * @type {Number}
        */
-      this.statsPeriod = 30;
+      this.statsPeriod = 1;
 
       chrome.alarms.onAlarm.addListener(Alarms.handleAlarms.bind(this));
     }
@@ -77,6 +77,9 @@ define(() => {
           devlog(err.message);
           // stop requesting stats when there is no auth token
           self.stopStats();
+          // set browserAction badge
+          chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
+          chrome.browserAction.setBadgeText({ text: '!' });
         }
       });
     }
