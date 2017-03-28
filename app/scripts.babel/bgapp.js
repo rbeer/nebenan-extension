@@ -3,7 +3,8 @@
 define([
   'alarms',
   'apiclient',
-  'livereload'], (Alarms, APIClient, lreload) => {
+  'cookies',
+  'livereload'], (Alarms, APIClient, Cookies, lreload) => {
 
   /**
    * Background Main App
@@ -39,7 +40,7 @@ define([
        * @type {Number}
        * @memberOf module:bgApp.requestCaches
        */
-      timeout: 1
+      timeout: 5
     }
   };
 
@@ -174,12 +175,24 @@ define([
       // check for cached data and resolve if in reqeuest timeout
       let cached = app.getCachedDataFor('stats');
       if (cached) {
-        return resolve(cached);
+        // check whether user is logged in
+        // before sending cached data
+        Cookies.getToken()
+        .then(() => {
+          return resolve(cached);
+        })
+        .catch((err) => {
+          devlog('Sending error albeit cached data available (logged out!)');
+          return reject(err);
+        });
+        return;
       }
 
       // request data from API otherwise
       app.api.getCounterStats()
       .then((counter_stats) => {
+        // always try, when JSON.parsing outside data sources;
+        // it's an unforgiving bitch, at times ^_^
         try {
           // parse JSON string and sanitize stats
           let statsObj = JSON.parse(counter_stats);
