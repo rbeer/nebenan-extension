@@ -26,7 +26,7 @@ define(() => {
         chrome.cookies.get(Cookies.tokenCookieIdentifier, (cookie) => {
           devlog('Token cookie:', cookie);
           if (cookie && cookie.name === 's') {
-            devlog('Resolving with:', cookie.value.substr(0, 14) + '...');
+            devlog('Auth token:', cookie.value.substr(0, 14) + '...');
             resolve(cookie.value);
           } else {
             let err = new Error('No auth token cookie found.');

@@ -178,9 +178,7 @@ define([
         // check whether user is logged in
         // before sending cached data
         Cookies.getToken()
-        .then(() => {
-          return resolve(cached);
-        })
+        .then(resolve.bind(null, cached))
         .catch((err) => {
           devlog('Sending error albeit cached data available (logged out!)');
           return reject(err);
