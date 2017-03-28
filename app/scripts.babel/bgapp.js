@@ -26,6 +26,7 @@ define([
        * @property {number} data.all           - messages + notifications (for display on browserAction badge)
        * @property {number} lastUpdate         - epoch timestamp of last API request
        * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
+       *       New property discovered @ 17/03/28: 'house_group_user_ids' is an Array.<number>, holding id's of online people from ones own apartment house?
        * @type {Object}
        * @memberOf module:bgApp.requestCaches
        */
@@ -89,14 +90,14 @@ define([
 
     // messages from browserAction popup
     // request for online-user/messages/notifications counts
-    if (msg.from === 'popupApp' && msg.type === 'counter_stats') {
+    if (msg.from === 'popupApp' && msg.type === 'stats') {
 
       app.updateStats()
       .then(app.updateBrowserAction)
       .then((stats) => {
         let res = {
           from: msg.to, to: msg.from,
-          type: 'response', counter_stats: stats
+          type: 'response', stats: stats
         };
         devlog('... responding with', res);
         respond(res);

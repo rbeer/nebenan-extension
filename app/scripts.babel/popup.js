@@ -22,11 +22,14 @@
       statsEls[name] = document.querySelector(`.status-${name} span`);
     }
 
-    // ask bgApp for status values
+    // Ask bgApp for status values
+    // ------------------------------
+    // The response will be of type "error" with solution "showLoginUI",
+    // even when cached values are available.
     chrome.runtime.sendMessage({
       from: 'popupApp',
       to: 'bgApp',
-      type: 'counter_stats'
+      type: 'stats'
     }, (res) => {
       if (!res) {
         return console.error(chrome.runtime.lastError);
@@ -34,12 +37,14 @@
       if (res.type === 'error') {
         return pupApp[res.solution]();
       }
-      let stats = res.counter_stats;
+      let stats = res.stats;
       let statsEls = pupApp.elements.stats;
 
       statsEls.notifications.textContent = stats.notifications;
       statsEls.messages.textContent = stats.messages;
       statsEls.users.textContent = (userCount => {
+        // abbreviate user counts > 999 to "1k+", "2k+", so on...
+        // (current location of status elements forces "newline" when value is > 3 chars)
         return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
       })(stats.users);
     });
