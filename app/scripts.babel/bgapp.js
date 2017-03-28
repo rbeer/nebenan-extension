@@ -211,6 +211,7 @@ define([
     let iconPath = `images/icon-${allNew > 0 ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
 
+    chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
     chrome.browserAction.setBadgeText({ text: allNew.toString() });
 
     return stats;
