@@ -23,7 +23,7 @@ define([ 'cookies' ], (Cookies) => {
      */
     static get XHR_DEFAULTS() {
       return {
-        type: 'GET',
+        method: 'GET',
         url: 'https://api.nebenan.de/api/v2',
         token: ''
       };
@@ -61,7 +61,7 @@ define([ 'cookies' ], (Cookies) => {
         };
 
         // open connection
-        xhr.open(options.type, options.url);
+        xhr.open(options.method, options.url);
 
         // set request headers
         xhr.setRequestHeader('Accept', 'application/json');
