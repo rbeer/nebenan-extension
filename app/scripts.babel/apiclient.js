@@ -39,7 +39,7 @@ define([ 'cookies' ], (Cookies) => {
     static callAPI(options) {
 
       if (!options) {
-        throw new SyntaxError('First argument must be an XHROptions object.');
+        throw new TypeError('First argument must be an XHROptions object.');
       }
 
       return new Promise((resolve, reject) => {
