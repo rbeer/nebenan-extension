@@ -2,7 +2,11 @@
 
 (() => {
 
-  let pupApp = window.popupApp = {
+  /**
+   * PopUP main app
+   * @module popupApp
+   */
+  let popupApp = window.popupApp = {
     elements: {
       stats: {
         users: null,
@@ -12,12 +16,19 @@
     }
   };
 
-  pupApp.init = () => {
+  /**
+   * Initializes main app
+   * - Gets references to DOM Elements
+   * - Sets hooks on Elements (clicks, etc.)
+   * - Sends stats-data request to module:bgApp
+   * @memberOf module:popupApp
+   */
+  popupApp.init = () => {
 
     // logo click event
-    document.querySelector('.logo').addEventListener('click', pupApp.clickLogo);
+    document.querySelector('.logo').addEventListener('click', popupApp.clickLogo);
 
-    let statsEls = pupApp.elements.stats;
+    let statsEls = popupApp.elements.stats;
     for (let name in statsEls) {
       statsEls[name] = document.querySelector(`.status-${name} span`);
     }
@@ -35,10 +46,10 @@
         return console.error(chrome.runtime.lastError);
       }
       if (res.type === 'error') {
-        return pupApp[res.solution]();
+        return popupApp[res.solution]();
       }
       let stats = res.stats;
-      let statsEls = pupApp.elements.stats;
+      let statsEls = popupApp.elements.stats;
 
       statsEls.notifications.textContent = stats.notifications;
       statsEls.messages.textContent = stats.messages;
@@ -51,18 +62,32 @@
 
   };
 
-  // logo click event handler
-  pupApp.clickLogo = (evt) => {
+  /**
+   * Handler for logo click
+   * - Opens new tab for https://nebenan.de/
+   * @param  {MouseEvent} evt
+   * @memberOf module:popupApp
+   */
+  popupApp.clickLogo = (evt) => {
     chrome.tabs.create({
       url: 'https://nebenan.de/',
       active: true
     });
   };
 
-  pupApp.showLoginUI = () => {
+  /**
+   * Handler for "logged out"-errors.
+   * - Prompts user to log in (link to /login)
+   * - Setting the token cookie from within the extension doesn't seem to work.
+   *   At least not if we want to share the cookie with the site. Cookie's domain from
+   *   within the extension would be ".nebenan.de" instead of "nebenan.de".
+   * @memberOf module:popupApp
+   */
+  popupApp.showLoginUI = () => {
     console.log('Showing login UI');
   };
 
-  document.addEventListener('DOMContentLoaded', pupApp.init);
+  // better safe than sorry ;D
+  document.addEventListener('DOMContentLoaded', popupApp.init);
 
 })();

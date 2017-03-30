@@ -16,6 +16,7 @@ define([
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
+     * @memberOf module:bgApp
      */
     requestCaches: {
       /**
@@ -46,6 +47,7 @@ define([
 
   /**
    * DEV/Debug mode injections
+   * Use `$ gulp dev` to activate
    */
   window.devlog = () => void 0;
 
@@ -61,6 +63,8 @@ define([
 
   /**
    * Initializes module:bgApp
+   * - Starts Alarm for stats
+   * - Listens to runtime messages
    * @memberOf module:bgApp
    */
   bgApp.init = () => {
@@ -76,12 +80,12 @@ define([
   };
 
   /**
-   * Handles messages for bgApp receives
+   * Handles messages for module:bgApp
    * @param  {object}   msg     - Any JSON conform object
    * @param  {Sender}   sender  - Sender of the message
    * @param  {function} respond - Callback/Response channel
    * @memberOf module:bgApp
-   * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel by timeout)
+   * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel prematurely)
    */
   bgApp.handleMessages = (msg, sender, respond) => {
     devlog('Received runtime message:', msg);
@@ -96,7 +100,7 @@ define([
     if (msg.from === 'popupApp' && msg.type === 'stats') {
 
       bgApp.updateStats()
-      .then(bgAapp.updateBrowserAction)
+      .then(bgApp.updateBrowserAction)
       .then((stats) => {
         let res = {
           from: msg.to, to: msg.from,
@@ -132,7 +136,7 @@ define([
 
   /**
    * Sanitizes API's counter_stats.json for internal use.
-   * NOTE: Mutates passed object.
+   * - **NOTE**: Mutates passed object.
    * @param  {object} stats - Parsed counter_stats.json
    * @memberOf module:bgApp
    */
@@ -149,7 +153,8 @@ define([
   };
 
   /**
-   * Checks cache timeout for requested data. Resolves with cached data if API should be omitted.
+   * Checks cache timeout for requested data.
+   * - Resolves with cached data if API should be omitted.
    * @param  {string} cacheName - Must be member of module:bgApp.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
@@ -168,6 +173,15 @@ define([
 
   /**
    * Updates local stats counters
+   * - 1 Tries to get cached data
+   * - 1.1 If cache is available: checks for auth token
+   * - 1.1.1 If auth token is available: resolves with cached data
+   * - 1.1.2 If auth token is not available: rejects with received "ENOTOKEN"
+   * - 1.2 If no cache is available: requests stats from API
+   * - 1.2.1 JSON-parses and sanitizes API response (counter_stats.json)
+   * - 1.2.2 Updates cache and cache timeout
+   * - 1.2.3 Resolves with parsed/sanitized data
+   * - 1.3 Rejects on all other errors
    * @memberOf module:bgApp
    * @return {Promise}
    */
@@ -225,7 +239,7 @@ define([
     chrome.browserAction.setIcon({ path: iconPath });
 
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
-    chrome.browserAction.setBadgeText({ text: allNew.toString() });
+    chrome.browserAction.setBadgeText({ text: allNew + '' });
 
     return stats;
   };

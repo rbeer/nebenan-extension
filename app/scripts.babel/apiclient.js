@@ -11,13 +11,14 @@ define([ 'cookies' ], (Cookies) => {
     }
 
     /**
-     * @typedef {XHROptions}
+     * @typedef XHROptions
      * @memberOf APIClient
      * @static
-     * @property {string} type       - Request type, e.g. `'GET', 'POST'`
-     * @property {string} url        - API endpoint URL to call
-     * @property {string} token      - Auth token to send with request
+     * @property {string} method - Request method, e.g. `'GET', 'POST'`
+     * @property {string} url    - API endpoint URL to call
+     * @property {string} token  - Auth token to send with request
      */
+
     /**
      * Default XHROptions
      */
@@ -33,7 +34,8 @@ define([ 'cookies' ], (Cookies) => {
      * Executes XMLHttpRequest
      * @memberOf APIClient
      * @static
-     * @param {?APIClient.XHROptions} options - Options passed to XMLHttpRequest
+     * @param  {!APIClient.XHROptions} options - Options passed to XMLHttpRequest
+     * @throws {TypeError} if (!options)
      * @return {Promise}
      */
     static callAPI(options) {

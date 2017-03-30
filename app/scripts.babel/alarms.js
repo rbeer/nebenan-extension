@@ -16,7 +16,7 @@ define(() => {
     constructor(parentApp) {
 
       /**
-       * Reference to parent (i.e. this module requiring) App
+       * Reference to parent (i.e. this module requiring) app
        * @type {module:bgApp}
        */
       this.parentApp = parentApp;
@@ -36,10 +36,12 @@ define(() => {
     }
 
     /**
-     * Organizes firing alarms
+     * Receives fired alarms and refers them to their handlers
      * @memberOf Alarms
      * @static
-     * @param {Alarm} alarm - Fired alarm
+     * @param {chrome.alarms.Alarm} alarm - Fired alarm
+     * @see [chrome.alarms.Alarm]{@link https://developer.chrome.com/extensions/alarms#type-Alarm}
+     * @this Alarms
      */
     static handleAlarms(alarm) {
       devlog('Alarm:', alarm);
@@ -77,7 +79,8 @@ define(() => {
           devlog(err.message);
           // stop requesting stats when there is no auth token
           self.stopStats();
-          // set browserAction badge
+          // set browserAction badge into error state
+          // TODO: refactor into module:ui or so? (net yet implemented!)
           chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
           chrome.browserAction.setBadgeText({ text: '!' });
         }
