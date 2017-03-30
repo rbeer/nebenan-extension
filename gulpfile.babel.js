@@ -150,6 +150,10 @@ gulp.task('docs', cb => {
     .pipe($.jsdoc3(config, cb));
 });
 
+gulp.task('watch-docs', cb => {
+  gulp.watch('app/**/*.js', ['docs']);
+});
+
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
