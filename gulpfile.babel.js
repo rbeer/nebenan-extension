@@ -98,13 +98,19 @@ gulp.task('babel', () => {
 gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/scripts']));
 
 gulp.task('watch', cb => {
+
+  let building = false;
+
   $.livereload.listen();
 
-  gulp.watch([
-    'app/**/*.*'
-  ]).on('change', () => {
-    runSequence('build',
-      () => $.livereload.reload('/var/wwn/nebenan.de/app/scripts/bgapp.js'));
+  gulp.watch([ 'app/**/*.*' ], (evt) => {
+    if (!building) {
+      building = true;
+      runSequence('build', () => {
+        building = false;
+        $.livereload.reload(evt.path);
+      });
+    }
   });
   gulp.watch('bower.json', ['wiredep']);
   cb();
