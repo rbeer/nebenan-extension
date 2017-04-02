@@ -40,6 +40,11 @@ body {
   display: none;
 }
 
+/* stop confusing MouseEvent.target */
+[aria-role="button"][action] * {
+  pointer-events: none;
+}
+
 .header {
   position: absolute;
   top: 0;
@@ -183,7 +188,7 @@ body {
   box-shadow: 1px 1px 3px #000;
 }
 
-.login-prompt .btn[action="login"] {
+.login-prompt .btn-green {
   background: #b2ca06;
   border-color: #b2ca06;
   color: #131;
@@ -191,12 +196,12 @@ body {
   border-bottom-right-radius: 0px;
 }
 
-.login-prompt .btn[action="login"]:hover {
+.login-prompt .btn-green:hover {
   background: #bad306;
   border-color: #bad306;
 }
 
-.login-prompt .btn[action="signup"] {
+.login-prompt .btn-gray {
   background: #393939;
   border-color: #393939;
   color: #fff;
@@ -204,7 +209,7 @@ body {
   border-bottom-left-radius: 0px;
 }
 
-.login-prompt .btn[action="signup"]:hover {
+.login-prompt .btn-gray:hover {
   background: #414239;
   border-color: #414239;
   color: #fff;

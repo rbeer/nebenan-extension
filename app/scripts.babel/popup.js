@@ -30,8 +30,11 @@
    */
   popupApp.init = () => {
 
-    // logo click event
-    document.querySelector('.logo').addEventListener('click', popupApp.clickLogo);
+    // hook clickable elements
+    let clickables = document.querySelectorAll('[aria-role="button"][action]');
+    for (let element of clickables) {
+      element.addEventListener('click', popupApp.handleClicks);
+    }
 
     // reference status elements
     let statsEls = popupApp.elements.stats;
@@ -76,16 +79,24 @@
   };
 
   /**
-   * Handler for logo click
-   * - Opens new tab for https://nebenan.de/
+   * Handler for DOM clicks (<* aria-role="button" action="action.value">)
+   * - newtab - Creates a new tab. The value is a path relative to https://nebenan.de/ (e.g. newtab.feed -> https://nebenan.de/feed)
    * @param  {MouseEvent} evt
    * @memberOf module:popupApp
    */
-  popupApp.clickLogo = (evt) => {
-    chrome.tabs.create({
-      url: 'https://nebenan.de/',
-      active: true
-    });
+  popupApp.handleClicks = (evt) => {
+    evt.preventDefault();
+
+    let [ action, value ] = evt.target.getAttribute('action').split('.');
+
+    if (action === 'newtab') {
+      chrome.tabs.create({
+        url: 'https://nebenan.de/' + value,
+        active: true
+      });
+    }
+
+    return false;
   };
 
   /**
