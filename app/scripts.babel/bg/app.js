@@ -1,10 +1,10 @@
 'use strict';
 
 define([
-  'alarms',
-  'apiclient',
-  'cookies',
-  'livereload'], (Alarms, APIClient, Cookies, lreload) => {
+  'bg/alarms',
+  'bg/apiclient',
+  'bg/cookies',
+  'bg/livereload'], (Alarms, APIClient, Cookies, lreload) => {
 
   /**
    * Background Main App

@@ -1,6 +1,6 @@
 ({
     baseUrl: './dist/scripts',
-    name: 'bgapp',
+    name: 'bg/app',
     out: 'dist/scripts/build/all.js',
     include: [
         '../../node_modules/almond/almond'
@@ -10,6 +10,6 @@
     wrap: {
         start: '',
         // true = load synchronously. This is a feature of almond.js
-        end: 'require(["bgapp"], null, null, true);'
+        end: 'require(["bg/app"], null, null, true);'
     }
 })

@@ -1,6 +1,6 @@
 'use strict';
 
-define([ 'cookies' ], (Cookies) => {
+define([ 'bg/cookies' ], (Cookies) => {
   /**
    * @class Client to nebenan.de API
    */
