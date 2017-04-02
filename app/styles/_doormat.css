@@ -1,0 +1,58 @@
+
+.doormat-container.hidden {
+  display: block !important;
+  transform: rotateZ(-15deg) scale(0);
+}
+
+.doormat-container {
+  position: relative;
+  width: 36px;
+  height: 20px;
+  transition: transform, width, right 0.2s ease-in;
+  transform: scale(1);
+}
+
+.doormat-container .doormat {
+  position: absolute;
+  height: 20px;
+  width: 36px;
+  border: 2px solid #a85;
+  /* border: 2px solid #aaa; */
+  border-radius: 2px;
+  /* Credits:
+      Paul Selentiny
+      http://lea.verou.me/css3patterns/#chocolate-weave
+  */
+  background: linear-gradient(45deg, #ba8 12%, transparent 0, transparent 88%, #ba8 0),
+              linear-gradient(135deg, transparent 37%, #863 0, #863 63%, transparent 0),
+              linear-gradient(45deg, transparent 37%, #ba8 0, #ba8 63%, transparent 0) #753;
+/*   background: linear-gradient(45deg, #fff 12%, transparent 0, transparent 88%, #fff 0),
+              linear-gradient(135deg, transparent 37%, #aaa 0, #aaa 63%, transparent 0),
+              linear-gradient(45deg, transparent 37%, #fff 0, #fff 63%, transparent 0) #753; */
+  background-size: 4px 4px;
+  /* -- */
+  transition: all 0.2s ease-out;
+}
+
+.doormat-container:hover .doormat {
+  width: 14px;
+  transform: translate(20px);
+}
+
+.doormat-container::after {
+  content: '';
+  background: linear-gradient(45deg, transparent 50%, #a85 50%);
+  position: absolute;
+  left: 0;
+  bottom: -5px;
+  width: 0px;
+  height: 0px;
+  box-shadow: none;
+  transition: all 0.2s ease-in;
+}
+
+.doormat-container:hover::after {
+  width: 22px;
+  height: 22px;
+  box-shadow: 1px -1px 0.3px #000;
+}

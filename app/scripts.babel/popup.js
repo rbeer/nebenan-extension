@@ -12,6 +12,11 @@
         users: null,
         messages: null,
         notifications: null
+      },
+      login: {
+        blur: null,
+        overlay: null,
+        prompt: null
       }
     }
   };
@@ -28,9 +33,16 @@
     // logo click event
     document.querySelector('.logo').addEventListener('click', popupApp.clickLogo);
 
+    // reference status elements
     let statsEls = popupApp.elements.stats;
     for (let name in statsEls) {
       statsEls[name] = document.querySelector(`.status-${name} span`);
+    }
+
+    // reference login prompt overlay elements
+    let loginEls = popupApp.elements.login;
+    for (let name in loginEls) {
+      loginEls[name] = document.querySelector(`.login-${name}`);
     }
 
     // Ask bgApp for status values
@@ -59,6 +71,7 @@
         return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
       })(stats.users);
     });
+    popupApp.showLoginUI();
 
   };
 
@@ -76,7 +89,7 @@
   };
 
   /**
-   * Handler for "logged out"-errors.
+   * Handler for ENOTOKEN-errors.
    * - Prompts user to log in (link to /login)
    * - Setting the token cookie from within the extension doesn't seem to work.
    *   At least not if we want to share the cookie with the site. Cookie's domain from
@@ -84,7 +97,10 @@
    * @memberOf module:popupApp
    */
   popupApp.showLoginUI = () => {
-    console.log('Showing login UI');
+    let elements = popupApp.elements.login;
+    elements.blur.setAttribute('blur', true);
+    elements.overlay.classList.remove('hidden');
+    elements.prompt.classList.remove('hidden');
   };
 
   // better safe than sorry ;D

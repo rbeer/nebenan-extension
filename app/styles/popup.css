@@ -3,7 +3,7 @@ body {
   padding: 50px 14px 14px 14px;
   width: 300px;
   background: rgb(237, 237, 233);
-  height: 500px;
+  height: 240px;
   font: 400 14px/20px 'Open Sans','Helvetica Neue',Arial,sans-serif;
 }
 
@@ -36,10 +36,8 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-.blur-container[blur] {
-  filter: url(../images/blur.svg);
-  filter: blur(5px);
-  -webkit-filter: blur(5px);
+.hidden {
+  display: none;
 }
 
 .header {
@@ -124,17 +122,29 @@ body {
   content: '\e83a';
 }
 
-.login {
-  position: absolute;
-  z-index: 2;
-  top: 150px;
-  left: 104px;
-  color: #fff;
-  height: 120px;
-  width: 120px;
+.login-blur[blur] {
+  filter: url(../images/blur.svg);
+  filter: blur(5px);
+  -webkit-filter: blur(5px);
 }
 
-.login i:before {
+.login-prompt {
+  position: absolute;
+  z-index: 2;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+}
+
+.login-icon {
+  color: #fff;
+  margin-top: 57px;
+  margin-bottom: 17px;
+}
+
+.login-prompt i:before {
   content: '\e82d';
   font-size: 120px;
   text-shadow: 1px 1px 3px #000;
@@ -149,4 +159,53 @@ body {
   height: 100%;
   margin: 0;
   background: rgba(33, 33, 33, 0.6);
+}
+
+.login-prompt .btn {
+  outline: 0;
+  height: 40px;
+  padding: 0 30px;
+  display: inline-block;
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 40px;
+  text-transform: uppercase;
+  text-decoration: none;
+  text-align: center;
+  border: 1px solid;
+  border-radius: 4px;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  cursor: pointer;
+  pointer-events: auto;
+  box-shadow: 1px 1px 3px #000;
+}
+
+.login-prompt .btn[action="login"] {
+  background: #b2ca06;
+  border-color: #b2ca06;
+  color: #131;
+  border-top-right-radius: 0px;
+  border-bottom-right-radius: 0px;
+}
+
+.login-prompt .btn[action="login"]:hover {
+  background: #bad306;
+  border-color: #bad306;
+}
+
+.login-prompt .btn[action="signup"] {
+  background: #393939;
+  border-color: #393939;
+  color: #fff;
+  border-top-left-radius: 0px;
+  border-bottom-left-radius: 0px;
+}
+
+.login-prompt .btn[action="signup"]:hover {
+  background: #414239;
+  border-color: #414239;
+  color: #fff;
 }
