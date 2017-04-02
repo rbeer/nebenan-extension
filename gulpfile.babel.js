@@ -83,8 +83,13 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('chromeManifest', () => {
+gulp.task('version', () => {
   return gulp.src('app/manifest.json')
+        .pipe($.jsonEditor((manifest) => {
+          // add '-dev' to version_name, if in DEV mode
+          manifest.version_name = manifest.version + (DEV ? '-dev' : '');
+          return manifest;
+        }))
         .pipe(gulp.dest('dist'));
 });
 
@@ -155,7 +160,7 @@ gulp.task('watch-docs', cb => {
 
 gulp.task('build', cb => {
   runSequence(
-    'lint', 'babel', 'chromeManifest',
+    'lint', 'babel', 'version',
     ['scripts', 'html', 'styles', 'images', 'extras'],
     'rjs', 'size', cb);
 });
