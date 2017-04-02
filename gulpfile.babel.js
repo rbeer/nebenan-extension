@@ -129,7 +129,8 @@ gulp.task('size', () => {
 gulp.task('package', () => {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.zip('nebenan-' + manifest.version + '.zip'))
+      .pipe($.if(manifest.version_name.endsWith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
+      .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
       .pipe(gulp.dest('package'));
 });
 
