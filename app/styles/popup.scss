@@ -1,0 +1,49 @@
+body {
+  margin: 0;
+  padding: 50px 14px 14px 14px;
+  width: 300px;
+  background: rgb(237, 237, 233);
+  height: 240px;
+  font: 400 14px/20px 'Open Sans','Helvetica Neue',Arial,sans-serif;
+}
+
+@font-face {
+  font-family: nebenan_icons;
+  src: url(/fonts/nebenan.woff) format('woff');
+  font-weight: 400;
+  font-style: normal
+}
+@font-face {
+  font-family: Open Sans;
+  src: url(/fonts/OpenSans.woff) format('woff');
+  font-weight: 400;
+  font-style: normal
+}
+
+.na-icon:before {
+  overflow: hidden;
+  font-family: nebenan_icons;
+  font-style: normal;
+  font-weight: 400;
+  speak: none;
+  display: inline-block;
+  text-decoration: inherit;
+  text-align: center;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1em;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.hidden {
+  display: none;
+}
+
+/* stop confusing MouseEvent.target */
+[aria-role="button"][action] * {
+  pointer-events: none;
+}
+
+@import 'popup/header';
+@import 'popup/login-prompt';

@@ -75,10 +75,13 @@ gulp.task('html', () => {
     .pipe(gulp.dest('dist'));
 });
 
-gulp.task('css', () => {
-  return gulp.src('app/**/*.css')
+gulp.task('styles', () => {
+  return gulp.src('app/styles/**/*.scss')
+    .pipe($.sourcemaps.init())
+    .pipe($.sass().on('error', $.sass.logError))
     .pipe($.cleanCss({compatibility: '*'}))
-    .pipe(gulp.dest('dist'));
+    .pipe($.sourcemaps.write())
+    .pipe(gulp.dest('dist/styles'));
 });
 
 gulp.task('chromeManifest', () => {
@@ -163,7 +166,7 @@ gulp.task('watch-docs', cb => {
 gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'chromeManifest',
-    ['scripts', 'html', 'css', 'images', 'extras'],
+    ['scripts', 'html', 'styles', 'images', 'extras'],
     'rjs', 'size', cb);
 });
 
