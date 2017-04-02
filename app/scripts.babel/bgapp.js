@@ -42,24 +42,38 @@ define([
        * @memberOf module:bgApp.requestCaches
        */
       timeout: 5
-    }
+    },
+    dev: {}
   };
 
   /**
-   * DEV/Debug mode injections
+   * DEV/Debug mode augmentations
    * Use `$ gulp dev` to activate
    */
+
+  // noop when not in dev mode
   window.devlog = () => void 0;
 
   // @if DEV=true
   console.clear();
   console.debug('Welcome to debug mode!');
-  window.bgApp = bgApp;
-  let devlog = window.devlog = console.debug;
-  // @endif
 
-  // init Alarms
-  bgApp.alarms = new Alarms(bgApp);
+  // global main app object
+  window.bgApp = bgApp;
+  /** helper functions */
+  // simulate logged out state (login overview testing)
+  bgApp.dev.forceLoggedOut = false;
+  bgApp.dev.toggleLoggedIn = (state) => {
+    let forced = bgApp.dev.forceLoggedOut;
+    bgApp.dev.forceLoggedOut = typeof state === 'boolean' ? state : !forced;
+    return bgApp.dev.forceLoggedOut ? 'Simulating logged out state!' :
+                                      'Login state according to auth token.';
+  };
+
+  // activate dev log
+  window.devlog = console.debug;
+
+  // @endif
 
   /**
    * Initializes module:bgApp
@@ -71,6 +85,9 @@ define([
     devlog('onStartup');
     // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
+
+    // init Alarms
+    bgApp.alarms = new Alarms(bgApp);
 
     // activate counter_stats alarm
     bgApp.alarms.startStats();
@@ -187,6 +204,12 @@ define([
    */
   bgApp.updateStats = () => {
     return new Promise((resolve, reject) => {
+
+      if (bgApp.dev.forceLoggedOut) {
+        let err = new Error('Simulated ENOTOKEN!');
+        err.code = 'ENOTOKEN';
+        return reject(err);
+      }
 
       // check for cached data and resolve if in reqeuest timeout
       let cached = bgApp.getCachedDataFor('stats');

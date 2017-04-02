@@ -74,7 +74,6 @@
         return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
       })(stats.users);
     });
-    popupApp.showLoginUI();
 
   };
 
