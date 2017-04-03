@@ -102,7 +102,14 @@ gulp.task('babel', () => {
       .pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/scripts']));
+gulp.task('clean', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+  del(['.tmp', 'dist', 'app/scripts', docPath, latestLink]).then(() => {
+    cb();
+  });
+});
 
 gulp.task('watch', cb => {
 
@@ -151,12 +158,17 @@ gulp.task('rjs', cb => {
 
 gulp.task('docs', cb => {
   let config = require('./.jsdoc.json');
-  gulp.src('app/scripts.babel/**/*')
-    .pipe($.jsdoc3(config, cb));
+  let pkg = require('./package.json');
+  let docPath = `./${pkg.version}`;
+  let latestPath = `docs/${pkg.name}/latest`;
+  gulp.src('app/scripts.babel/**/*.js')
+    .pipe($.jsdoc3(config, () => {
+      require('fs').symlink(docPath, latestPath, 'dir', cb);
+    }));
 });
 
 gulp.task('watch-docs', cb => {
-  gulp.watch('app/**/*.js', ['docs']);
+  gulp.watch('app/scripts.babel/**/*.js', ['docs']);
 });
 
 gulp.task('build', cb => {
