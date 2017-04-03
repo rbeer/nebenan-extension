@@ -141,7 +141,7 @@ gulp.task('package', () => {
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('rjs', cb => {
+gulp.task('requirejs', cb => {
   const spawn = require('child_process').spawn;
   let rjs = spawn('r.js', [ '-o', '.rjs' ]);
 
@@ -175,7 +175,7 @@ gulp.task('build', cb => {
   runSequence(
     'lint', 'babel', 'version',
     ['scripts', 'html', 'styles', 'images', 'extras'],
-    'rjs', 'size', cb);
+    'requirejs', 'size', cb);
 });
 
 gulp.task('dev', cb => {
