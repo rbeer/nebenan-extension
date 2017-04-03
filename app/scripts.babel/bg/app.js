@@ -4,7 +4,9 @@ define([
   'bg/alarms',
   'bg/apiclient',
   'bg/cookies',
-  'bg/livereload'], (Alarms, APIClient, Cookies, lreload) => {
+  'bg/livereload'/* @if DEV=true */,
+  'bg/dev'/* @endif */
+], (Alarms, APIClient, Cookies, lreload/* @if DEV=true */, dev/* @endif */) => {
 
   /**
    * Background Main App
@@ -42,7 +44,8 @@ define([
        * @memberOf module:bg/app.requestCaches
        */
       timeout: 5
-    }
+    }/* @if DEV=true */,
+    dev: dev/* @endif */
   };
 
   /**
@@ -54,7 +57,7 @@ define([
   window.devlog = () => void 0;
 
   // @if DEV=true
-  require(['bg/dev'], (dev) => dev.init(bgApp));
+  bgApp.dev.init(bgApp);
   // @endif
 
   /**

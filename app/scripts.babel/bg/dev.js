@@ -54,4 +54,6 @@ define(() => {
     .catch((err) => console.error('JSON parsing error,', err));
   };
 
+  return dev;
+
 });

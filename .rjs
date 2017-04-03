@@ -5,7 +5,6 @@
     include: [
         '../../node_modules/almond/almond'
     ],
-
     skipModuleInsertion: true,
     wrap: {
         start: '',

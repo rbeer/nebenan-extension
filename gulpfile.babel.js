@@ -152,7 +152,6 @@ gulp.task('package', () => {
 
 gulp.task('requirejs', cb => {
   const spawn = require('child_process').spawn;
-  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
 
   let logRjs = (data) => {
     data.toString()
@@ -160,6 +159,7 @@ gulp.task('requirejs', cb => {
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
 
+  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
   rjs.stdout.on('data', logRjs);
   rjs.stderr.on('data', logRjs);
   rjs.on('close', cb);
