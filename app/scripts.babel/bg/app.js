@@ -8,7 +8,7 @@ define([
 
   /**
    * Background Main App
-   * @module bgApp
+   * @module bg/app
    */
   let bgApp = {
     api: APIClient,
@@ -16,7 +16,7 @@ define([
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
-     * @memberOf module:bgApp
+     * @memberOf module:bg/app
      */
     requestCaches: {
       /**
@@ -27,10 +27,10 @@ define([
        * @property {number} data.users         - \# of 'active' users
        * @property {number} data.all           - messages + notifications (for display on browserAction badge)
        * @property {number} lastUpdate         - epoch timestamp of last API request
-       * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
+       * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bg/app.sanitizeStats and can be used (name tdb)
        *       New property discovered @ 17/03/28: 'house_group_user_ids' is an Array.<number>, holding id's of online people from ones own apartment house?
        * @type {Object}
-       * @memberOf module:bgApp.requestCaches
+       * @memberOf module:bg/app.requestCaches
        */
       stats: {
         data: { messages: 0, notifications: 0, users: 0, all: 0 },
@@ -39,11 +39,10 @@ define([
       /**
        * Timeout length for cached API requests in minutes
        * @type {Number}
-       * @memberOf module:bgApp.requestCaches
+       * @memberOf module:bg/app.requestCaches
        */
       timeout: 5
-    },
-    dev: {}
+    }
   };
 
   /**
@@ -55,31 +54,14 @@ define([
   window.devlog = () => void 0;
 
   // @if DEV=true
-  console.clear();
-  console.debug('Welcome to debug mode!');
-
-  // global main app object
-  window.bgApp = bgApp;
-  /** helper functions */
-  // simulate logged out state (login overview testing)
-  bgApp.dev.forceLoggedOut = false;
-  bgApp.dev.toggleLoggedIn = (state) => {
-    let forced = bgApp.dev.forceLoggedOut;
-    bgApp.dev.forceLoggedOut = typeof state === 'boolean' ? state : !forced;
-    return bgApp.dev.forceLoggedOut ? 'Simulating logged out state!' :
-                                      'Login state according to auth token.';
-  };
-
-  // activate dev log
-  window.devlog = console.debug;
-
+  require(['bg/dev'], (dev) => dev.init(bgApp));
   // @endif
 
   /**
-   * Initializes module:bgApp
+   * Initializes module:bg/app
    * - Starts Alarm for stats
    * - Listens to runtime messages
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    */
   bgApp.init = () => {
     devlog('onStartup');
@@ -97,11 +79,11 @@ define([
   };
 
   /**
-   * Handles messages for module:bgApp
+   * Handles messages for module:bg/app
    * @param  {object}   msg     - Any JSON conform object
    * @param  {Sender}   sender  - Sender of the message
    * @param  {function} respond - Callback/Response channel
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel prematurely)
    */
   bgApp.handleMessages = (msg, sender, respond) => {
@@ -155,7 +137,7 @@ define([
    * Sanitizes API's counter_stats.json for internal use.
    * - **NOTE**: Mutates passed object.
    * @param  {object} stats - Parsed counter_stats.json
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    */
   bgApp.sanitizeStats = (stats) => {
     let nameMap = [
@@ -172,7 +154,7 @@ define([
   /**
    * Checks cache timeout for requested data.
    * - Resolves with cached data if API should be omitted.
-   * @param  {string} cacheName - Must be member of module:bgApp.
+   * @param  {string} cacheName - Must be member of module:bg/app.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
@@ -199,7 +181,7 @@ define([
    * - 1.2.2 Updates cache and cache timeout
    * - 1.2.3 Resolves with parsed/sanitized data
    * - 1.3 Rejects on all other errors
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    * @return {Promise}
    */
   bgApp.updateStats = () => {
@@ -250,8 +232,8 @@ define([
 
   /**
    * Update browserAction icon and badge
-   * @param {module:bgApp.requestCaches.stats} stats
-   * @memberOf module:bgApp
+   * @param {module:bg/app.requestCaches.stats} stats
+   * @memberOf module:bg/app
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
