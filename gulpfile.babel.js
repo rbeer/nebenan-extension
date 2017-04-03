@@ -111,6 +111,15 @@ gulp.task('clean', (cb) => {
   });
 });
 
+gulp.task('clean-docs', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+  del([docPath, latestLink]).then(() => {
+    cb();
+  });
+});
+
 gulp.task('watch', cb => {
 
   let building = false;
@@ -168,7 +177,7 @@ gulp.task('docs', cb => {
 });
 
 gulp.task('watch-docs', cb => {
-  gulp.watch('app/scripts.babel/**/*.js', ['docs']);
+  gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
 });
 
 gulp.task('build', cb => {
