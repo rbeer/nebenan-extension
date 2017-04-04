@@ -159,6 +159,7 @@ define([ 'bg/cookies' ], (Cookies) => {
      * @param {NMessage} raw.hood_message          - Message that triggered the notification
      * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
      * @param {NType}    raw.notification_type_id  - Type of notification (market, feed, group, message)
+     * @param {Bool}     raw.seen                  - Whether notification has been clicked / content visited
      * @constructor
      * @return {NItem}
      */
@@ -169,7 +170,7 @@ define([ 'bg/cookies' ], (Cookies) => {
       };
 
       let subsetKeys = [
-        'id', extractMessage, 'created_at_timestamp', 'notification_type_id'
+        'id', extractMessage, 'created_at_timestamp', 'notification_type_id', 'seen'
       ];
       super(subsetKeys, raw);
     }
@@ -218,7 +219,7 @@ define([ 'bg/cookies' ], (Cookies) => {
       ];
 
       let slimUser = function() {
-        this.user = new NSubset(userSubsetKeys, raw);
+        this.user = new NSubset(userSubsetKeys, raw.user);
       };
 
       let subsetKeys = [
