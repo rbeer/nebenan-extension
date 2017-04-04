@@ -163,14 +163,16 @@ define([
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
-    let timeoutStamp = bgApp.requestCaches[cacheName].lastUpdate +
-                       bgApp.requestCaches.timeout * 60000000;
+    let expires = bgApp.requestCaches[cacheName].lastUpdate +
+                  bgApp.requestCaches.timeout * 60000000;
     let data;
-    devlog('now:', Date.now());
-    devlog('timeout:', timeoutStamp);
-    if (Date.now() < timeoutStamp) {
-      devlog('Serving cached data for', cacheName);
+    let expiresIn = expires - Date.now();
+    // use cache when not expired
+    if (expiresIn > 0) {
+      devlog(`Serving cached (${expiresIn}) data for ${cacheName}`);
       data = bgApp.requestCaches[cacheName].data;
+    } else {
+      devlog(`Cache for ${cacheName} has expired. Requesting from API...`);
     }
     return data;
   };
