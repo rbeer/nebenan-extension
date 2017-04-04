@@ -109,16 +109,22 @@ define([ 'bg/cookies' ], (Cookies) => {
 
     /**
      * Requests notifications.json
-     * @see APIClient.callAPI
+     * @param {Number} lower - UNIX epoch timestamp, ms precision; request only
+     *                         notifications older than this value
      * @memberOf APIClient
      * @static
+     * @see APIClient.callAPI
      * @return {Promise} - Resolves with response body from APIClient.callAPI
      */
-    static getNotifications() {
+    static getNotifications(lower) {
+      let per_page = 7;
       return Cookies.getToken()
       .then((token) => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/notifications.json?per_page=20';
+        xhrOptions.url += '/notifications.json?per_page=' + per_page;
+        if (lower) {
+          xhrOptions.url += '&lower=' + lower;
+        }
         xhrOptions.token = token;
         return xhrOptions;
       })
