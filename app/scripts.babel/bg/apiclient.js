@@ -249,6 +249,24 @@ define([ 'bg/cookies' ], (Cookies) => {
     static get FEED() {
       return 1200;
     }
+    /**
+     * **300** - Event/Meeting notification
+     */
+    static get EVENT() {
+      return 300;
+    }
+    /**
+     * **320** - ????????
+     */
+    /*static get () {
+      return 320;
+    }*/
+    /**
+     * **401** - Answer/Comment notification
+     */
+    static get ANSWER() {
+      return 401;
+    }
   }
 
   return APIClient;
