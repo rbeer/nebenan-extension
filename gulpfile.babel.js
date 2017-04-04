@@ -15,7 +15,7 @@ let DEV = false;
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
         .pipe($.sourcemaps.init())
-        .pipe($.uglify())
+        .pipe($.if(!DEV, $.uglify(), gutil.noop()))
         .pipe($.sourcemaps.write('.'))
         .pipe(gulp.dest('dist/scripts'));
 });
@@ -159,7 +159,8 @@ gulp.task('requirejs', cb => {
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
 
-  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
+  let rjsConfig = '.rjs' + (DEV ? '-dev' : '');
+  let rjs = spawn('r.js', [ '-o', rjsConfig ]);
   rjs.stdout.on('data', logRjs);
   rjs.stderr.on('data', logRjs);
   rjs.on('close', cb);
@@ -182,7 +183,7 @@ gulp.task('watch-docs', cb => {
 
 gulp.task('build', cb => {
   runSequence(
-    'lint', 'babel', 'version',
+    'clean', 'lint', 'babel', 'version',
     ['scripts', 'html', 'styles', 'images', 'extras'],
     'requirejs', 'size', cb);
 });
