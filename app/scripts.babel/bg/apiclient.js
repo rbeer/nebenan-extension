@@ -274,6 +274,12 @@ define([ 'bg/cookies' ], (Cookies) => {
     static get ANSWER() {
       return 401;
     }
+    /**
+     * **702** - User join notification
+     */
+    static get JOIN() {
+      return 702;
+    }
   }
 
   return APIClient;
