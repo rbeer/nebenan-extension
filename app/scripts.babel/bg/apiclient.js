@@ -10,6 +10,18 @@ define([ 'bg/cookies' ], (Cookies) => {
       this.options = APIClient.XHR_DEFAULTS;
     }
 
+    static get NItem() {
+      return NItem;
+    }
+/*
+    static get NMessage() {
+      return NMessage;
+    }
+
+    static get NType() {
+      return NType;
+    }
+*/
     /**
      * @typedef XHROptions
      * @memberOf APIClient
@@ -116,6 +128,34 @@ define([ 'bg/cookies' ], (Cookies) => {
   };
 
   /**
+   * @class Notification
+   */
+  class NItem {
+    /**
+     * Takes a raw notification object from the API and creates a subset with
+     * only the members of interest to the extension.
+     * @param {Object}   raw - Raw notification object as it comes from the API. The subset
+     *                         will consist of:
+     * @param {Number}   raw.id
+     * @param {NMessage} raw.hood_message          - Message that triggered the notification
+     * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
+     * @param {NType}    raw.notification_type_id  - Type of notification (market, feed, group, message)
+     * @memberOf APIClient
+     * @return {NItem}
+     */
+    constructor(raw) {
+
+      let subsetKeys = [
+        'id', 'hood_message', 'created_at_timestamp', 'notification_type_id'
+      ];
+      subsetKeys.forEach((key) => {
+        this[key] = raw[key];
+      });
+
+    }
+  };
+
+  /**
    * Message, linked to an NItem
    * @typedef {Object} NMessage
    * @property {Number}   id                        - Message's id
@@ -139,16 +179,6 @@ define([ 'bg/cookies' ], (Cookies) => {
    * @property {String}   user.photo_thumb_url      - Auhtor's profile image (thumbnail size)
    * @property {Number}   user.hood_id              - ID of author's hood
    * @property {String}   user.hood_title           - Name of author's hood
-   * @memberOf APIClient
-   */
-
-  /**
-   * Notification
-   * @typedef {Object} NItem
-   * @property {Number}   id
-   * @property {NMessage} hood_message          - Message that triggered the notification
-   * @property {Number}   created_at_timestamp  - UNIX epoch timestamp, millisecond precision
-   * @property {NType}    notification_type_id  - Type of notification (market, feed, group, message)
    * @memberOf APIClient
    */
 
