@@ -126,11 +126,19 @@ define([ 'bg/cookies' ], (Cookies) => {
     }
   };
 
+  class NSubset {
+    constructor(keys, raw) {
+      keys.forEach((key) => {
+        this[key] = raw[key];
+      });
+    }
+  };
+
   /**
    * @class Notification Data
    * @memberOf APIClient
    */
-  class NItem {
+  class NItem extends NSubset {
     /**
      * Takes a raw notification object from the API and creates a subset with
      * only the members of interest to the extension.
@@ -148,10 +156,7 @@ define([ 'bg/cookies' ], (Cookies) => {
       let subsetKeys = [
         'id', 'hood_message', 'created_at_timestamp', 'notification_type_id'
       ];
-      subsetKeys.forEach((key) => {
-        this[key] = raw[key];
-      });
-
+      super(subsetKeys, raw);
     }
   };
 
@@ -159,7 +164,7 @@ define([ 'bg/cookies' ], (Cookies) => {
    * @class Message, linked to an NItem
    * @memberOf APIClient
    */
-  class NMessage {
+  class NMessage extends NSubset {
 
     /**
      * Takes a raw hood_message object from the API and creates a subset with
@@ -198,10 +203,7 @@ define([ 'bg/cookies' ], (Cookies) => {
         'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
         'hood_id', 'house_group', 'user'
       ];
-
-      subsetKeys.forEach((key) => {
-        this[key] = raw[key];
-      });
+      super(subsetKeys, raw);
     }
   };
 
