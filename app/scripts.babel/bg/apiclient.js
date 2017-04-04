@@ -128,8 +128,13 @@ define([ 'bg/cookies' ], (Cookies) => {
 
   class NSubset {
     constructor(keys, raw) {
+
       keys.forEach((key) => {
-        this[key] = raw[key];
+        if (typeof key === 'function') {
+          key.bind(this)();
+        } else {
+          this[key] = raw[key];
+        }
       });
     }
   };
@@ -153,8 +158,12 @@ define([ 'bg/cookies' ], (Cookies) => {
      */
     constructor(raw) {
 
+      let extractMessage = function() {
+        this.hood_message = new NMessage(raw.hood_message);
+      };
+
       let subsetKeys = [
-        'id', 'hood_message', 'created_at_timestamp', 'notification_type_id'
+        'id', extractMessage, 'created_at_timestamp', 'notification_type_id'
       ];
       super(subsetKeys, raw);
     }
@@ -169,8 +178,8 @@ define([ 'bg/cookies' ], (Cookies) => {
     /**
      * Takes a raw hood_message object from the API and creates a subset with
      * only the members of interest to the extension.
-     * @param  {Object}     raw                           - Raw hood_message object as it comes from the API. The subset will
-     *                                                      consist of (a lot :smirk:):
+     * @param  {Object}     raw                        - Raw hood_message object as it comes from the API. The subset will
+     *                                                   consist of (a lot :smirk:):
      * @param {Number}   raw.id                        - Message's id
      * @param {Number}   raw.created                   - UNIX epoch timestamp, millisecond precision
      * @param {Number}   raw.user_id                   - Author's id
@@ -197,11 +206,20 @@ define([ 'bg/cookies' ], (Cookies) => {
      */
     constructor(raw) {
 
+      let userSubsetKeys = [
+        'id', 'firstname', 'lastname',
+        'photo_thumb_url', 'hood_id', 'hood_title'
+      ];
+
+      let slimUser = function() {
+        this.user = new NSubset(userSubsetKeys, raw);
+      };
+
       let subsetKeys = [
         'id', 'created', 'user_id',
         'body', 'subject', 'images',
         'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
-        'hood_id', 'house_group', 'user'
+        'hood_id', 'house_group', slimUser
       ];
       super(subsetKeys, raw);
     }
