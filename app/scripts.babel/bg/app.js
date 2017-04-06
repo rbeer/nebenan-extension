@@ -99,7 +99,7 @@ define([
     // request for online-user/messages/notifications counts
     if (msg.from === 'popupApp' && msg.type === 'stats') {
 
-      bgApp.updateStats()
+      bgApp.getStats()
       .then(bgApp.updateBrowserAction)
       .then((stats) => {
         let res = {
@@ -152,12 +152,10 @@ define([
 
   /**
    * Updates local stats
-   * - check whether extension has auth token value (user is logged in)
-   * - check cache
    * @memberOf module:bg/app
    * @return {Promise}
    */
-  bgApp.updateStats = () => {
+  bgApp.getStats = () => {
       // @if DEV=true
       /*if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
