@@ -5,7 +5,6 @@ define(() => {
   /**
    * @class Notification Type
    * @memberOf APIClient
-   * @throws {ReferenceError} If invoked. Class is static.
    */
   class NType {
     /**

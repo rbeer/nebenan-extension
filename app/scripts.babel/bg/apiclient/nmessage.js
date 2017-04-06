@@ -5,6 +5,7 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
   /**
    * @class Message, linked to an NItem
    * @memberOf APIClient
+   * @extends {APIClient.NSubset}
    */
   class NMessage extends NSubset {
 

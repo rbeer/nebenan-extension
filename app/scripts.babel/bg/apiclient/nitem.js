@@ -8,6 +8,7 @@ define([
   /**
    * @class Notification Data
    * @memberOf APIClient
+   * @extends {APIClient.NSubset}
    */
   class NItem extends NSubset {
     /**
