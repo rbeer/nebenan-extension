@@ -16,7 +16,7 @@ define(() => {
        * UNIX epoch tstamp (in microseconds!) of last successfull API call
        * @type {Number}
        */
-      this.lastUpdate = lastUpdate / Math.pow(10, 14) > 0 ? lastUpdate : lastUpdate * 1000;
+      this.lastUpdate = lastUpdate / 10000000000000 > 0 ? lastUpdate : lastUpdate * 1000;
 
       /**
        * Cache expiration timeout in (API compliant) microseconds
