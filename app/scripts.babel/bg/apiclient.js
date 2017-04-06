@@ -1,11 +1,11 @@
 'use strict';
 
 define([
-  'bg/cookies',
+  'bg/auth',
   'bg/apiclient/nitem',
   'bg/apiclient/nmessage',
   'bg/apiclient/ntype'
-], (Cookies, NItem, NMessage, NType) => {
+], (auth, NItem, NMessage, NType) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -102,11 +102,11 @@ define([
       if (cached) {
         return cached;
       }
-      return Cookies.getToken()
-      .then((token) => {
+      return auth.canAuthenticate()
+      .then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
         xhrOptions.url += '/profile/counter_stats.json';
-        xhrOptions.token = token;
+        xhrOptions.token = auth.token;
         return xhrOptions;
       })
       .then(APIClient.callAPI);
@@ -124,14 +124,14 @@ define([
      */
     static getNotifications(lower) {
       let per_page = 7;
-      return Cookies.getToken()
-      .then((token) => {
+      return auth.canAuthenticate()
+      .then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
         xhrOptions.url += '/notifications.json?per_page=' + per_page;
         if (lower) {
           xhrOptions.url += '&lower=' + lower;
         }
-        xhrOptions.token = token;
+        xhrOptions.token = auth.token;
         return xhrOptions;
       })
       .then(APIClient.callAPI)

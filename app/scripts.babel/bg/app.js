@@ -6,7 +6,7 @@ define([
   'bg/auth',
   'bg/livereload',
   'bg/request-cache'
-], (Alarms, APIClient, Auth, lreload, RequestCache) => {
+], (Alarms, APIClient, auth, lreload, RequestCache) => {
 
   /**
    * Background Main App
@@ -15,6 +15,7 @@ define([
   let bgApp = {
     api: APIClient,
     alarms: null,
+    auth: auth,
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
@@ -140,9 +141,9 @@ define([
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
-
     if (bgApp.requestCaches[cacheName].hasExpired) {
       devlog(`Cache for ${cacheName} has expired.`);
+      return void 0;
     } else {
       devlog(`Serving cached data for ${cacheName}`);
       return bgApp.requestCaches[cacheName].data;
@@ -150,61 +151,35 @@ define([
   };
 
   /**
-   * Updates local stats counters
-   * - 1 Tries to get cached data
-   * - 1.1 If cache is available: checks for auth token
-   * - 1.1.1 If auth token is available: resolves with cached data
-   * - 1.1.2 If auth token is not available: rejects with received "ENOTOKEN"
-   * - 1.2 If no cache is available: requests stats from API
-   * - 1.2.1 JSON-parses and sanitizes API response (counter_stats.json)
-   * - 1.2.2 Updates cache and cache timeout
-   * - 1.2.3 Resolves with parsed/sanitized data
-   * - 1.3 Rejects on all other errors
+   * Updates local stats
+   * - check whether extension has auth token value (user is logged in)
+   * - check cache
    * @memberOf module:bg/app
    * @return {Promise}
    */
   bgApp.updateStats = () => {
-    return new Promise((resolve, reject) => {
-
       // @if DEV=true
-      if (bgApp.dev.forceLoggedOut) {
+      /*if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
         err.code = 'ENOTOKEN';
         return reject(err);
-      }
+      }*/
       // @endif
 
-      // check for cached data and resolve if in reqeuest timeout
-      let cached = bgApp.getCachedDataFor('stats');
-      if (cached) {
-        // check whether user is logged in
-        // before sending cached data
-        Auth.canAuthenticate()
-        .then(resolve.bind(null, cached))
-        .catch((err) => {
-          devlog('Sending error albeit cached data available (logged out!)');
-          return reject(err);
-        });
-        return;
-      }
-
-      // request data from API otherwise
-      bgApp.api.getCounterStats()
-      .then((counter_stats) => {
-        // always try, when JSON.parsing outside data sources;
-        // it's an unforgiving bitch, at times ^_^
-        try {
-          // parse JSON string and update cache
-          let statsObj = JSON.parse(counter_stats);
-          bgApp.requestCaches.stats = new RequestCache.StatsCache(statsObj);
-
-          resolve(statsObj);
-        } catch (err) {
-          reject(err);
-        }
-      })
-      .catch(reject);
-    });
+    return bgApp.auth.canAuthenticate()                         // 1. make sure user is logged in
+          .then(bgApp.getCachedDataFor.bind(null, 'stats'))     // 2. try cached data
+          .then(bgApp.api.getCounterStats)                      //    request data from API, otherwise
+          .then((counter_stats) => {
+            // not a string? cached data!
+            if (typeof counter_stats !== 'string') {
+              return counter_stats;
+            } else {
+              // parse JSON string and update cache
+              let statsObj = JSON.parse(counter_stats);
+              bgApp.requestCaches.stats.data = statsObj;
+              return statsObj;
+            }
+          });
   };
 
   /**

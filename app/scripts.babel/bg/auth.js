@@ -21,16 +21,20 @@ define(() => {
     }
 
     /**
-     * [canAuthenticate description]
-     * @return {[type]} [description]
+     * Checks whether auth token value is available
+     * @return {Promise} - Resolves `true` or rejects with `ENOTOKEN`
      */
-    static canAuthenticate() {
+    canAuthenticate() {
+      devlog('Probing auth token value ...');
       let self = this;
       if (this.token.length > 0) {
+        devlog('Token available:', this.token.substr(0, 10));
         return new Promise((resolve) => resolve(true));
       } else {
+        devlog('No token value in memory. Asking chrome API ...');
         return Auth.getToken().then((token) => {
           self.token = token;
+          devlog('Token available:', self.token.substr(0, 10));
           return true;
         });
       }
@@ -44,9 +48,7 @@ define(() => {
     static getToken() {
       return new Promise((resolve, reject) => {
         chrome.cookies.get(Auth.tokenCookieIdentifier, (cookie) => {
-          devlog('Token cookie:', cookie);
           if (cookie && cookie.name === 's') {
-            devlog('Auth token:', cookie.value.substr(0, 14) + '...');
             resolve(cookie.value);
           } else {
             let err = new Error('No auth token cookie found.');
@@ -70,6 +72,6 @@ define(() => {
     }
   }
 
-  return Auth;
+  return new Auth();
 
 });
