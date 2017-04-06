@@ -22,19 +22,6 @@ define([
      * @memberOf module:bg/app
      */
     requestCaches: {
-      /**
-       * Sanitized counter_stats.json from API
-       * @property {object} data               - Response data
-       * @property {number} data.messages      - \# of unread messages
-       * @property {number} data.notifications - \# of unread notifications (i.e. feed activity)
-       * @property {number} data.users         - \# of 'active' users
-       * @property {number} data.all           - messages + notifications (for display on browserAction badge)
-       * @property {number} lastUpdate         - epoch timestamp of last API request
-       * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bg/app.sanitizeStats and can be used (name tdb)
-       *       New property discovered @ 17/03/28: 'house_group_user_ids' is an Array.<number>, holding id's of online people from ones own apartment house?
-       * @type {Object}
-       * @memberOf module:bg/app.requestCaches
-       */
       stats: new RequestCache.StatsCache({
         messages: 0, notifications: 0,
         users: 0, all: 0

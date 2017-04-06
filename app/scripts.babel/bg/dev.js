@@ -25,7 +25,32 @@ define(() => {
     dev.forceLoggedOut = false;
 
     // activate dev log
-    window.devlog = console.debug;
+    window.devlog = dev.log;
+  };
+
+  /**
+   * Log function for development mode
+   * - Prepends log output with [@function] tag
+   * @param  {...Object} parts - Any object you would also pass to console.debug
+   * @memberOf module:bg/dev
+   */
+  dev.log = (...parts) => {
+    parts.unshift(`[${dev.buildFunctionTag()}]`);
+    console.debug.apply(null, parts);
+  };
+
+  /**
+   * Builds `@function.doing.the_logging` tag for log outputs
+   * - Tag is derived from an error stack
+   * @memberOf module:bg/dev
+   * @return {string} Either the found `@function` tag or `not/found`
+   */
+  dev.buildFunctionTag = () => {
+    let fnRX = /at dev\.log .*\n\s*at (.+) \(/;
+    Error.stackTraceLimit = 25;
+    let stack = new Error().stack;
+    let fnMatch = stack.match(fnRX);
+    return fnMatch ? `@${fnMatch[1]}` : 'not/found';
   };
 
   /**
