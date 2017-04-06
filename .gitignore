@@ -8,5 +8,6 @@ test/bower_components
 package
 app/scripts
 docs/
+.api/
 
 *.sublime-*

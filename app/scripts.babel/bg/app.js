@@ -3,47 +3,30 @@
 define([
   'bg/alarms',
   'bg/apiclient',
-  'bg/cookies',
-  'bg/livereload'], (Alarms, APIClient, Cookies, lreload) => {
+  'bg/auth',
+  'bg/livereload',
+  'bg/request-cache'
+], (Alarms, APIClient, auth, lreload, RequestCache) => {
 
   /**
    * Background Main App
-   * @module bgApp
+   * @module bg/app
    */
   let bgApp = {
     api: APIClient,
     alarms: null,
+    auth: auth,
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
-     * @memberOf module:bgApp
+     * @memberOf module:bg/app
      */
     requestCaches: {
-      /**
-       * Sanitized counter_stats.json from API
-       * @property {object} data               - Response data
-       * @property {number} data.messages      - \# of unread messages
-       * @property {number} data.notifications - \# of unread notifications (i.e. feed activity)
-       * @property {number} data.users         - \# of 'active' users
-       * @property {number} data.all           - messages + notifications (for display on browserAction badge)
-       * @property {number} lastUpdate         - epoch timestamp of last API request
-       * @todo There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bgApp.sanitizeStats and can be used (name tdb)
-       *       New property discovered @ 17/03/28: 'house_group_user_ids' is an Array.<number>, holding id's of online people from ones own apartment house?
-       * @type {Object}
-       * @memberOf module:bgApp.requestCaches
-       */
-      stats: {
-        data: { messages: 0, notifications: 0, users: 0, all: 0 },
-        lastUpdate: 0
-      },
-      /**
-       * Timeout length for cached API requests in minutes
-       * @type {Number}
-       * @memberOf module:bgApp.requestCaches
-       */
-      timeout: 5
-    },
-    dev: {}
+      stats: new RequestCache.StatsCache({
+        messages: 0, notifications: 0,
+        users: 0, all: 0
+      }, 0)
+    }
   };
 
   /**
@@ -55,31 +38,18 @@ define([
   window.devlog = () => void 0;
 
   // @if DEV=true
-  console.clear();
-  console.debug('Welcome to debug mode!');
-
-  // global main app object
-  window.bgApp = bgApp;
-  /** helper functions */
-  // simulate logged out state (login overview testing)
-  bgApp.dev.forceLoggedOut = false;
-  bgApp.dev.toggleLoggedIn = (state) => {
-    let forced = bgApp.dev.forceLoggedOut;
-    bgApp.dev.forceLoggedOut = typeof state === 'boolean' ? state : !forced;
-    return bgApp.dev.forceLoggedOut ? 'Simulating logged out state!' :
-                                      'Login state according to auth token.';
-  };
-
-  // activate dev log
-  window.devlog = console.debug;
-
+  // included in .rjs-dev
+  require(['bg/dev'], (dev) => {
+    bgApp.dev = dev;
+    bgApp.dev.init(bgApp);
+  });
   // @endif
 
   /**
-   * Initializes module:bgApp
+   * Initializes module:bg/app
    * - Starts Alarm for stats
    * - Listens to runtime messages
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    */
   bgApp.init = () => {
     devlog('onStartup');
@@ -97,11 +67,11 @@ define([
   };
 
   /**
-   * Handles messages for module:bgApp
+   * Handles messages for module:bg/app
    * @param  {object}   msg     - Any JSON conform object
    * @param  {Sender}   sender  - Sender of the message
    * @param  {function} respond - Callback/Response channel
-   * @memberOf module:bgApp
+   * @memberOf module:bg/app
    * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel prematurely)
    */
   bgApp.handleMessages = (msg, sender, respond) => {
@@ -116,7 +86,7 @@ define([
     // request for online-user/messages/notifications counts
     if (msg.from === 'popupApp' && msg.type === 'stats') {
 
-      bgApp.updateStats()
+      bgApp.getStats()
       .then(bgApp.updateBrowserAction)
       .then((stats) => {
         let res = {
@@ -152,106 +122,55 @@ define([
   };
 
   /**
-   * Sanitizes API's counter_stats.json for internal use.
-   * - **NOTE**: Mutates passed object.
-   * @param  {object} stats - Parsed counter_stats.json
-   * @memberOf module:bgApp
-   */
-  bgApp.sanitizeStats = (stats) => {
-    let nameMap = [
-      [ 'users', 'hood_active_users_count' ],
-      [ 'messages', 'new_messages_count' ],
-      [ 'notifications', 'new_notifications_count' ]
-    ];
-    nameMap.forEach((namePair) => {
-      stats[namePair[0]] = parseInt(stats[namePair[1]], 10);
-      delete stats[namePair[1]];
-    });
-  };
-
-  /**
    * Checks cache timeout for requested data.
    * - Resolves with cached data if API should be omitted.
-   * @param  {string} cacheName - Must be member of module:bgApp.
+   * @param  {string} cacheName - Must be member of module:bg/app.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
-    let timeoutStamp = bgApp.requestCaches[cacheName].lastUpdate +
-                       bgApp.requestCaches.timeout * 60000000;
-    let data;
-    devlog('now:', Date.now());
-    devlog('timeout:', timeoutStamp);
-    if (Date.now() < timeoutStamp) {
-      devlog('Serving cached data for', cacheName);
-      data = bgApp.requestCaches[cacheName].data;
+    if (bgApp.requestCaches[cacheName].hasExpired) {
+      devlog(`Cache for ${cacheName} has expired.`);
+      return void 0;
+    } else {
+      devlog(`Serving cached data for ${cacheName}`);
+      return bgApp.requestCaches[cacheName].data;
     }
-    return data;
   };
 
   /**
-   * Updates local stats counters
-   * - 1 Tries to get cached data
-   * - 1.1 If cache is available: checks for auth token
-   * - 1.1.1 If auth token is available: resolves with cached data
-   * - 1.1.2 If auth token is not available: rejects with received "ENOTOKEN"
-   * - 1.2 If no cache is available: requests stats from API
-   * - 1.2.1 JSON-parses and sanitizes API response (counter_stats.json)
-   * - 1.2.2 Updates cache and cache timeout
-   * - 1.2.3 Resolves with parsed/sanitized data
-   * - 1.3 Rejects on all other errors
-   * @memberOf module:bgApp
+   * Updates local stats
+   * @memberOf module:bg/app
    * @return {Promise}
    */
-  bgApp.updateStats = () => {
-    return new Promise((resolve, reject) => {
-
-      if (bgApp.dev.forceLoggedOut) {
+  bgApp.getStats = () => {
+      // @if DEV=true
+      /*if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
         err.code = 'ENOTOKEN';
         return reject(err);
-      }
+      }*/
+      // @endif
 
-      // check for cached data and resolve if in reqeuest timeout
-      let cached = bgApp.getCachedDataFor('stats');
-      if (cached) {
-        // check whether user is logged in
-        // before sending cached data
-        Cookies.getToken()
-        .then(resolve.bind(null, cached))
-        .catch((err) => {
-          devlog('Sending error albeit cached data available (logged out!)');
-          return reject(err);
-        });
-        return;
-      }
-
-      // request data from API otherwise
-      bgApp.api.getCounterStats()
-      .then((counter_stats) => {
-        // always try, when JSON.parsing outside data sources;
-        // it's an unforgiving bitch, at times ^_^
-        try {
-          // parse JSON string and sanitize stats
-          let statsObj = JSON.parse(counter_stats);
-          bgApp.sanitizeStats(statsObj);
-          // write to cache
-          bgApp.requestCaches.stats.data = statsObj;
-          // update cache timeout
-          bgApp.requestCaches.stats.lastUpdate = Date.now();
-
-          resolve(statsObj);
-        } catch (err) {
-          reject(err);
-        }
-      })
-      .catch(reject);
-    });
+    return bgApp.auth.canAuthenticate()                         // 1. make sure user is logged in
+          .then(bgApp.getCachedDataFor.bind(null, 'stats'))     // 2. try cached data
+          .then(bgApp.api.getCounterStats)                      //    request data from API, otherwise
+          .then((counter_stats) => {
+            // not a string? cached data!
+            if (typeof counter_stats !== 'string') {
+              return counter_stats;
+            } else {
+              // parse JSON string and update cache
+              let statsObj = JSON.parse(counter_stats);
+              bgApp.requestCaches.stats.data = statsObj;
+              return statsObj;
+            }
+          });
   };
 
   /**
    * Update browserAction icon and badge
-   * @param {module:bgApp.requestCaches.stats} stats
-   * @memberOf module:bgApp
+   * @param {module:bg/app.requestCaches.stats} stats
+   * @memberOf module:bg/app
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
@@ -273,10 +192,8 @@ define([
   // fires when extension is installed or reloaded on extension page
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
-// @if DEV=true
-// init bgApp on extension reloads when in dev mode
+    // init bgApp on extension reloads
     bgApp.init();
-// @endif
   });
 
   return bgApp;

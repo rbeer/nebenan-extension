@@ -15,7 +15,7 @@ let DEV = false;
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
         .pipe($.sourcemaps.init())
-        .pipe($.uglify())
+        .pipe($.if(!DEV, $.uglify(), gutil.noop()))
         .pipe($.sourcemaps.write('.'))
         .pipe(gulp.dest('dist/scripts'));
 });
@@ -102,7 +102,23 @@ gulp.task('babel', () => {
       .pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/scripts']));
+gulp.task('clean', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+  del(['.tmp', 'dist', 'app/scripts', docPath, latestLink]).then(() => {
+    cb();
+  });
+});
+
+gulp.task('clean-docs', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+  del([docPath, latestLink]).then(() => {
+    cb();
+  });
+});
 
 gulp.task('watch', cb => {
 
@@ -134,9 +150,8 @@ gulp.task('package', () => {
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('rjs', cb => {
+gulp.task('requirejs', cb => {
   const spawn = require('child_process').spawn;
-  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
 
   let logRjs = (data) => {
     data.toString()
@@ -144,6 +159,8 @@ gulp.task('rjs', cb => {
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
 
+  let rjsConfig = '.rjs' + (DEV ? '-dev' : '');
+  let rjs = spawn('r.js', [ '-o', rjsConfig ]);
   rjs.stdout.on('data', logRjs);
   rjs.stderr.on('data', logRjs);
   rjs.on('close', cb);
@@ -151,19 +168,27 @@ gulp.task('rjs', cb => {
 
 gulp.task('docs', cb => {
   let config = require('./.jsdoc.json');
-  gulp.src('app/scripts.babel/**/*')
-    .pipe($.jsdoc3(config, cb));
+  let pkg = require('./package.json');
+  let docPath = `./${pkg.version}`;
+  let latestPath = `docs/${pkg.name}/latest`;
+  gulp.src('app/scripts.babel/**/*.js')
+    .pipe($.jsdoc3(config, () => {
+      require('fs').symlink(docPath, latestPath, 'dir', cb);
+    }));
 });
 
 gulp.task('watch-docs', cb => {
-  gulp.watch('app/**/*.js', ['docs']);
+  runSequence('clean-docs', 'docs', () => {
+    gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
+    cb();
+  });
 });
 
 gulp.task('build', cb => {
   runSequence(
-    'lint', 'babel', 'version',
+    'clean', 'lint', 'babel', 'version',
     ['scripts', 'html', 'styles', 'images', 'extras'],
-    'rjs', 'size', cb);
+    'requirejs', 'size', cb);
 });
 
 gulp.task('dev', cb => {

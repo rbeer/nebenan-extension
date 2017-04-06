@@ -1,6 +1,11 @@
 'use strict';
 
-define([ 'bg/cookies' ], (Cookies) => {
+define([
+  'bg/auth',
+  'bg/apiclient/nitem',
+  'bg/apiclient/nmessage',
+  'bg/apiclient/ntype'
+], (auth, NItem, NMessage, NType) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -8,6 +13,17 @@ define([ 'bg/cookies' ], (Cookies) => {
 
     constructor() {
       this.options = APIClient.XHR_DEFAULTS;
+    }
+
+    // sub classes
+    static get NItem() {
+      return NItem;
+    }
+    static get NMessage() {
+      return NMessage;
+    }
+    static get NType() {
+      return NType;
     }
 
     /**
@@ -36,7 +52,7 @@ define([ 'bg/cookies' ], (Cookies) => {
      * @static
      * @param  {!APIClient.XHROptions} options - Options passed to XMLHttpRequest
      * @throws {TypeError} if (!options)
-     * @return {Promise}
+     * @return {Promise}                       - Resolves with response body
      */
     static callAPI(options) {
 
@@ -80,20 +96,49 @@ define([ 'bg/cookies' ], (Cookies) => {
      * @see APIClient.callAPI
      * @memberOf APIClient
      * @static
-     * @return {Promise}
+     * @return {Promise} - Resolves with response body from APIClient.callAPI
      */
     static getCounterStats(cached) {
       if (cached) {
         return cached;
       }
-      return Cookies.getToken()
-      .then((token) => {
+      return auth.canAuthenticate()
+      .then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
         xhrOptions.url += '/profile/counter_stats.json';
-        xhrOptions.token = token;
+        xhrOptions.token = auth.token;
         return xhrOptions;
       })
       .then(APIClient.callAPI);
+    }
+
+    /**
+     * Requests notifications.json
+     * @param {?Number} lower - UNIX epoch timestamp, ms precision; request only
+     *                          notifications older than this value
+     * @memberOf APIClient
+     * @static
+     * @see APIClient.callAPI
+     * @return {Promise} - Resolves with Array of NItem instances, parsed from
+     *                     the response body APIClient.callAPI resolved with
+     */
+    static getNotifications(lower) {
+      let per_page = 7;
+      return auth.canAuthenticate()
+      .then(() => {
+        let xhrOptions = APIClient.XHR_DEFAULTS;
+        xhrOptions.url += '/notifications.json?per_page=' + per_page;
+        if (lower) {
+          xhrOptions.url += '&lower=' + lower;
+        }
+        xhrOptions.token = auth.token;
+        return xhrOptions;
+      })
+      .then(APIClient.callAPI)
+      .then((body) => {
+        let notifications = JSON.parse(body).notifications;
+        return notifications.map((n) => new APIClient.NItem(n));
+      });
     }
   };
 

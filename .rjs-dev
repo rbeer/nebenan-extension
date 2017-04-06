@@ -1,0 +1,16 @@
+({
+  baseUrl: './dist/scripts',
+  name: 'bg/app',
+  out: 'dist/scripts/build/all.js',
+  include: [
+    '../../node_modules/almond/almond',
+    './bg/dev'
+  ],
+  skipModuleInsertion: true,
+  optimize: "none",
+  wrap: {
+    start: '',
+    // true = load synchronously. This is a feature of almond.js
+    end: 'require(["bg/app"], null, null, true);'
+  }
+})
