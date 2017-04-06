@@ -10,6 +10,17 @@ define([ 'bg/cookies' ], (Cookies) => {
       this.options = APIClient.XHR_DEFAULTS;
     }
 
+    // sub classes
+    static get NItem() {
+      return NItem;
+    }
+    static get NMessage() {
+      return NMessage;
+    }
+    static get NType() {
+      return NType;
+    }
+
     /**
      * @typedef XHROptions
      * @memberOf APIClient
@@ -98,16 +109,22 @@ define([ 'bg/cookies' ], (Cookies) => {
 
     /**
      * Requests notifications.json
-     * @see APIClient.callAPI
+     * @param {Number} lower - UNIX epoch timestamp, ms precision; request only
+     *                         notifications older than this value
      * @memberOf APIClient
      * @static
+     * @see APIClient.callAPI
      * @return {Promise} - Resolves with response body from APIClient.callAPI
      */
-    static getNotifications() {
+    static getNotifications(lower) {
+      let per_page = 7;
       return Cookies.getToken()
       .then((token) => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/notifications.json?per_page=20';
+        xhrOptions.url += '/notifications.json?per_page=' + per_page;
+        if (lower) {
+          xhrOptions.url += '&lower=' + lower;
+        }
         xhrOptions.token = token;
         return xhrOptions;
       })
@@ -115,50 +132,171 @@ define([ 'bg/cookies' ], (Cookies) => {
     }
   };
 
-  /**
-   * Message, linked to an NItem
-   * @typedef {Object} NMessage
-   * @property {Number}   id                        - Message's id
-   * @property {Number}   created                   - UNIX epoch timestamp, millisecond precision
-   * @property {Number}   user_id                   - Author's id
-   * @property {Number}   hood_message_type_id      - ! UNKNOWN !
-   * @property {Number}   hood_message_category_id  - ! UNKNOWN !
-   * @property {?Number}  hood_group_id             - Id of group, message was posted in
-   * @property {String}   body                      - Message body
-   * @property {Number}   hood_id                   - Id of author's hood
-   * @property {String}   subject                   - Message's title
-   * @property {Bool}     house_group               - Whether message's author lives in the same house
-   * @property {Object[]} images                    - Images, embedded in post
-   * @property {Number}   images.id                 - Image's id
-   * @property {String}   images.url                - Image's url
-   * @property {String}   images.url_medium         - Image's url (medium size/thumb)
-   * @property {Object}   user                      - Message's author
-   * @property {Number}   user.id                   - Author's id
-   * @property {String}   user.firstname            - Author's first name
-   * @property {String}   user.lastname             - Author's last name (might be shortened to (\w\.) )
-   * @property {String}   user.photo_thumb_url      - Auhtor's profile image (thumbnail size)
-   * @property {Number}   user.hood_id              - ID of author's hood
-   * @property {String}   user.hood_title           - Name of author's hood
-   * @memberOf APIClient
-   */
+  class NSubset {
+    constructor(keys, raw) {
+
+      keys.forEach((key) => {
+        if (typeof key === 'function') {
+          key.bind(this)();
+        } else {
+          this[key] = raw[key];
+        }
+      });
+    }
+  };
 
   /**
-   * Notification
-   * @typedef {Object} NItem
-   * @property {Number}   id
-   * @property {NMessage} hood_message          - Message that triggered the notification
-   * @property {Number}   created_at_timestamp  - UNIX epoch timestamp, millisecond precision
-   * @property {NType}    notification_type_id  - Type of notification (market, feed, group, message)
+   * @class Notification Data
    * @memberOf APIClient
    */
+  class NItem extends NSubset {
+    /**
+     * Takes a raw notification object from the API and creates a subset with
+     * only the members of interest to the extension.
+     * @param {Object}   raw - Raw notification object as it comes from the API. The subset
+     *                         will consist of:
+     * @param {Number}   raw.id
+     * @param {NMessage} raw.hood_message          - Message that triggered the notification
+     * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
+     * @param {NType}    raw.notification_type_id  - Type of notification (market, feed, group, message)
+     * @param {Bool}     raw.seen                  - Whether notification has been clicked / content visited
+     * @constructor
+     * @return {NItem}
+     */
+    constructor(raw) {
+
+      let extractMessage = function() {
+        this.hood_message = new NMessage(raw.hood_message);
+      };
+
+      let createNType = function() {
+        this.notification_type_id = new NType(raw.notification_type_id);
+      };
+
+      let subsetKeys = [
+        'id', extractMessage, 'created_at_timestamp', createNType, 'seen'
+      ];
+      super(subsetKeys, raw);
+    }
+  };
 
   /**
-   * Notification Type, number values from API
-   * @typedef {Object} NType
-   * @property {Number} 400  - Marketplace notification
-   * @property {Number} 1200 - Feed notification
+   * @class Message, linked to an NItem
    * @memberOf APIClient
    */
+  class NMessage extends NSubset {
+
+    /**
+     * Takes a raw hood_message object from the API and creates a subset with
+     * only the members of interest to the extension.
+     * @param  {Object}     raw                        - Raw hood_message object as it comes from the API. The subset will
+     *                                                   consist of (a lot :smirk:):
+     * @param {Number}   raw.id                        - Message's id
+     * @param {Number}   raw.created                   - UNIX epoch timestamp, millisecond precision
+     * @param {Number}   raw.user_id                   - Author's id
+     * @param {Number}   raw.hood_message_type_id      - ! UNKNOWN !
+     * @param {Number}   raw.hood_message_category_id  - ! UNKNOWN !
+     * @param {?Number}  raw.hood_group_id             - Id of group, message was posted in
+     * @param {String}   raw.body                      - Message body
+     * @param {Number}   raw.hood_id                   - Id of author's hood
+     * @param {String}   raw.subject                   - Message's title
+     * @param {Bool}     raw.house_group               - Whether message's author lives in the same house
+     * @param {Object[]} raw.images                    - Images, embedded in post
+     * @param {Number}   raw.images.id                 - Image's id
+     * @param {String}   raw.images.url                - Image's url
+     * @param {String}   raw.images.url_medium         - Image's url (medium size/thumb)
+     * @param {Object}   raw.user                      - Message's author
+     * @param {Number}   raw.user.id                   - Author's id
+     * @param {String}   raw.user.firstname            - Author's first name
+     * @param {String}   raw.user.lastname             - Author's last name (might be shortened to (\w\.) )
+     * @param {String}   raw.user.photo_thumb_url      - Auhtor's profile image (thumbnail size)
+     * @param {Number}   raw.user.hood_id              - ID of author's hood
+     * @param {String}   raw.user.hood_title           - Name of author's hood
+     * @constructor
+     * @return {NMessage}
+     */
+    constructor(raw) {
+
+      let userSubsetKeys = [
+        'id', 'firstname', 'lastname',
+        'photo_thumb_url', 'hood_id', 'hood_title'
+      ];
+
+      let slimUser = function() {
+        this.user = new NSubset(userSubsetKeys, raw.user);
+      };
+
+      let subsetKeys = [
+        'id', 'created', 'user_id',
+        'body', 'subject', 'images',
+        'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
+        'hood_id', 'house_group', slimUser
+      ];
+      super(subsetKeys, raw);
+    }
+  };
+
+  /**
+   * @class Notification Type
+   * @memberOf APIClient
+   * @throws {ReferenceError} If invoked. Class is static.
+   */
+  class NType {
+    /**
+     * @constructor
+     */
+    constructor(id) {
+      this.id = id;
+      this.ntype = NType.ID_MAP[id];
+    }
+
+    static get ID_MAP() {
+      return {
+        300: 'EVENT',
+        400: 'MARKET',
+        401: 'ANSWER',
+        702: 'JOIN',
+        1200: 'FEED'
+      };
+    }
+
+    /**
+     * **400** - Marketplace notification
+     */
+    static get MARKET() {
+      return 400;
+    }
+    /**
+     * **1200** - Feed notification
+     */
+    static get FEED() {
+      return 1200;
+    }
+    /**
+     * **300** - Event/Meeting notification
+     */
+    static get EVENT() {
+      return 300;
+    }
+    /**
+     * **320** - ????????
+     */
+    /*static get () {
+      return 320;
+    }*/
+    /**
+     * **401** - Answer/Comment notification
+     */
+    static get ANSWER() {
+      return 401;
+    }
+    /**
+     * **702** - User join notification
+     */
+    static get JOIN() {
+      return 702;
+    }
+  }
 
   return APIClient;
 

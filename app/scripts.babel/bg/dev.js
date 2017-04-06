@@ -43,13 +43,18 @@ define(() => {
 
   /**
    * Test/Discover notifications.json from API
+   * @param {Number} lower - UNIX epoch timestamp, ms precision; request only
+   *                         notifications older than this value
    * @memberOf module:bg/dev
    */
-  dev.getNotifications = () => {
-    dev.bgApp.api.getNotifications()
+  dev.getNotifications = (lower) => {
+    dev.bgApp.api.getNotifications(lower)
     .then((body) => {
       let notifications = JSON.parse(body).notifications;
       devlog('notifications:', notifications);
+      notifications.forEach((notification) => {
+        devlog(new dev.bgApp.api.NItem(notification));
+      });
     })
     .catch((err) => console.error('JSON parsing error,', err));
   };
