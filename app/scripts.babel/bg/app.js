@@ -192,10 +192,8 @@ define([
   // fires when extension is installed or reloaded on extension page
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
-// @if DEV=true
-// init bgApp on extension reloads when in dev mode
+    // init bgApp on extension reloads
     bgApp.init();
-// @endif
   });
 
   return bgApp;
