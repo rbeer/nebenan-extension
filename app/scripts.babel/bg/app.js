@@ -137,24 +137,6 @@ define([
   };
 
   /**
-   * Sanitizes API's counter_stats.json for internal use.
-   * - **NOTE**: Mutates passed object.
-   * @param  {object} stats - Parsed counter_stats.json
-   * @memberOf module:bg/app
-   */
-  bgApp.sanitizeStats = (stats) => {
-    let nameMap = [
-      [ 'users', 'hood_active_users_count' ],
-      [ 'messages', 'new_messages_count' ],
-      [ 'notifications', 'new_notifications_count' ]
-    ];
-    nameMap.forEach((namePair) => {
-      stats[namePair[0]] = parseInt(stats[namePair[1]], 10);
-      delete stats[namePair[1]];
-    });
-  };
-
-  /**
    * Checks cache timeout for requested data.
    * - Resolves with cached data if API should be omitted.
    * @param  {string} cacheName - Must be member of module:bg/app.
@@ -220,13 +202,9 @@ define([
         // always try, when JSON.parsing outside data sources;
         // it's an unforgiving bitch, at times ^_^
         try {
-          // parse JSON string and sanitize stats
+          // parse JSON string and update cache
           let statsObj = JSON.parse(counter_stats);
-          bgApp.sanitizeStats(statsObj);
-          // write to cache
-          bgApp.requestCaches.stats.data = statsObj;
-          // update cache timeout
-          bgApp.requestCaches.stats.lastUpdate = Date.now();
+          bgApp.requestCaches.stats = new RequestCache.StatsCache(statsObj);
 
           resolve(statsObj);
         } catch (err) {
