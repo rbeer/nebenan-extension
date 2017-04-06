@@ -4,8 +4,9 @@ define([
   'bg/alarms',
   'bg/apiclient',
   'bg/cookies',
-  'bg/livereload'
-], (Alarms, APIClient, Cookies, lreload) => {
+  'bg/livereload',
+  'bg/request-cache'
+], (Alarms, APIClient, Cookies, lreload, RequestCache) => {
 
   /**
    * Background Main App
@@ -33,10 +34,7 @@ define([
        * @type {Object}
        * @memberOf module:bg/app.requestCaches
        */
-      stats: {
-        data: { messages: 0, notifications: 0, users: 0, all: 0 },
-        lastUpdate: 0
-      },
+      stats: new RequestCache.StatsCache({ messages: 0, notifications: 0, users: 0, all: 0 }, 0),
       /**
        * Timeout length for cached API requests in minutes
        * @type {Number}
