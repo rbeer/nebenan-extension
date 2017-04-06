@@ -37,13 +37,7 @@ define([
       stats: new RequestCache.StatsCache({
         messages: 0, notifications: 0,
         users: 0, all: 0
-      }, 0),
-      /**
-       * Timeout length for cached API requests in minutes
-       * @type {Number}
-       * @memberOf module:bg/app.requestCaches
-       */
-      timeout: 5
+      }, 0)
     }
   };
 
