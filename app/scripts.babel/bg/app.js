@@ -3,10 +3,10 @@
 define([
   'bg/alarms',
   'bg/apiclient',
-  'bg/cookies',
+  'bg/auth',
   'bg/livereload',
   'bg/request-cache'
-], (Alarms, APIClient, Cookies, lreload, RequestCache) => {
+], (Alarms, APIClient, Auth, lreload, RequestCache) => {
 
   /**
    * Background Main App
@@ -179,7 +179,7 @@ define([
       if (cached) {
         // check whether user is logged in
         // before sending cached data
-        Cookies.getToken()
+        Auth.canAuthenticate()
         .then(resolve.bind(null, cached))
         .catch((err) => {
           devlog('Sending error albeit cached data available (logged out!)');
