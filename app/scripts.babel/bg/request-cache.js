@@ -2,6 +2,10 @@
 
 define(() => {
 
+  let config = {
+    timeout: 5
+  };
+
   /**
    * @class Cached data from API requests
    */
@@ -17,6 +21,12 @@ define(() => {
        * @type {Number}
        */
       this.lastUpdate = lastUpdate;
+    }
+
+    get hasExpired() {
+      let expires = this.lastUpdate + config.timeout * 60000000;
+      let expiresIn = expires - Date.now();
+      return expiresIn <= 0;
     }
 
     static get StatsCache() {

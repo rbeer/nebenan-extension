@@ -34,7 +34,10 @@ define([
        * @type {Object}
        * @memberOf module:bg/app.requestCaches
        */
-      stats: new RequestCache.StatsCache({ messages: 0, notifications: 0, users: 0, all: 0 }, 0),
+      stats: new RequestCache.StatsCache({
+        messages: 0, notifications: 0,
+        users: 0, all: 0
+      }, 0),
       /**
        * Timeout length for cached API requests in minutes
        * @type {Number}
@@ -143,18 +146,13 @@ define([
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
-    let expires = bgApp.requestCaches[cacheName].lastUpdate +
-                  bgApp.requestCaches.timeout * 60000000;
-    let data;
-    let expiresIn = expires - Date.now();
-    // use cache when not expired
-    if (expiresIn > 0) {
-      devlog(`Serving cached (${expiresIn}) data for ${cacheName}`);
-      data = bgApp.requestCaches[cacheName].data;
+
+    if (bgApp.requestCaches[cacheName].hasExpired) {
+      devlog(`Cache for ${cacheName} has expired.`);
     } else {
-      devlog(`Cache for ${cacheName} has expired. Requesting from API...`);
+      devlog(`Serving cached data for ${cacheName}`);
+      return bgApp.requestCaches[cacheName].data;
     }
-    return data;
   };
 
   /**
