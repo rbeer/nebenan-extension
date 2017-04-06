@@ -169,8 +169,12 @@ define([ 'bg/cookies' ], (Cookies) => {
         this.hood_message = new NMessage(raw.hood_message);
       };
 
+      let createNType = function() {
+        this.notification_type_id = new NType(raw.notification_type_id);
+      };
+
       let subsetKeys = [
-        'id', extractMessage, 'created_at_timestamp', 'notification_type_id', 'seen'
+        'id', extractMessage, 'created_at_timestamp', createNType, 'seen'
       ];
       super(subsetKeys, raw);
     }
@@ -241,9 +245,21 @@ define([ 'bg/cookies' ], (Cookies) => {
     /**
      * @constructor
      */
-    constructor() {
-      throw new ReferenceError('Treat this class like a static enum!');
+    constructor(id) {
+      this.id = id;
+      this.ntype = NType.ID_MAP[id];
     }
+
+    static get ID_MAP() {
+      return {
+        300: 'EVENT',
+        400: 'MARKET',
+        401: 'ANSWER',
+        702: 'JOIN',
+        1200: 'FEED'
+      };
+    }
+
     /**
      * **400** - Marketplace notification
      */
