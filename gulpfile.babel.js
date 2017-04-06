@@ -178,7 +178,10 @@ gulp.task('docs', cb => {
 });
 
 gulp.task('watch-docs', cb => {
-  gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
+  runSequence('clean-docs', 'docs', () => {
+    gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
+    cb();
+  });
 });
 
 gulp.task('build', cb => {
