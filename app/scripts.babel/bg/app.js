@@ -4,8 +4,9 @@ define([
   'bg/alarms',
   'bg/apiclient',
   'bg/cookies',
-  'bg/livereload'
-], (Alarms, APIClient, Cookies, lreload) => {
+  'bg/livereload',
+  'bg/request-cache'
+], (Alarms, APIClient, Cookies, lreload, RequestCache) => {
 
   /**
    * Background Main App
@@ -33,16 +34,10 @@ define([
        * @type {Object}
        * @memberOf module:bg/app.requestCaches
        */
-      stats: {
-        data: { messages: 0, notifications: 0, users: 0, all: 0 },
-        lastUpdate: 0
-      },
-      /**
-       * Timeout length for cached API requests in minutes
-       * @type {Number}
-       * @memberOf module:bg/app.requestCaches
-       */
-      timeout: 5
+      stats: new RequestCache.StatsCache({
+        messages: 0, notifications: 0,
+        users: 0, all: 0
+      }, 0)
     }
   };
 
@@ -139,42 +134,19 @@ define([
   };
 
   /**
-   * Sanitizes API's counter_stats.json for internal use.
-   * - **NOTE**: Mutates passed object.
-   * @param  {object} stats - Parsed counter_stats.json
-   * @memberOf module:bg/app
-   */
-  bgApp.sanitizeStats = (stats) => {
-    let nameMap = [
-      [ 'users', 'hood_active_users_count' ],
-      [ 'messages', 'new_messages_count' ],
-      [ 'notifications', 'new_notifications_count' ]
-    ];
-    nameMap.forEach((namePair) => {
-      stats[namePair[0]] = parseInt(stats[namePair[1]], 10);
-      delete stats[namePair[1]];
-    });
-  };
-
-  /**
    * Checks cache timeout for requested data.
    * - Resolves with cached data if API should be omitted.
    * @param  {string} cacheName - Must be member of module:bg/app.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
   bgApp.getCachedDataFor = (cacheName) => {
-    let expires = bgApp.requestCaches[cacheName].lastUpdate +
-                  bgApp.requestCaches.timeout * 60000000;
-    let data;
-    let expiresIn = expires - Date.now();
-    // use cache when not expired
-    if (expiresIn > 0) {
-      devlog(`Serving cached (${expiresIn}) data for ${cacheName}`);
-      data = bgApp.requestCaches[cacheName].data;
+
+    if (bgApp.requestCaches[cacheName].hasExpired) {
+      devlog(`Cache for ${cacheName} has expired.`);
     } else {
-      devlog(`Cache for ${cacheName} has expired. Requesting from API...`);
+      devlog(`Serving cached data for ${cacheName}`);
+      return bgApp.requestCaches[cacheName].data;
     }
-    return data;
   };
 
   /**
@@ -222,13 +194,9 @@ define([
         // always try, when JSON.parsing outside data sources;
         // it's an unforgiving bitch, at times ^_^
         try {
-          // parse JSON string and sanitize stats
+          // parse JSON string and update cache
           let statsObj = JSON.parse(counter_stats);
-          bgApp.sanitizeStats(statsObj);
-          // write to cache
-          bgApp.requestCaches.stats.data = statsObj;
-          // update cache timeout
-          bgApp.requestCaches.stats.lastUpdate = Date.now();
+          bgApp.requestCaches.stats = new RequestCache.StatsCache(statsObj);
 
           resolve(statsObj);
         } catch (err) {
