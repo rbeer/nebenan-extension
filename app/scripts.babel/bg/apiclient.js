@@ -134,7 +134,11 @@ define([
         xhrOptions.token = token;
         return xhrOptions;
       })
-      .then(APIClient.callAPI);
+      .then(APIClient.callAPI)
+      .then((body) => {
+        let notifications = JSON.parse(body).notifications;
+        return notifications.map((n) => new APIClient.NItem(n));
+      });
     }
   };
 

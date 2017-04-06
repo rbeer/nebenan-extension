@@ -49,14 +49,13 @@ define(() => {
    */
   dev.getNotifications = (lower) => {
     dev.bgApp.api.getNotifications(lower)
-    .then((body) => {
-      let notifications = JSON.parse(body).notifications;
-      devlog('notifications:', notifications);
-      notifications.forEach((notification) => {
-        devlog(new dev.bgApp.api.NItem(notification));
-      });
+    .then((nitems) => {
+      devlog('nitems:', nitems);
     })
-    .catch((err) => console.error('JSON parsing error,', err));
+    .catch((err) => {
+      devlog('caught error:', err.message);
+      console.error(err);
+    });
   };
 
   return dev;
