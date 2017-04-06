@@ -194,11 +194,13 @@ define([
   bgApp.updateStats = () => {
     return new Promise((resolve, reject) => {
 
+      // @if DEV=true
       if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
         err.code = 'ENOTOKEN';
         return reject(err);
       }
+      // @endif
 
       // check for cached data and resolve if in reqeuest timeout
       let cached = bgApp.getCachedDataFor('stats');
