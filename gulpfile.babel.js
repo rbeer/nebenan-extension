@@ -159,7 +159,7 @@ gulp.task('requirejs', cb => {
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
 
-  let rjsConfig = '.rjs' + (DEV ? '-dev' : '');
+  let rjsConfig = '.rjs/background-' + (DEV ? 'dev' : 'build');
   let rjs = spawn('r.js', [ '-o', rjsConfig ]);
   rjs.stdout.on('data', logRjs);
   rjs.stderr.on('data', logRjs);
