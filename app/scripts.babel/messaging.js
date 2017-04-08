@@ -21,7 +21,7 @@ define(() => {
      * @return {Messaging}
      */
     constructor(handlers, parentId) {
-      typeError(!(handlers instanceof Array),
+      typeError(!handlers,
                 'Messaging needs a set of handlers.',
                 'ENOSETOHANDLERS');
       typeError((typeof parentId !== 'string'),
@@ -29,20 +29,52 @@ define(() => {
                 'ENOPARENTID');
       this.handlers = handlers;
       // @if DEV=true
-      this.handlers.dev = (response) => {
-        devlog('Receiving message:', response);
+      this.handlers.dev = (message, respond) => {
+        devlog('Receiving message:', message);
       };
       // @endif
       this.parentId = parentId;
-
-      devlog('Listening to incoming Messages ...');
-      chrome.runtime.onMessage.addListener(this.receive);
     }
 
-    receive(message) {
-      // @if DEV=true
-      this.handler.dev();
-      // @endif
+    static get Message() {
+      return Message;
+    }
+
+    listen() {
+      devlog('Listening to incoming Messages ...');
+      chrome.runtime.onMessage.addListener(this.receive.bind(this));
+    }
+
+    /**
+     * Receives message
+     * @param  {Object}     message -
+     * @param  {?Object}    sender  - Sender information from Chrome API
+     * @param  {?Function}  respond - Respond to message
+     * @return {Bool} - Always returns `true` to keep port open for response
+     */
+    receive(message, sender, respond) {
+      // ignore messages not for this instance
+      if (message.to === this.parentId) {
+        // handle initial messages
+        // } else {
+        // handle response messages
+        if (true) {
+          let self = this;
+          devlog(message);
+          let msg = Message.fromObject(message);
+
+          msg.handlers.forEach((handler) => {
+            self.handlers[handler].call(self, msg, respond);
+          });
+
+          // @if DEV=true
+          this.handlers.dev.call(this, msg);
+          // @endif
+
+        }
+      }
+
+      return true;
     };
 
     /**
@@ -58,14 +90,17 @@ define(() => {
       typeError(!(message instanceof Message),
                 'sendMessage expects \'message\' to be an instance of Messaging.Message.',
                 'ENOMESSAGE');
+
       let self = this;
 
-      chrome.runtime.sendMessage(message.toObject, (response) => {
+      chrome.runtime.sendMessage(message.toObject(), (response) => {
         if (!response) {
           console.error('Sending a message has failed.');
-          return console.error(chrome.runtimes.lastError);
+          return console.error(chrome.runtime.lastError);
         }
+        devlog('RESPONSE:', response);
         self.receive(response);
+        return true;
       });
     }
 
@@ -79,8 +114,9 @@ define(() => {
      * @param  {?Object}         payload  Message payload data
      */
     send(to, handlers, payload) {
+
       let m = new Message(this.parentId, to, handlers, payload);
-      Messaging.sendMessage(m);
+      Messaging.sendMessage.call(this, m);
     }
 
     static get Message() {
@@ -112,6 +148,7 @@ define(() => {
       typeError(((typeof handlers !== 'string') && !(handlers instanceof Array)),
                 'Message needs one or more handler names.',
                 'ENOHANDLER');
+
       /**
        * Name of Message sender
        * @type {!String}
@@ -147,14 +184,59 @@ define(() => {
     }
 
     /**
+     * Creates new Message instance from an Object
+     * @param  {!Object} obj - Object you want to turn into a Message
+     * @return {Messaging.Message}
+     */
+    static fromObject(obj) {
+      typeError(!obj,
+                'From what object, exactly?',
+                'ENOOBJECT');
+
+      let params = [ null ];
+      for (let key in obj) {
+        params.push(obj[key]);
+      }
+
+      let m = new (Function.prototype.bind.apply(Message, params));
+      m.trigger = obj.trigger;
+      return m;
+    }
+
+    /**
+     * Creates a response (new) Message, based on `this` instance
+     * and with passed set of handler names and payload
+     * @param  {!String|!Array.<String>} handlers - Set of handler names the receiving end
+     *                                      should handle the response Message with
+     * @param  {?Object}         payload  - Payload data, e.g. stats object on 'getStats'
+     * @return {Messaging.Message} - New instance of Message, serving as response to `this`
+     */
+    cloneForAnswer(handlers, payload) {
+      typeError(((typeof handlers !== 'string') && !(handlers instanceof Array)),
+                'Message needs one or more handler names.',
+                'ENOHANDLER');
+
+      let bareClone = {
+        sender: this.to,
+        to: this.sender,
+        handlers: (typeof handlers === 'string') ? [ handlers ] : handlers,
+        payload: payload,
+        trigger: this.toObject()
+      };
+      devlog(bareClone);
+      let clone = Message.fromObject(bareClone);
+      return clone;
+    }
+
+    /**
      * Returns instance's data as clean object.
      * @type {Object}
      */
-    get toObject() {
+    toObject() {
       let obj = {
         sender: this.sender,
         to: this.to,
-        handler: this.handler,
+        handlers: this.handlers,
         trigger: this.trigger
       };
       if (this.payload !== null) {

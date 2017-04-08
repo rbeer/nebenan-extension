@@ -5,8 +5,9 @@ define([
   'bg/apiclient',
   'bg/auth',
   'bg/livereload',
-  'bg/request-cache'
-], (Alarms, APIClient, auth, lreload, RequestCache) => {
+  'bg/request-cache',
+  'messaging'
+], (Alarms, APIClient, auth, lreload, RequestCache, Messaging) => {
 
   /**
    * Background Main App
@@ -14,8 +15,9 @@ define([
    */
   let bgApp = {
     api: APIClient,
-    alarms: null,
+    alarms: null, // -> .init()
     auth: auth,
+    messaging: null, // -> .init()
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
@@ -59,11 +61,19 @@ define([
     // init Alarms
     bgApp.alarms = new Alarms(bgApp);
 
+    // init Messaging
+    bgApp.messaging = new Messaging({
+      getStats: (msg, respond) => {
+        let response = msg.cloneForAnswer(['setStats'], bgApp.requestCaches.stats.data);
+        respond(response);
+      },
+      noop: () => devlog('noop')
+    }, 'bg/app');
+    bgApp.messaging.listen();
+
     // activate counter_stats alarm
     bgApp.alarms.startStats();
 
-    // listen for runtime messages
-    chrome.runtime.onMessage.addListener(bgApp.handleMessages);
   };
 
   /**
@@ -74,7 +84,7 @@ define([
    * @memberOf module:bg/app
    * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel prematurely)
    */
-  bgApp.handleMessages = (msg, sender, respond) => {
+/*  bgApp.handleMessages = (msg) => {
     devlog('Received runtime message:', msg);
 
     // bail out, if message is not for bgApp
@@ -119,7 +129,7 @@ define([
     // return true from handler to keep respond() channel open
     // (as in, 'respect muh asynciteeh!')
     return true;
-  };
+  };*/
 
   /**
    * Checks cache timeout for requested data.
