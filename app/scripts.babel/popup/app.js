@@ -1,6 +1,6 @@
 'use strict';
 
-(() => {
+define(() => {
 
   /**
    * PopUP main app
@@ -49,9 +49,6 @@
     }
 
     // Ask bgApp for status values
-    // ------------------------------
-    // The response will be of type "error" with solution "showLoginUI",
-    // even when cached values are available.
     chrome.runtime.sendMessage({
       from: 'popupApp',
       to: 'bgApp',
@@ -74,6 +71,11 @@
         return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
       })(stats.users);
     });
+
+    // Ask bgApp for notifications
+    // - might include older, unseen items,
+    //   not indicated by stats
+    chrome.runtime.sendMessage
 
   };
 
@@ -116,4 +118,4 @@
   // better safe than sorry ;D
   document.addEventListener('DOMContentLoaded', popupApp.init);
 
-})();
+});

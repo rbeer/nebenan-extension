@@ -1,0 +1,15 @@
+({
+  baseUrl: '../dist/scripts',
+  name: 'popup/app',
+  out: '../dist/scripts/builds/popup.js',
+  include: [
+    '../../node_modules/almond/almond'
+  ],
+  skipModuleInsertion: true,
+  optimize: "none",
+  wrap: {
+    start: '',
+    // true = load synchronously. This is a feature of almond.js
+    end: 'require(["popup/app"], null, null, true);'
+  }
+})

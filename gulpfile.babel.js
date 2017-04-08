@@ -150,7 +150,7 @@ gulp.task('package', () => {
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('requirejs', cb => {
+let requirejsTask = (type, cb) => {
   const spawn = require('child_process').spawn;
 
   let logRjs = (data) => {
@@ -159,12 +159,18 @@ gulp.task('requirejs', cb => {
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
 
-  let rjsConfig = '.rjs/background-' + (DEV ? 'dev' : 'build');
+  let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
   let rjs = spawn('r.js', [ '-o', rjsConfig ]);
   rjs.stdout.on('data', logRjs);
   rjs.stderr.on('data', logRjs);
   rjs.on('close', cb);
-});
+};
+
+gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
+
+gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
+
+gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
 
 gulp.task('docs', cb => {
   let config = require('./.jsdoc.json');
