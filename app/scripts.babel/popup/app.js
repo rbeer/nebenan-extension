@@ -71,12 +71,6 @@ define(() => {
         return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
       })(stats.users);
     });
-
-    // Ask bgApp for notifications
-    // - might include older, unseen items,
-    //   not indicated by stats
-    chrome.runtime.sendMessage
-
   };
 
   /**
