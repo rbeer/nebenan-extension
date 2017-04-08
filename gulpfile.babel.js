@@ -11,6 +11,7 @@ import preprocess from 'gulp-preprocess';
 const $ = gulpLoadPlugins();
 
 let DEV = false;
+let DOCS = false;
 
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
@@ -128,14 +129,28 @@ gulp.task('watch', cb => {
 
   gulp.watch([ 'app/**/*.*' ], (evt) => {
     if (!building) {
+      let buildTasks = [
+        'build',
+        () => {
+          building = false;
+          $.livereload.reload(evt.path);
+        }
+      ];
+      if (DOCS) {
+        buildTasks.splice(buildTasks.length - 2, 'docs');
+      }
       building = true;
-      runSequence('build', () => {
-        building = false;
-        $.livereload.reload(evt.path);
-      });
+      runSequence.apply(null, buildTasks);
     }
   });
   cb();
+});
+
+gulp.task('watch-docs', cb => {
+  runSequence('clean-docs', 'docs', () => {
+    gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
+    cb();
+  });
 });
 
 gulp.task('size', () => {
@@ -174,6 +189,9 @@ gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
 
 gulp.task('docs', cb => {
   let config = require('./.jsdoc.json');
+  if (DOCS) {
+    config.opts.verbose = false;
+  }
   let pkg = require('./package.json');
   let docPath = `./${pkg.version}`;
   let latestPath = `docs/${pkg.name}/latest`;
@@ -183,23 +201,25 @@ gulp.task('docs', cb => {
     }));
 });
 
-gulp.task('watch-docs', cb => {
-  runSequence('clean-docs', 'docs', () => {
-    gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
-    cb();
-  });
-});
-
 gulp.task('build', cb => {
-  runSequence(
+  DOCS = DOCS || process.argv.includes('--with-docs');
+
+  let buildTasks = [
     'clean', 'lint', 'babel', 'version',
     ['scripts', 'html', 'styles', 'images', 'extras'],
-    'requirejs', 'size', cb);
+    'requirejs', 'size', cb
+  ];
+  if (DOCS) {
+    buildTasks.splice(buildTasks.length - 2, 0, 'docs');
+  }
+
+  runSequence.apply(null, buildTasks);
 });
 
 gulp.task('dev', cb => {
   DEV = true;
-  runSequence('clean', 'build', 'watch', cb);
+  DOCS = true;
+  runSequence('build', 'watch', cb);
 });
 
 gulp.task('default', ['clean'], cb => {
