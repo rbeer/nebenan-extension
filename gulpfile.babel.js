@@ -16,9 +16,11 @@ const $ = gulpLoadPlugins();
 // - Watch out for the preprocess() parts in
 //   script files! A search for `// @` over
 //   `/app/scripts.babel/` should reveal them all.
-let DEV = false;
+let DEV = process.argv.includes('--dev');
 // Whether to include docs generation
-let DOCS = false;
+let DOCS = process.argv.includes('--with-docs');
+// Generate lodash library, no matter what
+let LODASH = process.argv.includes('--with-lodash');
 
 //---------------------------------\
 // The Good, The Bad, The Scritps
@@ -55,6 +57,7 @@ gulp.task('extras', () => {
     'app/*.*',
     'app/_locales/**',
     'app/fonts/*.*',
+    '!app/*.js',
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html'
@@ -131,7 +134,12 @@ gulp.task('clean', (cb) => {
   let pkg = require('./package.json');
   let docPath = `docs/${pkg.name}/${pkg.version}`;
   let latestLink = `docs/${pkg.name}/latest`;
-  del(['.tmp', 'dist', 'app/scripts', docPath, latestLink]).then(() => {
+
+  let delPaths = ['dist', 'app/scripts', docPath, latestLink];
+  if (LODASH) {
+    delPaths.push('app/lodash.js');
+  }
+  del(delPaths).then(() => {
     cb();
   });
 });
@@ -174,38 +182,67 @@ gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
 
 gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
 
+let copyLodash = (path) => {
+  return gulp.src(path)
+             .pipe(gulp.dest('dist/scripts'));
+};
+
 // lodash
 gulp.task('lodash', cb => {
+
+  const fs = require('fs');
 
   // require lodash-cli arguments
   let argsObj = require('./.lodash.json');
 
-  // ES strict mode; ftw
-  let args = ['strict'];
-  // dev = output only non-minified
-  // production = output only minified
-  args.push(DEV || process.argv.includes('--devdash') ? '-d' : '-p');
+  let generate = () => {
+    gutil.log('Generating NEW lodash library');
 
-  // add to spawn() args array from required object
-  for (let arg in argsObj) {
-    // arguments with leading dash(es)
-    // aren't concatenated to their values, ...
-    if (arg.startsWith('-')) {
-      args.push(arg);
-      // .. some don't even have a value
-      if (argsObj[arg]) {
-        args.push(argsObj[arg]);
+    // ES strict mode; ftw
+    let args = ['strict'];
+    // dev = output only non-minified
+    // production = output only minified
+    args.push(DEV ? '-d' : '-p');
+
+    // add to spawn() args array from required object
+    for (let arg in argsObj) {
+      // arguments with leading dash(es)
+      // aren't concatenated to their values, ...
+      if (arg.startsWith('-')) {
+        args.push(arg);
+        // .. some don't even have a value
+        if (argsObj[arg]) {
+          args.push(argsObj[arg]);
+        }
+      } else {
+        let argString = arg + '=' + argsObj[arg];
+        args.push(argString);
       }
-    } else {
-      let argString = arg + '=' + argsObj[arg];
-      args.push(argString);
     }
+
+    // run lodash-cli
+    runProcess('lodash', args, () => {
+      copyLodash(argsObj['-o']);
+      cb();
+    });
+  };
+
+  // try to only copy file in dev mode
+  // (generation takes 10s+)
+  if (DEV && !LODASH) {
+    return fs.access(argsObj['-o'], (err) => {
+      // file DOES exist
+      if (!err) {
+        gutil.log('Using lodash COPY');
+        copyLodash(argsObj['-o']);
+        return cb();
+      }
+      // file does not exist
+      generate();
+    });
   }
-
-  console.log('lodash args:', args);
-
-  // run lodash-cli
-  runProcess('lodash', args, cb);
+  // generate library on normal `build`s
+  generate();
 });
 
 //---------------------------\
@@ -220,7 +257,7 @@ gulp.task('watch', cb => {
   gulp.watch([ 'app/**/*.*' ], (evt) => {
     if (!building) {
       let buildTasks = [
-        'build',
+        'clean', 'build',
         () => {
           building = false;
           $.livereload.reload(evt.path);
@@ -260,17 +297,13 @@ gulp.task('build', cb => {
   DOCS = DOCS || process.argv.includes('--with-docs');
 
   let buildTasks = [
-    'clean', 'lint', 'babel', 'version',
-    ['scripts', 'html', 'styles', 'images', 'extras'],
+    'lint', 'babel', 'scripts', 'lodash', 'version',
+    ['html', 'styles', 'images', 'extras'],
     'requirejs', 'size', cb
   ];
   // build with docs
   if (DOCS) {
     buildTasks.splice(buildTasks.length - 2, 0, 'docs');
-  }
-  // build with lodash
-  if (process.argv.includes('--with-lodash')) {
-    buildTasks.splice(5, 0, 'lodash');
   }
 
   runSequence.apply(null, buildTasks);
@@ -293,7 +326,7 @@ gulp.task('docs', cb => {
 gulp.task('dev', cb => {
   DEV = true;
   DOCS = true;
-  runSequence('build', 'watch', cb);
+  runSequence('clean', 'build', 'watch', cb);
 });
 
 gulp.task('package', () => {
