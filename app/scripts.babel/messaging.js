@@ -16,8 +16,9 @@ define(['lodash'], (_) => {
   class Messaging {
 
     /**
-     * @param  {!Object.<String, Function>} handlers -
-     * @param  {!String} parentId - Module id of parent, serving as sender
+     * @param  {!Object.<String, Function>} handlers - Set of handlers, Messages can
+     *                                                 request to be handled by
+     * @param  {!String}                    parentId - Module id of parent, serving as sender
      * @return {Messaging}
      */
     constructor(handlers, parentId) {
@@ -47,7 +48,7 @@ define(['lodash'], (_) => {
 
     /**
      * Receives message
-     * @param  {Object}     message -
+     * @param  {Object}     message - Message object (not yet an instance!), received
      * @param  {?Object}    sender  - Sender information from Chrome API
      * @param  {?Function}  respond - Respond to message
      * @return {Bool} - Always returns `true` to keep port open for response
@@ -60,13 +61,13 @@ define(['lodash'], (_) => {
         // handle response messages
         if (true) {
           let self = this;
-          devlog(message);
+          // create Message instance
           let msg = Message.fromObject(message);
 
           // find matching handlers (intersection available/requested)
-          console.log(_.intersect);
+          let mhandlers = _.intersection(msg.handlers, Object.keys(this.handlers));
 
-          msg.handlers.forEach((handler) => {
+          mhandlers.forEach((handler) => {
             self.handlers[handler].call(self, msg, respond);
           });
 
