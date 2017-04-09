@@ -43,35 +43,34 @@
   }
 
   .btn-green {
-    background: #b2ca06;
-    border-color: #b2ca06;
-    color: #131;
+    background: $BTN_GREEN_BG;
+    border-color: $BTN_GREEN_BG;
+    color: $BTN_GREEN_TEXT;
     border-top-right-radius: 0px;
     border-bottom-right-radius: 0px;
   }
 
   .btn-green:hover {
-    background: #bad306;
-    border-color: #bad306;
+    background: $BTN_GREEN_HOVER_BG;
+    border-color: $BTN_GREEN_HOVER_BG;
   }
 
   .btn-gray {
-    background: #393939;
-    border-color: #393939;
-    color: #fff;
+    background: $BTN_GRAY_BG;
+    border-color: $BTN_GRAY_BG;
+    color: $BTN_GRAY_TEXT;
     border-top-left-radius: 0px;
     border-bottom-left-radius: 0px;
   }
 
   .btn-gray:hover {
-    background: #414239;
-    border-color: #414239;
-    color: #fff;
+    background: $BTN_GRAY_HOVER_BG;
+    border-color: $BTN_GRAY_HOVER_BG;
   }
 }
 
 .login-icon {
-  color: #fff;
+  color: $TEXT_WHITE;
   margin-top: 57px;
   margin-bottom: 17px;
 }
