@@ -12,6 +12,9 @@ $BTN_GREEN_TEXT: #131;
 $BTN_GRAY_BG: #393939;
 $BTN_GRAY_HOVER_BG: #414239;
 $BTN_GRAY_TEXT: #fff;
+
+$SCROLLBAR_GRADIENT_1: $BTN_GREEN_BG;
+$SCROLLBAR_GRADIENT_2: $BTN_GREEN_HOVER_BG;
 /** --------- **/
 
 /** MAIN LAYOUT **/
@@ -66,3 +69,38 @@ body {
 @import 'popup/header';
 /** Login Prompt; showing when user is not logged in **/
 @import 'popup/login-prompt';
+
+/** Notification List **/
+.nlist {
+  -webkit-padding-start: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  max-height: 340px;
+  list-style-type: none;
+  box-shadow: 0.3px 0.3px 0.3px rgba(0, 0, 0, 0.6);
+  overflow-x: hidden;
+  overflow-y: overlay;
+
+  &::-webkit-scrollbar {
+    width: 7px;
+  }
+  &::-webkit-scrollbar-track {
+    background: $BG_LIGHT;
+    border-radius: 7px;
+  }
+  &::-webkit-scrollbar-thumb {
+    border-radius: 7px;
+    -webkit-box-shadow: 0 0 6px inset rgba(0, 0, 0, 0.3);
+    background: -webkit-linear-gradient(45deg, $SCROLLBAR_GRADIENT_2 0%, $SCROLLBAR_GRADIENT_1 100%);
+  }
+
+  .nlist-slot {
+    padding: 7px;
+    height: 50px;
+    border-bottom: 1px solid #CCC;
+  }
+
+  .nlist-item {
+
+  }
+}
