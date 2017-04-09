@@ -41,17 +41,19 @@ define(() => {
     }
   };
 
-  ui.setStats = (msg) => {
-    let stats = msg.payload;
+  /**
+   * Sets status counter values
+   * @param {!Object} values
+   * @param {!String} values.notifications - # of notifications
+   * @param {!String} values.messages      - # of new messages
+   * @param {!String} values.users         - # of hood users (kinda YAGNI)
+   */
+  ui.setStats = (values) => {
     let statsEls = ui.elements.stats;
 
-    statsEls.notifications.textContent = stats.notifications;
-    statsEls.messages.textContent = stats.messages;
-    statsEls.users.textContent = (userCount => {
-      // abbreviate user counts > 999 to "1k+", "2k+", so on...
-      // (current location of status elements forces "newline" when value is > 3 chars)
-      return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
-    })(stats.users);
+    statsEls.notifications.textContent = values.notifications;
+    statsEls.messages.textContent = values.messages;
+    statsEls.users.textContent = values.users;
   };
 
   /**

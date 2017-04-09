@@ -65,6 +65,10 @@ define([
         .then((stats) => {
           let response = msg.cloneForAnswer(['setStats'], stats);
           respond(response);
+        })
+        .catch((err) => {
+          let response = msg.cloneForAnswer(['error'], err);
+          respond(response);
         });
       }
     }, 'bg/app');
@@ -100,13 +104,6 @@ define([
    * @return {Promise}
    */
   bgApp.getStats = () => {
-      // @if DEV=true
-      /*if (bgApp.dev.forceLoggedOut) {
-        let err = new Error('Simulated ENOTOKEN!');
-        err.code = 'ENOTOKEN';
-        return reject(err);
-      }*/
-      // @endif
 
     return bgApp.auth.canAuthenticate()                         // 1. make sure user is logged in
           .then(bgApp.getCachedDataFor.bind(null, 'stats'))     // 2. try cached data
