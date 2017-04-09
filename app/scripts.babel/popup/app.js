@@ -1,6 +1,8 @@
 'use strict';
 
-define(() => {
+define(['messaging'], (Messaging) => {
+
+  window.devlog = console.debug;
 
   /**
    * PopUP main app
@@ -18,7 +20,8 @@ define(() => {
         overlay: null,
         prompt: null
       }
-    }
+    },
+    messaging: null             // -> .init()
   };
 
   /**
@@ -48,35 +51,29 @@ define(() => {
       loginEls[name] = document.querySelector(`.login-${name}`);
     }
 
-    // Ask bgApp for status values
-    chrome.runtime.sendMessage({
-      from: 'popupApp',
-      to: 'bgApp',
-      type: 'stats'
-    }, (res) => {
-      if (!res) {
-        return console.error(chrome.runtime.lastError);
-      }
-      if (res.type === 'error') {
-        return popupApp[res.solution]();
-      }
-      let stats = res.stats;
-      let statsEls = popupApp.elements.stats;
+    // init Messaging
+    popupApp.messaging = new Messaging({
+      setStats: popupApp.setStats     // response for bg/app:getStats
+    }, 'popup/app');
 
-      statsEls.notifications.textContent = stats.notifications;
-      statsEls.messages.textContent = stats.messages;
-      statsEls.users.textContent = (userCount => {
-        // abbreviate user counts > 999 to "1k+", "2k+", so on...
-        // (current location of status elements forces "newline" when value is > 3 chars)
-        return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
-      })(stats.users);
-    });
+    popupApp.messaging.listen();
 
-    // Ask bgApp for notifications
-    // - might include older, unseen items,
-    //   not indicated by stats
-    chrome.runtime.sendMessage
+    // query bgApp for stats
+    popupApp.messaging.send('bg/app', ['getStats']);
 
+  };
+
+  popupApp.setStats = (msg) => {
+    let stats = msg.payload;
+    let statsEls = popupApp.elements.stats;
+
+    statsEls.notifications.textContent = stats.notifications;
+    statsEls.messages.textContent = stats.messages;
+    statsEls.users.textContent = (userCount => {
+      // abbreviate user counts > 999 to "1k+", "2k+", so on...
+      // (current location of status elements forces "newline" when value is > 3 chars)
+      return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
+    })(stats.users);
   };
 
   /**
