@@ -1,3 +1,6 @@
+// @if DEV=true
+/* global bgApp */
+// @endif
 'use strict';
 
 define(() => {
@@ -11,6 +14,7 @@ define(() => {
 
     constructor() {
       this.token = '';
+      this.SIM_ENOTOKEN = false;
     }
 
     static get tokenCookieIdentifier() {
@@ -27,6 +31,14 @@ define(() => {
     canAuthenticate() {
       devlog('Probing auth token value ...');
       let self = this;
+      // @if DEV=true
+      if (bgApp.dev.forceLoggedOut) {
+        let err = new Error('Simulated ENOTOKEN!');
+        err.code = 'ENOTOKEN';
+        console.error(err);
+        return new Promise((resolve, reject) => reject(err));
+      }
+      // @endif
       if (this.token.length > 0) {
         devlog('Token available:', this.token.substr(0, 10));
         return new Promise((resolve) => resolve(true));

@@ -1,7 +1,7 @@
 ({
-    baseUrl: './dist/scripts',
+    baseUrl: '../dist/scripts',
     name: 'bg/app',
-    out: 'dist/scripts/build/all.js',
+    out: '../dist/scripts/builds/background.js',
     include: [
         '../../node_modules/almond/almond'
     ],

@@ -5,8 +5,9 @@ define([
   'bg/apiclient',
   'bg/auth',
   'bg/livereload',
-  'bg/request-cache'
-], (Alarms, APIClient, auth, lreload, RequestCache) => {
+  'bg/request-cache',
+  'messaging'
+], (Alarms, APIClient, auth, lreload, RequestCache, Messaging) => {
 
   /**
    * Background Main App
@@ -14,8 +15,9 @@ define([
    */
   let bgApp = {
     api: APIClient,
-    alarms: null,
+    alarms: null, // -> .init()
     auth: auth,
+    messaging: null, // -> .init()
     /**
      * Holds answer data from API requests and their timeout values
      * @type {object}
@@ -56,69 +58,28 @@ define([
     // set browserAction badge color
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
 
+    // init Messaging
+    bgApp.messaging = new Messaging({
+      getStats: (msg, respond) => {
+        bgApp.getStats()
+        .then((stats) => {
+          let response = msg.cloneForAnswer(['setStats'], stats);
+          respond(response);
+        })
+        .catch((err) => {
+          let response = msg.cloneForAnswer(['error'], err);
+          respond(response);
+        });
+      }
+    }, 'bg/app');
+    // start listening for messages
+    bgApp.messaging.listen();
+
     // init Alarms
     bgApp.alarms = new Alarms(bgApp);
-
     // activate counter_stats alarm
     bgApp.alarms.startStats();
 
-    // listen for runtime messages
-    chrome.runtime.onMessage.addListener(bgApp.handleMessages);
-  };
-
-  /**
-   * Handles messages for module:bg/app
-   * @param  {object}   msg     - Any JSON conform object
-   * @param  {Sender}   sender  - Sender of the message
-   * @param  {function} respond - Callback/Response channel
-   * @memberOf module:bg/app
-   * @return {bool}             - Returns true to set message channels into async state (i.e. not closing response channel prematurely)
-   */
-  bgApp.handleMessages = (msg, sender, respond) => {
-    devlog('Received runtime message:', msg);
-
-    // bail out, if message is not for bgApp
-    if (msg.to !== 'bgApp') {
-      return;
-    }
-
-    // messages from browserAction popup
-    // request for online-user/messages/notifications counts
-    if (msg.from === 'popupApp' && msg.type === 'stats') {
-
-      bgApp.getStats()
-      .then(bgApp.updateBrowserAction)
-      .then((stats) => {
-        let res = {
-          from: msg.to, to: msg.from,
-          type: 'response', stats: stats
-        };
-        devlog('... responding with', res);
-        respond(res);
-      })
-      .catch((err) => {
-        devlog(err);
-        switch(err.code) {
-          // No auth token/cookie
-          case 'ENOTOKEN':
-            devlog(err.message);
-            // tell popup to show login UI
-            let res = {
-              from: msg.to, to: msg.from,
-              type: 'error', solution: 'showLoginUI'
-            };
-            devlog('... responding with', res);
-            respond(res);
-            // stop counter_stats API requests
-            bgApp.alarms.stopStats();
-            break;
-        }
-      });
-    }
-
-    // return true from handler to keep respond() channel open
-    // (as in, 'respect muh asynciteeh!')
-    return true;
   };
 
   /**
@@ -143,13 +104,6 @@ define([
    * @return {Promise}
    */
   bgApp.getStats = () => {
-      // @if DEV=true
-      /*if (bgApp.dev.forceLoggedOut) {
-        let err = new Error('Simulated ENOTOKEN!');
-        err.code = 'ENOTOKEN';
-        return reject(err);
-      }*/
-      // @endif
 
     return bgApp.auth.canAuthenticate()                         // 1. make sure user is logged in
           .then(bgApp.getCachedDataFor.bind(null, 'stats'))     // 2. try cached data
