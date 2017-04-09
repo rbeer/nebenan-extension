@@ -1,6 +1,6 @@
 'use strict';
 
-define(() => {
+define(['lodash'], (_) => {
 
   let typeError = (failCondition, msg, code) => {
     if (failCondition) {
@@ -62,6 +62,9 @@ define(() => {
           let self = this;
           devlog(message);
           let msg = Message.fromObject(message);
+
+          // find matching handlers (intersection available/requested)
+          console.log(_.intersect);
 
           msg.handlers.forEach((handler) => {
             self.handlers[handler].call(self, msg, respond);

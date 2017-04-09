@@ -148,22 +148,24 @@ gulp.task('clean-docs', (cb) => {
 //---------------------------/
 
 //---------------------------\
-// require.js bundling
+// Bundling
 
-let requirejsTask = (type, cb) => {
-  const spawn = require('child_process').spawn;
-
-  let logRjs = (data) => {
+let runProcess = (cmd, args, cb) => {
+  let log = (data) => {
     data.toString()
         .split('\n')
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
   };
+  let proc = require('child_process').spawn(cmd, args);
+  proc.stdout.on('data', log);
+  proc.stderr.on('data', log);
+  proc.on('close', cb);
+};
 
+// require.js
+let requirejsTask = (type, cb) => {
   let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
-  let rjs = spawn('r.js', [ '-o', rjsConfig ]);
-  rjs.stdout.on('data', logRjs);
-  rjs.stderr.on('data', logRjs);
-  rjs.on('close', cb);
+  runProcess('r.js', [ '-o', rjsConfig ], cb);
 };
 
 gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
@@ -171,6 +173,40 @@ gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
 gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
 
 gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
+
+// lodash
+gulp.task('lodash', cb => {
+
+  // require lodash-cli arguments
+  let argsObj = require('./.lodash.json');
+
+  // ES strict mode; ftw
+  let args = ['strict'];
+  // dev = output only non-minified
+  // production = output only minified
+  args.push(DEV || process.argv.includes('--devdash') ? '-d' : '-p');
+
+  // add to spawn() args array from required object
+  for (let arg in argsObj) {
+    // arguments with leading dash(es)
+    // aren't concatenated to their values, ...
+    if (arg.startsWith('-')) {
+      args.push(arg);
+      // .. some don't even have a value
+      if (argsObj[arg]) {
+        args.push(argsObj[arg]);
+      }
+    } else {
+      let argString = arg + '=' + argsObj[arg];
+      args.push(argString);
+    }
+  }
+
+  console.log('lodash args:', args);
+
+  // run lodash-cli
+  runProcess('lodash', args, cb);
+});
 
 //---------------------------\
 // watchers
@@ -210,10 +246,12 @@ gulp.task('watch-docs', cb => {
 //-------------------------------------\
 // Main Tasks
 // `build`   - Main build chain
+//               --with-docs to include
+//               building documentation
 // `docs`    - Generates jsdoc for
 //             current version in /docs/
 // `dev`     - Build in developement mode
-//             and watch /app/
+//             and watch /app/; builds docs
 // `package` - Package/Zip /dist/
 //             This does **not** create
 //             a valid .crx!
@@ -226,8 +264,13 @@ gulp.task('build', cb => {
     ['scripts', 'html', 'styles', 'images', 'extras'],
     'requirejs', 'size', cb
   ];
+  // build with docs
   if (DOCS) {
     buildTasks.splice(buildTasks.length - 2, 0, 'docs');
+  }
+  // build with lodash
+  if (process.argv.includes('--with-lodash')) {
+    buildTasks.splice(5, 0, 'lodash');
   }
 
   runSequence.apply(null, buildTasks);
