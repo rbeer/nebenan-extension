@@ -99,10 +99,10 @@ define(['lodash'], (_) => {
 
       chrome.runtime.sendMessage(message.toObject(), (response) => {
         if (!response) {
-          console.error('Sending a message has failed.');
+          console.error('Sending a Message has failed.');
+          console.error(message);
           return console.error(chrome.runtime.lastError);
         }
-        devlog('RESPONSE:', response);
         self.receive(response);
         return true;
       });
@@ -227,7 +227,6 @@ define(['lodash'], (_) => {
         payload: payload,
         trigger: this.toObject()
       };
-      devlog(bareClone);
       let clone = Message.fromObject(bareClone);
       return clone;
     }
