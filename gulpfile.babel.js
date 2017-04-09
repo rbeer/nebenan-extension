@@ -10,8 +10,18 @@ import preprocess from 'gulp-preprocess';
 
 const $ = gulpLoadPlugins();
 
+// Sets build into DEV mode
+// - Includes and loads module:bg/dev
+//   Exposing `window.bgApp`, `bgApp.dev`, ...
+// - Watch out for the preprocess() parts in
+//   script files! A search for `// @` over
+//   `/app/scripts.babel/` should reveal them all.
 let DEV = false;
+// Whether to include docs generation
 let DOCS = false;
+
+//---------------------------------\
+// The Good, The Bad, The Scritps
 
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
@@ -19,20 +29,6 @@ gulp.task('scripts', () => {
         .pipe($.if(!DEV, $.uglify(), gutil.noop()))
         .pipe($.sourcemaps.write('.'))
         .pipe(gulp.dest('dist/scripts'));
-});
-
-gulp.task('extras', () => {
-  return gulp.src([
-    'app/*.*',
-    'app/_locales/**',
-    'app/fonts/*.*',
-    '!app/scripts.babel',
-    '!app/*.json',
-    '!app/*.html'
-  ], {
-    base: 'app',
-    dot: true
-  }).pipe(gulp.dest('dist'));
 });
 
 function lint(files, options) {
@@ -48,6 +44,25 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
     es6: true
   }
 }));
+//---------------------------/
+
+//---------------------------\
+// HTML, Styles, Images, ...
+// a/k/a meta data :smirk:
+
+gulp.task('extras', () => {
+  return gulp.src([
+    'app/*.*',
+    'app/_locales/**',
+    'app/fonts/*.*',
+    '!app/scripts.babel',
+    '!app/*.json',
+    '!app/*.html'
+  ], {
+    base: 'app',
+    dot: true
+  }).pipe(gulp.dest('dist'));
+});
 
 gulp.task('images', () => {
   return gulp.src('app/images/**/*')
@@ -103,6 +118,15 @@ gulp.task('babel', () => {
       .pipe(gulp.dest('app/scripts'));
 });
 
+gulp.task('size', () => {
+  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+});
+
+//---------------------------/
+
+//---------------------------\
+// Cleanup Crews
+
 gulp.task('clean', (cb) => {
   let pkg = require('./package.json');
   let docPath = `docs/${pkg.name}/${pkg.version}`;
@@ -120,6 +144,36 @@ gulp.task('clean-docs', (cb) => {
     cb();
   });
 });
+
+//---------------------------/
+
+//---------------------------\
+// require.js bundling
+
+let requirejsTask = (type, cb) => {
+  const spawn = require('child_process').spawn;
+
+  let logRjs = (data) => {
+    data.toString()
+        .split('\n')
+        .forEach((line) => line !== '' ? gutil.log(line) : void 0);
+  };
+
+  let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
+  let rjs = spawn('r.js', [ '-o', rjsConfig ]);
+  rjs.stdout.on('data', logRjs);
+  rjs.stderr.on('data', logRjs);
+  rjs.on('close', cb);
+};
+
+gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
+
+gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
+
+gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
+
+//---------------------------\
+// watchers
 
 gulp.task('watch', cb => {
 
@@ -153,53 +207,16 @@ gulp.task('watch-docs', cb => {
   });
 });
 
-gulp.task('size', () => {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
-});
-
-gulp.task('package', () => {
-  var manifest = require('./dist/manifest.json');
-  return gulp.src('dist/**')
-      .pipe($.if(manifest.version_name.endsWith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
-      .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
-      .pipe(gulp.dest('package'));
-});
-
-let requirejsTask = (type, cb) => {
-  const spawn = require('child_process').spawn;
-
-  let logRjs = (data) => {
-    data.toString()
-        .split('\n')
-        .forEach((line) => line !== '' ? gutil.log(line) : void 0);
-  };
-
-  let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
-  let rjs = spawn('r.js', [ '-o', rjsConfig ]);
-  rjs.stdout.on('data', logRjs);
-  rjs.stderr.on('data', logRjs);
-  rjs.on('close', cb);
-};
-
-gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
-
-gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
-
-gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
-
-gulp.task('docs', cb => {
-  let config = require('./.jsdoc.json');
-  if (DOCS) {
-    config.opts.verbose = false;
-  }
-  let pkg = require('./package.json');
-  let docPath = `./${pkg.version}`;
-  let latestPath = `docs/${pkg.name}/latest`;
-  gulp.src('app/scripts.babel/**/*.js')
-    .pipe($.jsdoc3(config, () => {
-      require('fs').symlink(docPath, latestPath, 'dir', cb);
-    }));
-});
+//-------------------------------------\
+// Main Tasks
+// `build`   - Main build chain
+// `docs`    - Generates jsdoc for
+//             current version in /docs/
+// `dev`     - Build in developement mode
+//             and watch /app/
+// `package` - Package/Zip /dist/
+//             This does **not** create
+//             a valid .crx!
 
 gulp.task('build', cb => {
   DOCS = DOCS || process.argv.includes('--with-docs');
@@ -216,12 +233,41 @@ gulp.task('build', cb => {
   runSequence.apply(null, buildTasks);
 });
 
+gulp.task('docs', cb => {
+  let config = require('./.jsdoc.json');
+  if (DOCS) {
+    config.opts.verbose = false;
+  }
+  let pkg = require('./package.json');
+  let docPath = `./${pkg.version}`;
+  let latestPath = `docs/${pkg.name}/latest`;
+  gulp.src('app/scripts.babel/**/*.js')
+    .pipe($.jsdoc3(config, () => {
+      require('fs').symlink(docPath, latestPath, 'dir', cb);
+    }));
+});
+
 gulp.task('dev', cb => {
   DEV = true;
   DOCS = true;
   runSequence('build', 'watch', cb);
 });
 
+gulp.task('package', () => {
+  var manifest = require('./dist/manifest.json');
+  return gulp.src('dist/**')
+      .pipe($.if(manifest.version_name.endsWith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
+      .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
+      .pipe(gulp.dest('package'));
+});
+
+//---------------------------/
+
+//---------------------------\
+// defaults to `build`
+
 gulp.task('default', ['clean'], cb => {
   runSequence('build', cb);
 });
+
+//---------------------------/
