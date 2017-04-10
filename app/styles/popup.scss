@@ -71,27 +71,48 @@ body {
 @import 'popup/login-prompt';
 
 /** Notification List **/
+
+.nlist-container {
+  box-shadow: 0.3px 0.3px 0.3px rgba(0, 0, 0, 0.6);
+}
+
+.nlist-scrollthumb-overlay {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  height: 100%;
+  width: .6em;
+  background: $BG_LIGHT;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
 .nlist {
   -webkit-padding-start: 0;
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
   max-height: 340px;
   list-style-type: none;
-  box-shadow: 0.3px 0.3px 0.3px rgba(0, 0, 0, 0.6);
   overflow-x: hidden;
   overflow-y: overlay;
 
   &::-webkit-scrollbar {
-    width: 7px;
+    width: .4em;
   }
   &::-webkit-scrollbar-track {
     background: $BG_LIGHT;
-    border-radius: 7px;
+    border-radius: 3px;
   }
   &::-webkit-scrollbar-thumb {
-    border-radius: 7px;
-    -webkit-box-shadow: 0 0 6px inset rgba(0, 0, 0, 0.3);
     background: -webkit-linear-gradient(45deg, $SCROLLBAR_GRADIENT_2 0%, $SCROLLBAR_GRADIENT_1 100%);
+  }
+  &::-webkit-scrollbar, &::-webkit-scrollbar-thumb {
+    overflow: visible;
+    border-radius: 3px;
+  }
+
+  &:hover ~ .nlist-scrollthumb-overlay {
+    opacity: 0;
   }
 
   .nlist-slot {
