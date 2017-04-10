@@ -2,7 +2,6 @@
 <html>
   <head>
     <link href="styles/popup.css" rel="stylesheet">
-    <!-- <script src="scripts/popup/nlist-item.js" type="text/javascript" charset="utf-8"></script> -->
   </head>
   <body>
     <div class="login-blur">
@@ -27,23 +26,26 @@
           </div>
         </div>
       </div>
-      <div class="nlist-container">
-        <ul class="nlist">
-          <li class="nlist-slot">
-            <div class="nlist-item" type="feed">
-              <span class="nlist-item-thumb"></span>
-              <div class="nlist-item-preview">
-                <span class="nlist-item-type na-icon"></span>
-                <span class="nlist-item-title">IKEA Bett Malm Birke, 160x200</span>
-                <span class="nlist-item-body"><a href="#">Ich möchte mein IKEA Bettgestell in Birke mit Nachtkonsole verkaufen. Das gibt es so bei...</a></span>
+      <div class="n-list-container">
+        <n-list class="n-list"></n-list>
+
+        <template id="n-listitem">
+          <div class="n-list-slot">
+            <div class="n-listitem" type="feed">
+              <span class="n-listitem-thumb"></span>
+              <div class="n-listitem-preview">
+                <span class="n-listitem-type na-icon"></span>
+                <span class="n-listitem-title">IKEA Bett Malm Birke, 160x200</span>
+                <span class="n-listitem-body"><a href="#">Ich möchte mein IKEA Bettgestell in Birke mit Nachtkonsole verkaufen. Das gibt es so bei...</a></span>
               </div>
-              <div class="nlist-item-dismiss" aria-type="button" action="dismissNItem">
+              <div class="n-listitem-dismiss" aria-type="button" action="dismissNItem">
                 <span class="cw"></span><span class="ccw"></span>
               </div>
             </div>
-          </li>
-        </ul>
-        <div class="nlist-scrollthumb-overlay"></div>
+          </div>
+        </template>
+
+        <div class="n-list-scrollthumb-overlay"></div>
       </div>
     </div>
 

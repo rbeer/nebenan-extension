@@ -82,13 +82,13 @@ a:hover {
 
 /** Notification List **/
 
-.nlist-container {
+.n-list-container {
   position: relative;
   left: 0;
   top: 0;
 }
 
-.nlist-scrollthumb-overlay {
+.n-list-scrollthumb-overlay {
   position: absolute;
   top: 0;
   right: 0;
@@ -99,7 +99,7 @@ a:hover {
   transition: opacity 0.3s ease-out;
 }
 
-.nlist {
+.n-list {
   -webkit-padding-start: 0;
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
@@ -123,18 +123,18 @@ a:hover {
     border-radius: 3px;
   }
 
-  &:hover ~ .nlist-scrollthumb-overlay {
+  &:hover ~ .n-list-scrollthumb-overlay {
     opacity: 0;
   }
 
-  .nlist-slot {
+  .n-list-slot {
     position: relative;
     margin: 7px;
     height: 60px;
     width: 325px;
   }
 
-  .nlist-item {
+  .n-listitem {
 
     position: absolute;
     width: 100%;
@@ -146,7 +146,7 @@ a:hover {
     border-radius: 3px;
     box-shadow: 1px 1px 0.3px rgba(0, 0, 0, .3);
 
-    .nlist-item-thumb {
+    .n-listitem-thumb {
       width: 50px;
       height: 50px;
       float: left;
@@ -156,13 +156,13 @@ a:hover {
       background-size: cover;
     }
 
-    .nlist-item-preview {
+    .n-listitem-preview {
       float: left;
       margin-left: 5px;
       width: 240px;
       height: 100%;
 
-      .nlist-item-type {
+      .n-listitem-type {
         font-size: 20px;
         float: left;
 
@@ -171,20 +171,20 @@ a:hover {
         }
       }
 
-      .nlist-item-title, .nlist-item-body {
+      .n-listitem-title, .n-listitem-body {
         display: block;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
       }
 
-      .nlist-item-title {
+      .n-listitem-title {
         width: 210px;
         margin-left: 10px;
         float: left;
       }
 
-      .nlist-item-body {
+      .n-listitem-body {
         width: 100%;
         font-size: 85%;
         line-height: 20px;
@@ -192,7 +192,7 @@ a:hover {
 
     }
 
-    .nlist-item-dismiss {
+    .n-listitem-dismiss {
       position: absolute;
       top: 0px;
       right: 0px;

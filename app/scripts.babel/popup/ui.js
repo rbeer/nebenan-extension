@@ -1,6 +1,6 @@
 'use strict';
 
-define(() => {
+define(['popup/n-list'], (nlist) => {
 
   /**
    * Popup DOM interaction
