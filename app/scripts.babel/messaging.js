@@ -99,9 +99,16 @@ define(['lodash'], (_) => {
 
       chrome.runtime.sendMessage(message.toObject(), (response) => {
         if (!response) {
+          let crx_le = chrome.runtime.lastError;
+
           console.error('Sending a Message has failed.');
           console.error(message);
-          return console.error(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
+          if (crx_le.message.includes('before a reponse was received')) {
+            console.warn('Did you call the `respond` callback in the message ' +
+                         'handler on the other end?');
+          }
+          return;
         }
         self.receive(response);
         return true;

@@ -37,6 +37,9 @@ define(['messaging', 'popup/ui'], (Messaging, ui) => {
     // query bgApp for stats
     popupApp.messaging.send('bg/app', ['getStats']);
 
+    // query bgApp for notifications
+    popupApp.messaging.send('bg/app', ['getNotifications']);
+
   };
 
   popupApp.setStats = (msg) => {

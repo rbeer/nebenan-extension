@@ -70,6 +70,18 @@ define([
           let response = msg.cloneForAnswer(['error'], err);
           respond(response);
         });
+      },
+      getNotifications: (msg, respond) => {
+        bgApp.api.getNotifications()
+        .then((nitems) => {
+          devlog('nitems:', nitems);
+          let response = msg.cloneForAnswer(['addNotifications'], nitems);
+          respond(response);
+        })
+        .catch((err) => {
+          let response = msg.cloneForAnswer(['error'], err);
+          respond(response);
+        });
       }
     }, 'bg/app');
     // start listening for messages

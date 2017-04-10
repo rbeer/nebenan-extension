@@ -119,8 +119,7 @@ define([
      * @memberOf APIClient
      * @static
      * @see APIClient.callAPI
-     * @return {Promise} - Resolves with Array of NItem instances, parsed from
-     *                     the response body APIClient.callAPI resolved with
+     * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
      */
     static getNotifications(lower) {
       let per_page = 7;
