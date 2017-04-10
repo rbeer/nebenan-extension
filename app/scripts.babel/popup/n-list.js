@@ -1,6 +1,6 @@
 'use strict';
 
-define(() => {
+define(['bg/apiclient/nitem'], (NItem) => {
 
   /**
    * @class Notification List
@@ -20,11 +20,21 @@ define(() => {
 
     /**
      * Adds an NListItem to the list
-     * @param {?NListItem} nListItem [description]
+     * @param {!APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
+     *                                             NListeItem from; or a fully prepared,
+     *                                             as in .populate called, NListItem.
      */
-    add(nListItem) {
-      nListItem = nListItem || document.createElement('n-listitem');
-      this.append(nListItem.populate());
+    add(nItem) {
+      let nListItem;
+      if (nItem instanceof NListItem) {
+        nListItem = nItem;
+      } else if (nItem instanceof NItem) {
+        nListItem = document.createElement('n-listitem');
+        nListItem.populate(nItem);
+      } else {
+        throw new TypeError('First parameter must be of type APIClient.NItem or NListItem');
+      }
+      this.append(nListItem);
     }
   }
 
@@ -61,9 +71,15 @@ define(() => {
     /**
      * Populates new <n-listitem> with initial values.
      * After this, the item must be ready to be displayed.
+     * @param {!APIClient.NItem} nItem - Data from API
      * @return {NListItem} `this`
      */
-    populate() {
+    populate(nItem) {
+      if (!(nItem instanceof NItem)) {
+        throw new TypeError('NListItem needs an APIClient.NItem instance' +
+                            'to be populate with.');
+      }
+      devlog(nItem);
       let tpl = document.getElementById('nlist-item');
       this.appendChild(document.importNode(tpl.content, true));
       return this;

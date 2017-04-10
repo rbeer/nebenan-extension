@@ -17,7 +17,8 @@ define(['popup/n-list'], (nlist) => {
         blur: null,
         overlay: null,
         prompt: null
-      }
+      },
+      nlist: null
     }
   };
 
@@ -39,6 +40,13 @@ define(['popup/n-list'], (nlist) => {
     for (let name in loginEls) {
       loginEls[name] = document.querySelector(`.login-${name}`);
     }
+
+    // reference notification list
+    ui.nlist = document.getElementById('n-list');
+  };
+
+  ui.addNotification = (nItem) => {
+    ui.nlist.add(nItem);
   };
 
   /**
