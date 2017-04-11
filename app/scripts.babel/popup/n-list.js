@@ -79,8 +79,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
         throw new TypeError('NListItem needs an APIClient.NItem instance' +
                             'to be populate with.');
       }
-      devlog(nItem);
-      let tpl = document.getElementById('nlist-item');
+      let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
       return this;
     }
