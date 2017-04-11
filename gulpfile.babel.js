@@ -56,7 +56,7 @@ gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
-    'app/fonts/*.*',
+    'app/fonts/*.woff',
     '!app/*.js',
     '!app/scripts.babel',
     '!app/*.json',
