@@ -126,7 +126,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
     }
 
     set body(text) {
-      let singleLine = text.slice(0, 42).replace('\n', ' ');
+      let singleLine = text.slice(0, 42).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
       this.querySelector('.n-listitem-body a').innerText = singleLine;
     }
