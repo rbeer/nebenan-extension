@@ -6,25 +6,8 @@
   position: relative;
   left: 0;
   top: 0;
-}
-
-.n-list-scrollthumb-overlay {
-  position: absolute;
-  top: 0;
-  right: 0;
-  height: 100%;
-  width: .6em;
-  background: $BG_LIGHT;
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-}
-
-.n-list {
-  -webkit-padding-start: 0;
-  -webkit-margin-before: 0;
-  -webkit-margin-after: 0;
-  max-height: 340px;
-  list-style-type: none;
+  max-height: 350px;
+  min-height: 350px;
   overflow-x: hidden;
   overflow-y: overlay;
 
@@ -43,9 +26,37 @@
     border-radius: 3px;
   }
 
-  &:hover ~ .n-list-scrollthumb-overlay {
+  &:hover .n-list-scrollthumb-overlay {
     opacity: 0;
   }
+}
+
+n-listitem {
+  position: relative;
+  transition: right 0.3s ease-out;
+  right: 0;
+
+  &.out {
+    right: -350px;
+  }
+}
+
+.n-list-scrollthumb-overlay {
+  position: absolute;
+  top: 0;
+  right: 0;
+  height: 100%;
+  width: .6em;
+  background: $BG_LIGHT;
+  opacity: 1;
+  transition: opacity 0.3s ease-out;
+}
+
+.n-list {
+  -webkit-padding-start: 0;
+  -webkit-margin-before: 0;
+  -webkit-margin-after: 0;
+  max-height: 340px;
 
   .n-list-slot {
     position: relative;

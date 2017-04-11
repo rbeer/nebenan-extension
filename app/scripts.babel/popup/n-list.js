@@ -105,7 +105,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
      * Fancy (animations 'n' stuff) extension of .remove
      */
     dismiss() {
-      this.remove();
+      this.slideOut().then(this.remove.bind(this));
     }
 
     set type(nType) {
@@ -138,7 +138,13 @@ define(['bg/apiclient/nitem'], (NItem) => {
     }
 
     slideIn() {}
-    slideOut() {}
+    slideOut() {
+      let self = this;
+      return new Promise((resolve) => {
+        self.addEventListener('transitionend', resolve);
+        self.classList.add('out');
+      });
+    }
   }
 
   // register Custom Elements
