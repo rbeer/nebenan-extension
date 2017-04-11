@@ -72,7 +72,7 @@ define([
         });
       },
       getNotifications: (msg, respond) => {
-        bgApp.api.getNotifications()
+        bgApp.getNotifications()
         .then((nitems) => {
           devlog('nitems:', nitems);
           let response = msg.cloneForAnswer(['addNotifications'], nitems);
@@ -113,13 +113,13 @@ define([
   /**
    * Updates local stats
    * @memberOf module:bg/app
-   * @return {Promise}
+   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in   * @return {Promise}
    */
   bgApp.getStats = () => {
 
-    return bgApp.auth.canAuthenticate()                         // 1. make sure user is logged in
-          .then(bgApp.getCachedDataFor.bind(null, 'stats'))     // 2. try cached data
-          .then(bgApp.api.getCounterStats)                      //    request data from API, otherwise
+    // bgApp.api.getCounterStats passes its first paremeter
+    // (possible cache object) to resolve, when valid/not expired.
+    return bgApp.api.getCounterStats(bgApp.getCachedDataFor('stats'))
           .then((counter_stats) => {
             // not a string? cached data!
             if (typeof counter_stats !== 'string') {
@@ -131,6 +131,36 @@ define([
               return statsObj;
             }
           });
+  };
+
+  /**
+   * Updates notifications
+   * @memberOf module:bg/app
+   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
+   */
+  bgApp.getNotifications = () => {
+    return bgApp.api.getNotifications(0, 7, null)
+    .then((notifications) => {
+      let parsed;
+      if (typeof notifications !== 'string') {
+        parsed = notifications;
+      } else {
+        parsed = JSON.parse(notifications).notifications;
+      }
+      // strip notifications that defy the standard object layout
+      // e.g. NType.NEWGROUP (501) doesn't have a hood_message
+      // member. Skip everything but some standard messages, until
+      // error/NType handling is implemented
+      let safeTypes = [
+        APIClient.NType.EVENT,
+        APIClient.NType.MARKET,
+        APIClient.NType.ANSWER,
+        APIClient.NType.FEED
+      ];
+      parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id));
+
+      return parsed.map((n) => new APIClient.NItem(n));
+    });
   };
 
   /**

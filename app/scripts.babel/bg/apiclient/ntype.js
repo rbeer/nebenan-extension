@@ -21,6 +21,7 @@ define(() => {
         400: 'MARKET',
         401: 'ANSWER',
         404: 'THANKS',
+        501: 'NEWGROUP',
         702: 'JOIN',
         1200: 'FEED'
       };
@@ -60,6 +61,14 @@ define(() => {
     static get THANKS() {
       // web developers associating "thank you" with 404. must be sarcasm. :3
       return 404;
+    }
+
+    /**
+     * **501** - Notification when a new group has been created
+     */
+    static get NEWGROUP() {
+      // web developers associating "thank you" with 404. must be sarcasm. :3
+      return 501;
     }
 
     /**
