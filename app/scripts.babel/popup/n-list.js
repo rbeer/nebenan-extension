@@ -23,6 +23,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
      * @param {!APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
      *                                             NListeItem from; or a fully prepared,
      *                                             as in .populate called, NListItem.
+     * @returns {NListItem} - NListItem that has actually been added
      */
     add(nItem) {
       let nListItem;
@@ -36,6 +37,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
                             'APIClient.NItem or NListItem');
       }
       this.append(nListItem);
+      return nListItem;
     }
   }
 
@@ -101,13 +103,6 @@ define(['bg/apiclient/nitem'], (NItem) => {
       return this;
     }
 
-    /**
-     * Fancy (animations 'n' stuff) extension of .remove
-     */
-    dismiss() {
-      this.slideOut().then(this.remove.bind(this));
-    }
-
     set type(nType) {
       this.setAttribute('type', nType.id);
     }
@@ -128,13 +123,29 @@ define(['bg/apiclient/nitem'], (NItem) => {
     set body(text) {
       let singleLine = text.slice(0, 52).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
-      this.querySelector('.n-listitem-body a').innerText = singleLine;
+      this.querySelector('.n-listitem-body').innerText = singleLine;
     }
 
     set link(messageId) {
       let url = 'https://nebenan.de/feed/' + messageId;
       this.setAttribute('link', url);
-      this.querySelector('.n-listitem-body a').setAttribute('href', url);
+    }
+
+    get link() {
+      return this.getAttribute('link');
+    }
+
+    /**
+     * Removes item from list
+     * @return {Promise} - Resolves when item has been removed from DOM
+     */
+    dismiss() {
+      return this.slideOut().then(this.remove.bind(this));
+    }
+
+    hookLink(handler) {
+      this.querySelector('.n-listitem-body')
+          .addEventListener('click', handler.bind(this, 'newtab.feed/' + this.link));
     }
 
     slideIn() {}

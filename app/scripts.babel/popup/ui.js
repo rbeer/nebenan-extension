@@ -22,6 +22,10 @@ define(['popup/n-list'], (nlist) => {
     }
   };
 
+  /**
+   * I don't know... what could .init be doing? Hmmm...
+   * @memberOf module:popup/ui
+   */
   ui.init = () => {
     // hook clickable elements
     let clickables = document.querySelectorAll('[aria-role="button"][action]');
@@ -45,16 +49,27 @@ define(['popup/n-list'], (nlist) => {
     ui.nlist = document.getElementById('n-list');
   };
 
+  /**
+   * Adds a new n-listitem to the n-list
+   *   - Hooks the link of that new n-listitem
+   * @param  {APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
+   *                                             NListeItem from; or a fully prepared,
+   *                                             as in .populate called, NListItem.
+   * @memberOf module:popup/ui
+   * @see module:popup/ui.handleClicks
+   * @see NList.add
+   */
   ui.addNotification = (nItem) => {
-    ui.nlist.add(nItem);
+    ui.nlist.add(nItem).hookLink(ui.handleClicks);
   };
 
   /**
    * Sets status counter values
    * @param {!Object} values
-   * @param {!String} values.notifications - # of notifications
-   * @param {!String} values.messages      - # of new messages
-   * @param {!String} values.users         - # of hood users (kinda YAGNI)
+   * @param {!String} values.notifications - \# of notifications
+   * @param {!String} values.messages      - \# of new messages
+   * @param {!String} values.users         - \# of hood users (kinda YAGNI)
+   * @memberOf module:popup/ui
    */
   ui.setStats = (values) => {
     let statsEls = ui.elements.stats;
@@ -67,17 +82,33 @@ define(['popup/n-list'], (nlist) => {
   /**
    * Handler for DOM clicks (<* aria-role="button" action="action.value">)
    * - newtab - Creates a new tab. The value is a path relative to https://nebenan.de/ (e.g. newtab.feed -> https://nebenan.de/feed)
-   * @param  {MouseEvent} evt
+   * @param {?String}     actionValue - First parameter is the `action.value` String, when called explicitly by an NListItem
+   * @param {!MouseEvent} evt         - First parameter is a MousrEvent, when hooked by module:popup/ui.init; second otherwise
    * @memberOf module:popup/ui
+   * @returns {Bool} `false`
+   * @see NListItem#hookLink
    */
-  ui.handleClicks = (evt) => {
-    evt.preventDefault();
+  ui.handleClicks = (...args) => {
 
-    let [ action, value ] = evt.target.getAttribute('action').split('.');
+    let evt;
+    let action;
+    let value;
+
+    if (args.length === 1) {
+      // event mode - args[0] is the MouseEvent
+      evt = args[0];
+      [ action, value ] = evt.target.getAttribute('action').split('.');
+    } else {
+      // explicit mode - args[1] is the MouseEvent
+      evt = args[1];
+      [ action, value ] = args[0].split('.');
+    }
+
+    evt.preventDefault();
 
     if (action === 'newtab') {
       chrome.tabs.create({
-        url: 'https://nebenan.de/' + value,
+        url: (value.startsWith('https') ? value : 'https://nebenan.de/' + value),
         active: true
       });
     }
