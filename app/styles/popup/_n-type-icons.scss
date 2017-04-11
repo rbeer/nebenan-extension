@@ -1,5 +1,9 @@
 .n-listitem-type {
 
+  n-listitem &:before {
+    vertical-align: text-top;
+  }
+
   n-listitem[type="300"] &:before {
     content: '\e808';
   }
