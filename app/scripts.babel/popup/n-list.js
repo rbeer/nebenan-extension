@@ -32,7 +32,8 @@ define(['bg/apiclient/nitem'], (NItem) => {
         nListItem = document.createElement('n-listitem');
         nListItem.populate(nItem);
       } else {
-        throw new TypeError('First parameter must be of type APIClient.NItem or NListItem');
+        throw new TypeError('First parameter must be of type ' +
+                            'APIClient.NItem or NListItem');
       }
       this.append(nListItem);
     }
@@ -79,8 +80,24 @@ define(['bg/apiclient/nitem'], (NItem) => {
         throw new TypeError('NListItem needs an APIClient.NItem instance' +
                             'to be populate with.');
       }
+
+      // clone DOM Elements from <template>
+      // append to `this` <n-listitem>
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
+
+      // dismiss click
+      this.querySelector('[aria-role="button"]')
+          .addEventListener('click', this.dismiss.bind(this));
+
+      // set stuff
+      this.type = nItem.notification_type_id.id;
+      this.id = nItem.id;
+      this.seen = nItem.seen;
+      this.title = nItem.hood_message.subject;
+      this.body = nItem.hood_message.body;
+      this.link = nItem.hood_message.id;
+
       return this;
     }
 
@@ -89,6 +106,35 @@ define(['bg/apiclient/nitem'], (NItem) => {
      */
     dismiss() {
       this.remove();
+    }
+
+    set type(ntype) {
+      this.setAttribute('type', ntype);
+    }
+
+    set id(id) {
+      this.setAttribute('id', id);
+    }
+
+    set seen(hasSeen) {
+      this.setAttribute('seen', true);
+    }
+
+    set title(text) {
+      this.setAttribute('title', text);
+      this.querySelector('.n-listitem-title').innerText = text;
+    }
+
+    set body(text) {
+      let singleLine = text.slice(0, 42).replace('\n', ' ');
+      this.setAttribute('body', singleLine);
+      this.querySelector('.n-listitem-body a').innerText = singleLine;
+    }
+
+    set link(messageId) {
+      let url = 'https://nebenan.de/feed/' + messageId;
+      this.setAttribute('link', url);
+      this.querySelector('.n-listitem-body a').setAttribute('href', url);
     }
 
     slideIn() {}

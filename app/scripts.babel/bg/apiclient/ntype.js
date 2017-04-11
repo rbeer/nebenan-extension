@@ -11,8 +11,8 @@ define(() => {
      * @constructor
      */
     constructor(id) {
-      this.id = id;
-      this.ntype = NType.ID_MAP[id];
+      this.id = typeof id === 'number' ? id : id.id;
+      this.ntype = NType.ID_MAP[this.id];
     }
 
     static get ID_MAP() {
