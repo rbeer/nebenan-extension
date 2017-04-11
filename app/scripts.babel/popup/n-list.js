@@ -145,7 +145,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
 
     hookLink(handler) {
       this.querySelector('.n-listitem-body')
-          .addEventListener('click', handler.bind(this, 'newtab.feed/' + this.link));
+          .addEventListener('click', handler.bind(this, 'newtab.' + this.link));
     }
 
     slideIn() {}

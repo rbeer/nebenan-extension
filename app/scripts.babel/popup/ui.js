@@ -81,7 +81,10 @@ define(['popup/n-list'], (nlist) => {
 
   /**
    * Handler for DOM clicks (<* aria-role="button" action="action.value">)
-   * - newtab - Creates a new tab. The value is a path relative to https://nebenan.de/ (e.g. newtab.feed -> https://nebenan.de/feed)
+   * - newtab - Creates a new tab.
+   *            The value can be either a path relative to https://nebenan.de/
+   *            (e.g. newtab.feed -> https://nebenan.de/feed) or an absolute
+   *            (starting with `https`!) one
    * @param {?String}     actionValue - First parameter is the `action.value` String, when called explicitly by an NListItem
    * @param {!MouseEvent} evt         - First parameter is a MousrEvent, when hooked by module:popup/ui.init; second otherwise
    * @memberOf module:popup/ui
@@ -93,15 +96,19 @@ define(['popup/n-list'], (nlist) => {
     let evt;
     let action;
     let value;
+    let splitActionValue = (str) => {
+      let matches = str.match(/(\w+)\.(.*)/);
+      return [ matches[1], matches[2] ];
+    };
 
     if (args.length === 1) {
       // event mode - args[0] is the MouseEvent
       evt = args[0];
-      [ action, value ] = evt.target.getAttribute('action').split('.');
+      [ action, value ] = splitActionValue(evt.target.getAttribute('action'));
     } else {
       // explicit mode - args[1] is the MouseEvent
       evt = args[1];
-      [ action, value ] = args[0].split('.');
+      [ action, value ] = splitActionValue(args[0]);
     }
 
     evt.preventDefault();
