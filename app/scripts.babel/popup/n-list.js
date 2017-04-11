@@ -91,7 +91,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
           .addEventListener('click', this.dismiss.bind(this));
 
       // set stuff
-      this.type = nItem.notification_type_id.id;
+      this.type = nItem.notification_type_id;
       this.id = nItem.id;
       this.seen = nItem.seen;
       this.title = nItem.hood_message.subject;
@@ -108,8 +108,8 @@ define(['bg/apiclient/nitem'], (NItem) => {
       this.remove();
     }
 
-    set type(ntype) {
-      this.setAttribute('type', ntype);
+    set type(nType) {
+      this.setAttribute('type', nType.id);
     }
 
     set id(id) {

@@ -1,3 +1,7 @@
+
+// type icon glyphs
+@import 'n-type-icons';
+
 .n-list-container {
   position: relative;
   left: 0;
@@ -81,11 +85,6 @@
       .n-listitem-type {
         font-size: 20px;
         float: left;
-        font-family: nebenan_icons;
-
-        &:before {
-          content: attr(glyph);
-        }
       }
 
       .n-listitem-title, .n-listitem-body {

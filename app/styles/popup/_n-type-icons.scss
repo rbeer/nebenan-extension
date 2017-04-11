@@ -1,0 +1,24 @@
+.n-listitem-type {
+
+  n-listitem[type="300"] &:before {
+    content: '\e808';
+  }
+  n-listitem[type="400"] &:before {
+    content: '\e832';
+  }
+  n-listitem[type="401"] &:before {
+    content: '\e842';
+  }
+  n-listitem[type="404"] &:before {
+    content: '\e83c';
+  }
+  n-listitem[type="501"] &:before {
+    content: '\e83a';
+  }
+  n-listitem[type="702"] &:before {
+    content: '\e849';
+  }
+  n-listitem[type="1200"] &:before {
+    content: '\e845';
+  }
+}
