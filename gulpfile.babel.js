@@ -70,11 +70,6 @@ gulp.task('extras', () => {
 
 gulp.task('html', () => {
   return gulp.src('app/*.html')
-    .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
-    .pipe($.sourcemaps.init())
-    .pipe($.if('*.js', $.uglify()))
-    .pipe($.sourcemaps.write())
-    .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
     .pipe($.htmlmin({removeComments: true, collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 });
