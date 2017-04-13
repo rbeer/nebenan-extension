@@ -21,8 +21,9 @@ define(() => {
 
     static get ID_MAP() {
       return {
-        1: 'NORMAL',
-        4: 'DELETED'
+        1: 'FEED',
+        2: 'EVENT',
+        4: 'MARKET'
       };
     }
   }

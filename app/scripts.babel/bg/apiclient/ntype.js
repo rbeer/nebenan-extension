@@ -18,12 +18,12 @@ define(() => {
     static get ID_MAP() {
       return {
         300: 'EVENT',
-        400: 'MARKET',
+        400: 'FEED',
         401: 'ANSWER',
         404: 'THANKS',
         501: 'NEWGROUP',
         702: 'JOIN',
-        1200: 'FEED'
+        1200: 'MARKET'
       };
     }
 
@@ -42,9 +42,9 @@ define(() => {
     }*/
 
     /**
-     * **400** - Marketplace notification
+     * **400** - Feed notification
      */
-    static get MARKET() {
+    static get FEED() {
       return 400;
     }
 
@@ -79,9 +79,9 @@ define(() => {
     }
 
     /**
-     * **1200** - Feed notification
+     * **1200** - Marketplace notification
      */
-    static get FEED() {
+    static get MARKET() {
       return 1200;
     }
   }
