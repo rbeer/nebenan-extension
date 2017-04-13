@@ -2,7 +2,7 @@
 
 define(['lodash'], (_) => {
 
-  let typeError = (failCondition, msg, code) => {
+  let typeCheck = (failCondition, msg, code) => {
     if (failCondition) {
       let err = new TypeError(msg);
       err.code = code;
@@ -22,10 +22,10 @@ define(['lodash'], (_) => {
      * @return {Messaging}
      */
     constructor(handlers, parentId) {
-      typeError(!handlers,
+      typeCheck(!handlers,
                 'Messaging needs a set of handlers.',
                 'ENOSETOHANDLERS');
-      typeError((typeof parentId !== 'string'),
+      typeCheck((typeof parentId !== 'string'),
                 'Messaging needs a parentId to identify itself (Message.sender).',
                 'ENOPARENTID');
       this.handlers = handlers;
@@ -80,13 +80,13 @@ define(['lodash'], (_) => {
      * Sends a Message instance
      * @param  {Messaging.Message} message - Message instance to send
      * @this    Messaging                 - Messaging instance sending the message
-     * @throws {TypeError} If `this` is not an instance of Messaging
+     * @throws {typeCheck} If `this` is not an instance of Messaging
      */
     static sendMessage(message) {
-      typeError(!(this instanceof Messaging),
+      typeCheck(!(this instanceof Messaging),
                 'sendMessage must be bound to an instanece of Messaging.',
                 'ENOMESSAGINGTHIS');
-      typeError(!(message instanceof Message),
+      typeCheck(!(message instanceof Message),
                 'sendMessage expects \'message\' to be an instance of Messaging.Message.',
                 'ENOMESSAGE');
 
@@ -145,13 +145,13 @@ define(['lodash'], (_) => {
      * @return {Messaging.Message}
      */
     constructor(sender, to, handlers, payload) {
-      typeError((typeof sender !== 'string'),
+      typeCheck((typeof sender !== 'string'),
                 'Message needs a sender of type string.',
                 'ENOSENDER');
-      typeError((typeof to !== 'string'),
+      typeCheck((typeof to !== 'string'),
                 'Message needs a recipient (to).',
                 'ENOTO');
-      typeError(((typeof handlers !== 'string') && !(handlers instanceof Array)),
+      typeCheck(((typeof handlers !== 'string') && !(handlers instanceof Array)),
                 'Message needs one or more handler names.',
                 'ENOHANDLER');
 
@@ -195,7 +195,7 @@ define(['lodash'], (_) => {
      * @return {Messaging.Message}
      */
     static fromObject(obj) {
-      typeError(!obj,
+      typeCheck(!obj,
                 'From what object, exactly?',
                 'ENOOBJECT');
 
@@ -218,7 +218,7 @@ define(['lodash'], (_) => {
      * @return {Messaging.Message} - New instance of Message, serving as response to `this`
      */
     cloneForAnswer(handlers, payload) {
-      typeError(((typeof handlers !== 'string') && !(handlers instanceof Array)),
+      typeCheck(((typeof handlers !== 'string') && !(handlers instanceof Array)),
                 'Message needs one or more handler names.',
                 'ENOHANDLER');
 
