@@ -38,6 +38,7 @@
     "default_popup": "popup.html"
   },
   "web_accessible_resources": [
-    "images/icon_128.png"
+    "images/icon_128.png",
+    "images/thumb_dummy.jpg"
   ]
 }

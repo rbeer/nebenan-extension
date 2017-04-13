@@ -56,26 +56,21 @@ define(['lodash'], (_) => {
     receive(message, sender, respond) {
       // ignore messages not for this instance
       if (message.to === this.parentId) {
-        // handle initial messages
-        // } else {
-        // handle response messages
-        if (true) {
-          let self = this;
-          // create Message instance
-          let msg = Message.fromObject(message);
+        let self = this;
 
-          // find matching handlers (intersection available/requested)
-          let mhandlers = _.intersection(msg.handlers, Object.keys(this.handlers));
+        // create Message instance
+        let msg = Message.fromObject(message);
 
-          mhandlers.forEach((handler) => {
-            self.handlers[handler].call(self, msg, respond);
-          });
+        // find matching handlers (intersection available/requested)
+        let mhandlers = _.intersection(msg.handlers, Object.keys(this.handlers));
 
-          // @if DEV=true
-          this.handlers.dev.call(this, msg);
-          // @endif
+        mhandlers.forEach((handler) => {
+          self.handlers[handler].call(self, msg, respond);
+        });
 
-        }
+        // @if DEV=true
+        this.handlers.dev.call(this, msg);
+        // @endif
       }
 
       return true;
@@ -99,9 +94,16 @@ define(['lodash'], (_) => {
 
       chrome.runtime.sendMessage(message.toObject(), (response) => {
         if (!response) {
+          let crx_le = chrome.runtime.lastError;
+
           console.error('Sending a Message has failed.');
           console.error(message);
-          return console.error(chrome.runtime.lastError);
+          console.error(chrome.runtime.lastError);
+          if (crx_le.message.includes('before a reponse was received')) {
+            console.warn('Did you call the `respond` callback in the message ' +
+                         'handler on the other end?');
+          }
+          return;
         }
         self.receive(response);
         return true;

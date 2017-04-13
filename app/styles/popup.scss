@@ -1,11 +1,39 @@
+/** VARIABLES **/
+$BG_LIGHT: rgb(237, 237, 233);
+$BG_DARK: #393939;
+
+$TEXT_GREEN: #b2ca06;
+$TEXT_WHITE: #fff;
+
+$BTN_GREEN_BG: #b2ca06;
+$BTN_GREEN_HOVER_BG: #bad306;
+$BTN_GREEN_TEXT: #131;
+
+$BTN_GRAY_BG: #393939;
+$BTN_GRAY_HOVER_BG: #414239;
+$BTN_GRAY_TEXT: #fff;
+
+$SCROLLBAR_GRADIENT_1: $BTN_GREEN_BG;
+$SCROLLBAR_GRADIENT_2: $BTN_GREEN_HOVER_BG;
+/** --------- **/
+
+/** MAIN LAYOUT **/
 body {
   margin: 0;
-  padding: 50px 14px 14px 14px;
-  width: 300px;
-  background: rgb(237, 237, 233);
-  height: 240px;
+  padding: 46px 3px 0px 3px;
+  width: 350px;
+  background: $BG_LIGHT;
   font: 400 14px/20px 'Open Sans','Helvetica Neue',Arial,sans-serif;
-  max-height: 0px;
+  font-size: 14px;
+  line-height: 20px;
+}
+
+a, a:visited {
+  color: #799189;
+  text-decoration: none;
+}
+a:hover {
+  color: #575757;
 }
 
 @font-face {
@@ -34,7 +62,6 @@ body {
   text-transform: none;
   line-height: 1em;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
 .hidden {
@@ -45,6 +72,11 @@ body {
 [aria-role="button"][action] * {
   pointer-events: none;
 }
+/** ----------- **/
 
+/** header **/
 @import 'popup/header';
+/** Login Prompt; showing when user is not logged in **/
 @import 'popup/login-prompt';
+/** Notification List **/
+@import 'popup/n-list';

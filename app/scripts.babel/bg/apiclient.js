@@ -100,7 +100,7 @@ define([
      */
     static getCounterStats(cached) {
       if (cached) {
-        return cached;
+        return auth.canAuthenticate().then(() => cached);
       }
       return auth.canAuthenticate()
       .then(() => {
@@ -119,26 +119,25 @@ define([
      * @memberOf APIClient
      * @static
      * @see APIClient.callAPI
-     * @return {Promise} - Resolves with Array of NItem instances, parsed from
-     *                     the response body APIClient.callAPI resolved with
+     * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
      */
-    static getNotifications(lower) {
-      let per_page = 7;
+    static getNotifications(lower, perPage, cached) {
+      lower = lower || 0;
+      perPage = perPage || 7;
+      if (cached) {
+        return auth.canAuthenticate().then(() => cached);
+      }
       return auth.canAuthenticate()
       .then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/notifications.json?per_page=' + per_page;
+        xhrOptions.url += '/notifications.json?per_page=' + perPage;
         if (lower) {
           xhrOptions.url += '&lower=' + lower;
         }
         xhrOptions.token = auth.token;
         return xhrOptions;
       })
-      .then(APIClient.callAPI)
-      .then((body) => {
-        let notifications = JSON.parse(body).notifications;
-        return notifications.map((n) => new APIClient.NItem(n));
-      });
+      .then(APIClient.callAPI);
     }
   };
 

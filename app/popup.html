@@ -2,7 +2,6 @@
 <html>
   <head>
     <link href="styles/popup.css" rel="stylesheet">
-    <!-- <script src="scripts/popup/nlist-item.js" type="text/javascript" charset="utf-8"></script> -->
   </head>
   <body>
     <div class="login-blur">
@@ -27,11 +26,25 @@
           </div>
         </div>
       </div>
-      <!-- <div class="nlist">
-        <div class="nlist-item" type=""></div>
-        <div class="nlist-item"></div>
-        <div class="nlist-item"></div>
-      </div> -->
+      <div class="n-list-container">
+        <n-list id="n-list" class="n-list"></n-list>
+
+        <template id="n-listitem">
+          <div class="n-list-slot">
+            <div class="n-listitem">
+              <span class="n-listitem-thumb"></span>
+              <div class="n-listitem-preview">
+                <span class="n-listitem-type na-icon"></span>
+                <span class="n-listitem-title"></span>
+                <span class="n-listitem-body"></span>
+              </div>
+              <div class="n-listitem-dismiss na-icon" aria-role="button"></div>
+            </div>
+          </div>
+        </template>
+
+        <div class="n-list-scrollthumb-overlay"></div>
+      </div>
     </div>
 
     <div class="login-prompt hidden">

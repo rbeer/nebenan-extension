@@ -1,6 +1,6 @@
 'use strict';
 
-define(['messaging', 'popup/ui'], (Messaging, ui) => {
+define(['messaging', 'popup/ui', 'bg/apiclient/nitem'], (Messaging, ui, NItem) => {
 
   window.devlog = console.debug;
 
@@ -28,7 +28,8 @@ define(['messaging', 'popup/ui'], (Messaging, ui) => {
 
     // init Messaging
     popupApp.messaging = new Messaging({
-      setStats: popupApp.setStats,                // response for bg/app:getStats
+      setStats: popupApp.setStats,                 // response for bg/app:getStats
+      addNotifications: popupApp.addNotifications, // response for bg/app:getNotifications
       error: handleErrorMessages
     }, 'popup/app');
 
@@ -36,6 +37,9 @@ define(['messaging', 'popup/ui'], (Messaging, ui) => {
 
     // query bgApp for stats
     popupApp.messaging.send('bg/app', ['getStats']);
+
+    // query bgApp for notifications
+    popupApp.messaging.send('bg/app', ['getNotifications']);
 
   };
 
@@ -51,6 +55,14 @@ define(['messaging', 'popup/ui'], (Messaging, ui) => {
       messages: msg.payload.messages || 0,
       notifications: msg.payload.notifications || 0,
       users: users
+    });
+  };
+
+  popupApp.addNotifications = (msg) => {
+    msg.payload.forEach((nItemObject) => {
+      let nitem = new NItem(nItemObject);
+      devlog(nitem);
+      popupApp.ui.addNotification(nitem);
     });
   };
 

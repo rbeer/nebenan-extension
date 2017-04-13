@@ -56,7 +56,7 @@ gulp.task('extras', () => {
   return gulp.src([
     'app/*.*',
     'app/_locales/**',
-    'app/fonts/*.*',
+    'app/fonts/*.woff',
     '!app/*.js',
     '!app/scripts.babel',
     '!app/*.json',
@@ -96,8 +96,8 @@ gulp.task('html', () => {
 gulp.task('styles', () => {
   return gulp.src('app/styles/**/*.scss')
     .pipe($.sourcemaps.init())
-    .pipe($.sass().on('error', $.sass.logError))
-    .pipe($.cleanCss({compatibility: '*'}))
+    .pipe($.sass({ outputStyle: DEV ? 'expanded' : 'compressed'}).on('error', $.sass.logError))
+    //.pipe($.cleanCss({compatibility: '*'}))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('dist/styles'));
 });
