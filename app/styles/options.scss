@@ -1,0 +1,42 @@
+$TEXT_GREEN: #b2ca06;
+
+body {
+  padding: 20px;
+  min-width: 500px;
+}
+
+abbr {
+  text-decoration: $TEXT_GREEN dotted underline;
+  cursor: help;
+}
+
+a, a:visited {
+  text-decoration: none;
+}
+
+#social-info {
+  .ico {
+    width: 24px;
+    height: 24px;
+    margin: 3px;
+  }
+  .ico:not(.rofl) {
+    background-image: url(../images/options/social-sprites.png);
+    background-size: cover;
+  }
+  .rofl {
+    display: inline-block;
+    background-image: url(../images/options/rofl.png);
+    background-size: contain;
+    vertical-align: middle;
+  }
+  .github {
+    background-position-y: 48px;
+  }
+  .email {
+    background-position-y: -24px;
+  }
+  .facebook {
+    background-position-y: 24px;
+  }
+}
