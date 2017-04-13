@@ -30,12 +30,12 @@ define([
         this.hood_message = new NMessage(raw.hood_message);
       };
 
-      let createNType = function() {
+      let wrapNType = function() {
         this.notification_type_id = new NType(raw.notification_type_id);
       };
 
       let subsetKeys = [
-        'id', extractMessage, 'created_at_timestamp', createNType, 'seen'
+        'id', extractMessage, 'created_at_timestamp', wrapNType, 'seen'
       ];
       super(subsetKeys, raw);
     }

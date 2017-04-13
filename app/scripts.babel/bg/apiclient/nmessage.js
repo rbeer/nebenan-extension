@@ -1,6 +1,9 @@
 'use strict';
 
-define(['bg/apiclient/nsubset'], (NSubset) => {
+define([
+  'bg/apiclient/nsubset',
+  'bg/apiclient/nmessage-type'
+], (NSubset, NMessageType) => {
 
   /**
    * @class Message, linked to an NItem
@@ -17,7 +20,7 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
      * @param {Number}   raw.id                        - Message's id
      * @param {Number}   raw.created                   - UNIX epoch timestamp, millisecond precision
      * @param {Number}   raw.user_id                   - Author's id
-     * @param {Number}   raw.hood_message_type_id      - ! UNKNOWN !
+     * @param {Number}   raw.hood_message_type_id      - Id of message type (e.g. deleted = 4)
      * @param {Number}   raw.hood_message_category_id  - ! UNKNOWN !
      * @param {?Number}  raw.hood_group_id             - Id of group, message was posted in
      * @param {String}   raw.body                      - Message body
@@ -49,10 +52,14 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
         this.user = new NSubset(userSubsetKeys, raw.user);
       };
 
+      let wrapNMessageType = function() {
+        this.hood_message_type_id = new NMessageType(raw.hood_message_type_id);
+      };
+
       let subsetKeys = [
         'id', 'created', 'user_id',
         'body', 'subject', 'images',
-        'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
+        wrapNMessageType, 'hood_message_category_id', 'hood_group_id',
         'hood_id', 'house_group', slimUser
       ];
       super(subsetKeys, raw);

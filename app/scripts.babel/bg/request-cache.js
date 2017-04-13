@@ -80,8 +80,8 @@ define(() => {
     get data() {
       return this._data;
     }
-    set data(v) {
-      this._data = StatsCache.sanitizeStats(v);
+    set data(rawData) {
+      this._data = StatsCache.sanitizeStats(rawData);
       this.lastUpdate = Date.now() * 1000;
     }
 
