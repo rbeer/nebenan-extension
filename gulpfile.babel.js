@@ -19,7 +19,7 @@ const $ = gulpLoadPlugins();
 let DEV = process.argv.includes('--dev');
 // Whether to include docs generation
 let DOCS = process.argv.includes('--with-docs');
-// Generate lodash library, no matter what
+// Generate (not just copy existing) lodash library, no matter what
 let LODASH = process.argv.includes('--with-lodash');
 
 //---------------------------------\
@@ -54,9 +54,10 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
 
 gulp.task('extras', () => {
   return gulp.src([
-    'app/*.*',
     'app/_locales/**',
     'app/fonts/*.woff',
+    'app/images/**/*',
+    '!app/images/**/*.xcf',
     '!app/*.js',
     '!app/scripts.babel',
     '!app/*.json',
@@ -67,22 +68,6 @@ gulp.task('extras', () => {
   }).pipe(gulp.dest('dist'));
 });
 
-gulp.task('images', () => {
-  return gulp.src('app/images/**/*')
-    .pipe($.if($.if.isFile, $.cache($.imagemin({
-      progressive: true,
-      interlaced: true,
-      // don't remove IDs from SVGs, they are often used
-      // as hooks for embedding and styling
-      svgoPlugins: [{cleanupIDs: false}]
-    }))
-    .on('error', function(err) {
-      console.log(err);
-      this.end();
-    })))
-    .pipe(gulp.dest('dist/images'));
-});
-
 gulp.task('html', () => {
   return gulp.src('app/*.html')
     .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
@@ -90,6 +75,7 @@ gulp.task('html', () => {
     .pipe($.if('*.js', $.uglify()))
     .pipe($.sourcemaps.write())
     .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
+    .pipe($.htmlmin({removeComments: true, collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 });
 
@@ -298,7 +284,7 @@ gulp.task('build', cb => {
 
   let buildTasks = [
     'lint', 'babel', 'scripts', 'lodash', 'version',
-    ['html', 'styles', 'images', 'extras'],
+    ['html', 'styles', 'extras'],
     'requirejs', 'size', cb
   ];
   // build with docs
@@ -336,8 +322,6 @@ gulp.task('package', () => {
       .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
       .pipe(gulp.dest('package'));
 });
-
-//---------------------------/
 
 //---------------------------\
 // defaults to `build`
