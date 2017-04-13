@@ -15,27 +15,39 @@ a, a:visited {
 }
 
 #social-info {
+
+  width: 100%;
+
+  td:nth-of-type(1), td:nth-of-type(3) {
+    width: 30px;
+  }
+
   .ico {
     width: 24px;
     height: 24px;
     margin: 3px;
   }
+
   .ico:not(.rofl) {
     background-image: url(../images/options/social-sprites.png);
     background-size: cover;
   }
+
   .rofl {
     display: inline-block;
     background-image: url(../images/options/rofl.png);
     background-size: contain;
     vertical-align: middle;
   }
+
   .github {
     background-position-y: 48px;
   }
+
   .email {
     background-position-y: -24px;
   }
+
   .facebook {
     background-position-y: 24px;
   }
