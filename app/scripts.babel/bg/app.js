@@ -150,7 +150,7 @@ define([
       // strip notifications that defy the standard object layout
       // e.g. NType.NEWGROUP (501) doesn't have a hood_message
       // member. Skip everything but some standard messages, until
-      // error/NType handling is implemented
+      // proper error/NType handling is implemented
       let safeTypes = [
         APIClient.NType.EVENT,
         APIClient.NType.MARKET,
@@ -158,6 +158,15 @@ define([
         APIClient.NType.FEED
       ];
       parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id));
+      // exclude deleted messages
+      // site doesn't filter, so I assume there's no flag to
+      // safely identify deleted messages;
+      // working around with:
+      // { subject: 'gelöscht', body: 'gelöscht-gelöscht' } detection
+      // I don't have to mention that this is highly VOLATILE, right? :smirk:
+      parsed = parsed.filter((n) => n.hood_message.subject !== 'gelöscht' &&
+                                    n.hood_message.body !== 'gelöscht-gelöscht');
+      // P.S. - 6:1 (comments:code) ratio is a good thing, isn't it? :sweat_smile:
 
       return parsed.map((n) => new APIClient.NItem(n));
     });
