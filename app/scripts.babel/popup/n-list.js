@@ -49,6 +49,6 @@ define([
   // https://bugs.chromium.org/p/chromium/issues/detail?id=618606
   document.registerElement('n-list', NList, { extends: 'ul' });
 
-  return true;
+  return NList;
 
 });

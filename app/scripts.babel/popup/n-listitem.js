@@ -1,6 +1,6 @@
 'use strict';
 
-define(() => {
+define(['bg/apiclient/nitem'], (NItem) => {
 
   /**
    * @class Item for NList
@@ -124,6 +124,6 @@ define(() => {
   // https://bugs.chromium.org/p/chromium/issues/detail?id=618606
   document.registerElement('n-listitem', NListItem, { extends: 'li' });
 
-  return true;
+  return NListItem;
 
 });
