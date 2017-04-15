@@ -57,7 +57,7 @@ gulp.task('extras', () => {
     'app/_locales/**',
     'app/fonts/*.woff',
     'app/images/**/*',
-    '!app/images/**/*.xcf',
+    '!app/images/_xcf{,/*.xcf}',
     '!app/*.js',
     '!app/scripts.babel',
     '!app/*.json',
