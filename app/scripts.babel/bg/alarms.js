@@ -72,7 +72,7 @@ define(() => {
     fireStats() {
       devlog(this.statsName, 'is firing.');
       let self = this;
-      this.parentApp.updateStats()
+      this.parentApp.getStats()
       .then(this.parentApp.updateBrowserAction)
       .catch((err) => {
         if (err.code === 'ENOTOKEN') {

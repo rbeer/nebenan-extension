@@ -10,28 +10,27 @@ import preprocess from 'gulp-preprocess';
 
 const $ = gulpLoadPlugins();
 
-let DEV = false;
+// Sets build into DEV mode
+// - Includes and loads module:bg/dev
+//   Exposing `window.bgApp`, `bgApp.dev`, ...
+// - Watch out for the preprocess() parts in
+//   script files! A search for `// @` over
+//   `/app/scripts.babel/` should reveal them all.
+let DEV = process.argv.includes('--dev');
+// Whether to include docs generation
+let DOCS = process.argv.includes('--with-docs');
+// Generate (not just copy existing) lodash library, no matter what
+let LODASH = process.argv.includes('--with-lodash');
+
+//---------------------------------\
+// The Good, The Bad, The Scritps
 
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
         .pipe($.sourcemaps.init())
-        .pipe($.uglify())
+        .pipe($.if(!DEV, $.uglify(), gutil.noop()))
         .pipe($.sourcemaps.write('.'))
         .pipe(gulp.dest('dist/scripts'));
-});
-
-gulp.task('extras', () => {
-  return gulp.src([
-    'app/*.*',
-    'app/_locales/**',
-    'app/fonts/*.*',
-    '!app/scripts.babel',
-    '!app/*.json',
-    '!app/*.html'
-  ], {
-    base: 'app',
-    dot: true
-  }).pipe(gulp.dest('dist'));
 });
 
 function lint(files, options) {
@@ -47,38 +46,39 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
     es6: true
   }
 }));
+//---------------------------/
 
-gulp.task('images', () => {
-  return gulp.src('app/images/**/*')
-    .pipe($.if($.if.isFile, $.cache($.imagemin({
-      progressive: true,
-      interlaced: true,
-      // don't remove IDs from SVGs, they are often used
-      // as hooks for embedding and styling
-      svgoPlugins: [{cleanupIDs: false}]
-    }))
-    .on('error', function(err) {
-      console.log(err);
-      this.end();
-    })))
-    .pipe(gulp.dest('dist/images'));
+//---------------------------\
+// HTML, Styles, Images, ...
+// a/k/a meta data :smirk:
+
+gulp.task('extras', () => {
+  return gulp.src([
+    'app/_locales/**',
+    'app/fonts/*.woff',
+    'app/images/**/*',
+    '!app/images/_xcf{,/*.xcf}',
+    '!app/*.js',
+    '!app/scripts.babel',
+    '!app/*.json',
+    '!app/*.html'
+  ], {
+    base: 'app',
+    dot: true
+  }).pipe(gulp.dest('dist'));
 });
 
 gulp.task('html', () => {
   return gulp.src('app/*.html')
-    .pipe($.useref({searchPath: ['.tmp', 'app', '.']}))
-    .pipe($.sourcemaps.init())
-    .pipe($.if('*.js', $.uglify()))
-    .pipe($.sourcemaps.write())
-    .pipe($.if('*.html', $.htmlmin({removeComments: true, collapseWhitespace: true})))
+    .pipe($.htmlmin({removeComments: true, collapseWhitespace: true}))
     .pipe(gulp.dest('dist'));
 });
 
 gulp.task('styles', () => {
   return gulp.src('app/styles/**/*.scss')
     .pipe($.sourcemaps.init())
-    .pipe($.sass().on('error', $.sass.logError))
-    .pipe($.cleanCss({compatibility: '*'}))
+    .pipe($.sass({ outputStyle: DEV ? 'expanded' : 'compressed'}).on('error', $.sass.logError))
+    //.pipe($.cleanCss({compatibility: '*'}))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('dist/styles'));
 });
@@ -102,7 +102,132 @@ gulp.task('babel', () => {
       .pipe(gulp.dest('app/scripts'));
 });
 
-gulp.task('clean', del.bind(null, ['.tmp', 'dist', 'app/scripts']));
+gulp.task('size', () => {
+  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+});
+
+//---------------------------/
+
+//---------------------------\
+// Cleanup Crews
+
+gulp.task('clean', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+
+  let delPaths = ['dist', 'app/scripts', docPath, latestLink];
+  if (LODASH) {
+    delPaths.push('app/lodash.js');
+  }
+  del(delPaths).then(() => {
+    cb();
+  });
+});
+
+gulp.task('clean-docs', (cb) => {
+  let pkg = require('./package.json');
+  let docPath = `docs/${pkg.name}/${pkg.version}`;
+  let latestLink = `docs/${pkg.name}/latest`;
+  del([docPath, latestLink]).then(() => {
+    cb();
+  });
+});
+
+//---------------------------/
+
+//---------------------------\
+// Bundling
+
+let runProcess = (cmd, args, cb) => {
+  let log = (data) => {
+    data.toString()
+        .split('\n')
+        .forEach((line) => line !== '' ? gutil.log(line) : void 0);
+  };
+  let proc = require('child_process').spawn(cmd, args);
+  proc.stdout.on('data', log);
+  proc.stderr.on('data', log);
+  proc.on('close', cb);
+};
+
+// require.js
+let requirejsTask = (type, cb) => {
+  let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
+  runProcess('r.js', [ '-o', rjsConfig ], cb);
+};
+
+gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
+
+gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
+
+gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
+
+let copyLodash = (path) => {
+  return gulp.src(path)
+             .pipe(gulp.dest('dist/scripts'));
+};
+
+// lodash
+gulp.task('lodash', cb => {
+
+  const fs = require('fs');
+
+  // require lodash-cli arguments
+  let argsObj = require('./.lodash.json');
+
+  let generate = () => {
+    gutil.log('Generating NEW lodash library');
+
+    // ES strict mode; ftw
+    let args = ['strict'];
+    // dev = output only non-minified
+    // production = output only minified
+    args.push(DEV ? '-d' : '-p');
+
+    // add to spawn() args array from required object
+    for (let arg in argsObj) {
+      // arguments with leading dash(es)
+      // aren't concatenated to their values, ...
+      if (arg.startsWith('-')) {
+        args.push(arg);
+        // .. some don't even have a value
+        if (argsObj[arg]) {
+          args.push(argsObj[arg]);
+        }
+      } else {
+        let argString = arg + '=' + argsObj[arg];
+        args.push(argString);
+      }
+    }
+
+    // run lodash-cli
+    runProcess('lodash', args, () => {
+      copyLodash(argsObj['-o']);
+      cb();
+    });
+  };
+
+  // try to only copy file in dev mode
+  // (generation takes 10s+)
+  if (DEV && !LODASH) {
+    return fs.access(argsObj['-o'], (err) => {
+      // file DOES exist
+      if (!err) {
+        gutil.log('Using lodash COPY');
+        copyLodash(argsObj['-o']);
+        return cb();
+      }
+      // file does not exist
+      generate();
+    });
+  }
+  // generate library on normal `build`s
+  generate();
+});
+
+//---------------------------\
+// watchers
 
 gulp.task('watch', cb => {
 
@@ -112,18 +237,77 @@ gulp.task('watch', cb => {
 
   gulp.watch([ 'app/**/*.*' ], (evt) => {
     if (!building) {
+      let buildTasks = [
+        'clean', 'build',
+        () => {
+          building = false;
+          $.livereload.reload(evt.path);
+        }
+      ];
+      if (DOCS) {
+        buildTasks.splice(buildTasks.length - 2, 'docs');
+      }
       building = true;
-      runSequence('build', () => {
-        building = false;
-        $.livereload.reload(evt.path);
-      });
+      runSequence.apply(null, buildTasks);
     }
   });
   cb();
 });
 
-gulp.task('size', () => {
-  return gulp.src('dist/**/*').pipe($.size({title: 'build', gzip: true}));
+gulp.task('watch-docs', cb => {
+  runSequence('clean-docs', 'docs', () => {
+    gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
+    cb();
+  });
+});
+
+//-------------------------------------\
+// Main Tasks
+// `build`   - Main build chain
+//               --with-docs to include
+//               building documentation
+// `docs`    - Generates jsdoc for
+//             current version in /docs/
+// `dev`     - Build in developement mode
+//             and watch /app/; builds docs
+// `package` - Package/Zip /dist/
+//             This does **not** create
+//             a valid .crx!
+
+gulp.task('build', cb => {
+  DOCS = DOCS || process.argv.includes('--with-docs');
+
+  let buildTasks = [
+    'lint', 'babel', 'scripts', 'lodash', 'version',
+    ['html', 'styles', 'extras'],
+    'requirejs', 'size', cb
+  ];
+  // build with docs
+  if (DOCS) {
+    buildTasks.splice(buildTasks.length - 2, 0, 'docs');
+  }
+
+  runSequence.apply(null, buildTasks);
+});
+
+gulp.task('docs', cb => {
+  let config = require('./.jsdoc.json');
+  if (DOCS) {
+    config.opts.verbose = false;
+  }
+  let pkg = require('./package.json');
+  let docPath = `./${pkg.version}`;
+  let latestPath = `docs/${pkg.name}/latest`;
+  gulp.src('app/scripts.babel/**/*.js')
+    .pipe($.jsdoc3(config, () => {
+      require('fs').symlink(docPath, latestPath, 'dir', cb);
+    }));
+});
+
+gulp.task('dev', cb => {
+  DEV = true;
+  DOCS = true;
+  runSequence('clean', 'build', 'watch', cb);
 });
 
 gulp.task('package', () => {
@@ -134,43 +318,11 @@ gulp.task('package', () => {
       .pipe(gulp.dest('package'));
 });
 
-gulp.task('rjs', cb => {
-  const spawn = require('child_process').spawn;
-  let rjs = spawn('r.js', [ '-o', '.rjs' ]);
-
-  let logRjs = (data) => {
-    data.toString()
-        .split('\n')
-        .forEach((line) => line !== '' ? gutil.log(line) : void 0);
-  };
-
-  rjs.stdout.on('data', logRjs);
-  rjs.stderr.on('data', logRjs);
-  rjs.on('close', cb);
-});
-
-gulp.task('docs', cb => {
-  let config = require('./.jsdoc.json');
-  gulp.src('app/scripts.babel/**/*')
-    .pipe($.jsdoc3(config, cb));
-});
-
-gulp.task('watch-docs', cb => {
-  gulp.watch('app/**/*.js', ['docs']);
-});
-
-gulp.task('build', cb => {
-  runSequence(
-    'lint', 'babel', 'version',
-    ['scripts', 'html', 'styles', 'images', 'extras'],
-    'rjs', 'size', cb);
-});
-
-gulp.task('dev', cb => {
-  DEV = true;
-  runSequence('clean', 'build', 'watch', cb);
-});
+//---------------------------\
+// defaults to `build`
 
 gulp.task('default', ['clean'], cb => {
   runSequence('build', cb);
 });
+
+//---------------------------/

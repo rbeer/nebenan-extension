@@ -4,25 +4,26 @@
   top: 0;
   left: 0;
   width: 100%;
+  height: $HEADER_HEIGHT;
   margin-left: auto;
   margin-right: auto;
-  background: #393939;
+  background: $BG_DARK;
 
   > div {
     display: inline-block;
-    color: #fff;
+    color: $TEXT_WHITE;
   }
 }
 
 
 .logo {
   float: none;
-  color: #fff;
+  color: $TEXT_WHITE;
   cursor: pointer;
   width: 150px;
 }
 .logo:hover {
-  color: #b2ca06;
+  color: $TEXT_GREEN;
 }
 
 .logo-icon {

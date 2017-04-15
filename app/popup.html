@@ -26,6 +26,24 @@
           </div>
         </div>
       </div>
+      <div class="n-list-container">
+        <n-list id="n-list" class="n-list"></n-list>
+
+        <template id="n-listitem">
+          <div class="n-list-slot">
+            <div class="n-listitem">
+              <span class="n-listitem-thumb"></span>
+              <div class="n-listitem-preview">
+                <span class="n-listitem-type na-icon"></span>
+                <span class="n-listitem-title"></span>
+                <span class="n-listitem-body"></span>
+              </div>
+              <div class="n-listitem-dismiss na-icon" aria-role="button"></div>
+            </div>
+          </div>
+        </template>
+      </div>
+      <div class="n-list-scrollthumb-overlay"></div>
     </div>
 
     <div class="login-prompt hidden">
@@ -44,6 +62,6 @@
 
     <div class="login-overlay hidden"></div>
 
-    <script src="scripts/popup.js"></script>
+    <script src="scripts/builds/popup.js"></script>
   </body>
 </html>
