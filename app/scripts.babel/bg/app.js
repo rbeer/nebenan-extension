@@ -182,12 +182,13 @@ define([
     console.log('Updating browserAction with:', stats);
 
     let allNew = stats.messages + stats.notifications;
+    let hasNew = allNew > 0;
 
-    let iconPath = `images/icon-${allNew > 0 ? 'unread' : 'read'}_16.png`;
+    let iconPath = `images/icon-${hasNew ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
 
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
-    chrome.browserAction.setBadgeText({ text: allNew + '' });
+    chrome.browserAction.setBadgeText({ text: hasNew ? allNew + '' : '' });
 
     return stats;
   };

@@ -51,7 +51,8 @@ define(['popup/n-list'], (nlist) => {
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.nlist.parentElement.addEventListener('scroll', ui.showScrollbar.bind(null, overlay));
+    ui.nlist.parentElement.addEventListener('scroll',
+                                            ui.showScrollbar.bind(null, overlay));
   };
 
   ui.showScrollbar = (overlay, evt) => {
