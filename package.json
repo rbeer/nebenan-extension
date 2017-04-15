@@ -1,6 +1,6 @@
 {
   "name": "nebenan.de",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "engines": {
     "node": ">=0.8.0"
