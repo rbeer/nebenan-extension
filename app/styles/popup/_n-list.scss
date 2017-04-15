@@ -43,13 +43,17 @@ n-listitem {
 
 .n-list-scrollthumb-overlay {
   position: absolute;
-  top: 0;
+  top: $HEADER_HEIGHT;
   right: 0;
   height: 100%;
   width: .6em;
   background: $BG_LIGHT;
   opacity: 1;
   transition: opacity 0.3s ease-out;
+
+  &.scrolling {
+    opacity: 0;
+  }
 }
 
 .n-list {

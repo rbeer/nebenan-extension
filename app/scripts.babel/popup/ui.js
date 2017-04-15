@@ -18,7 +18,8 @@ define(['popup/n-list'], (nlist) => {
         overlay: null,
         prompt: null
       },
-      nlist: null
+      nlist: null,
+      scrollOverlayTimeout: null
     }
   };
 
@@ -47,6 +48,17 @@ define(['popup/n-list'], (nlist) => {
 
     // reference notification list
     ui.nlist = document.getElementById('n-list');
+
+    // hook scroll event to show/hide scrollbar
+    let overlay = document.querySelector('.n-list-scrollthumb-overlay');
+    ui.nlist.parentElement.addEventListener('scroll', ui.showScrollbar.bind(null, overlay));
+  };
+
+  ui.showScrollbar = (overlay, evt) => {
+    overlay.classList.add('scrolling');
+    ui.scrollOverlayTimeout = window.setTimeout(() => {
+      overlay.classList.remove('scrolling');
+    }, 750);
   };
 
   /**
