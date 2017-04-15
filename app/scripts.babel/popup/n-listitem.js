@@ -53,13 +53,19 @@ define(['bg/apiclient/nitem'], (NItem) => {
       this.querySelector('[aria-role="button"]')
           .addEventListener('click', this.dismiss.bind(this));
 
-      // set stuff
+      // set element's attributes
+      let nMsg = nItem.hood_message;
+
       this.type = nItem.notification_type_id;
       this.id = nItem.id;
       this.seen = nItem.seen;
-      this.title = nItem.hood_message.subject;
-      this.body = nItem.hood_message.body;
-      this.link = nItem.hood_message.id;
+
+      this.title = nMsg.subject;
+      this.body = nMsg.body;
+      this.link = 'https://nebenan.de/feed/' + nMsg.id;
+
+      // set thumbnail
+      this.setThumb(nMsg);
 
       return this;
     }
@@ -87,13 +93,39 @@ define(['bg/apiclient/nitem'], (NItem) => {
       this.querySelector('.n-listitem-body').innerText = singleLine;
     }
 
-    set link(messageId) {
-      let url = 'https://nebenan.de/feed/' + messageId;
+    set link(url) {
       this.setAttribute('link', url);
     }
 
     get link() {
       return this.getAttribute('link');
+    }
+
+    setThumb(nMessage) {
+
+      let url;
+      let thumbStyle = this.querySelector('.n-listitem-thumb').style;
+      // use (first) image attached to message
+      // or user's thumbnail
+      // or random dummy avatar as last resort (based on sex)
+      if (nMessage.images[0]) {
+        url = nMessage.images[0].url_medium;
+      } else if (nMessage.user.photo_thumb_url) {
+        url = nMessage.user.photo_thumb_url;
+      } else {
+        let rnd = Math.floor(Math.random() * 6) + 1;
+        // dummy avatars are all in one file
+        // women on the left, men on the right;
+        // 7 pictures, each -> 2x7 matrix
+        url = '../images/usr_thumb_fallbacks.png';
+        // 50px avatar width * 2 columns
+        thumbStyle.backgroundSize = '100px';
+        // offset background for males (right column)
+        thumbStyle.backgroundPositionX = `${nMessage.user.sex_id * 50}px`;
+        // random row
+        thumbStyle.backgroundPositionY = `${rnd * 50}px`;
+      }
+      thumbStyle.backgroundImage = `url(${url})`;
     }
 
     /**

@@ -38,13 +38,14 @@ define([
      * @param {String}   raw.user.photo_thumb_url      - Auhtor's profile image (thumbnail size)
      * @param {Number}   raw.user.hood_id              - ID of author's hood
      * @param {String}   raw.user.hood_title           - Name of author's hood
+     * @param {String}   raw.user.sex_id               - Author's sex (0: female, 1: male)
      * @constructor
      * @return {NMessage}
      */
     constructor(raw) {
 
       let userSubsetKeys = [
-        'id', 'firstname', 'lastname',
+        'id', 'firstname', 'lastname', 'sex_id',
         'photo_thumb_url', 'hood_id', 'hood_title'
       ];
 
@@ -52,14 +53,10 @@ define([
         this.user = new NSubset(userSubsetKeys, raw.user);
       };
 
-      let wrapNMessageType = function() {
-        this.hood_message_type_id = new NMessageType(raw.hood_message_type_id);
-      };
-
       let subsetKeys = [
         'id', 'created', 'user_id',
         'body', 'subject', 'images',
-        wrapNMessageType, 'hood_message_category_id', 'hood_group_id',
+        'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
         'hood_id', 'house_group', slimUser
       ];
       super(subsetKeys, raw);
