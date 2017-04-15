@@ -179,6 +179,7 @@ define([
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
+    console.log('Updating browserAction with:', stats);
 
     let allNew = stats.messages + stats.notifications;
 
@@ -192,14 +193,15 @@ define([
   };
 
   // fires when extension (i.e. user's profile) starts up
-  chrome.runtime.onStartup.addListener(bgApp.init);
+  // chrome.runtime.onStartup.addListener();
 
   // fires when extension is installed or reloaded on extension page
   chrome.runtime.onInstalled.addListener(details => {
     devlog('onInstalled:', details);
-    // init bgApp on extension reloads
-    bgApp.init();
   });
+
+  // init extension
+  bgApp.init();
 
   return bgApp;
 
