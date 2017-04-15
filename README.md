@@ -1,3 +1,11 @@
+## v0.2.0
+
+- [53a9239]  commit: Fix: bgApp.init
+- [c0d2f27]  commit: Add: options dialog
+- [6fd4af0]  commit: Add: NList and NListItem web component classes
+- [7f7b87f]  commit: Change: Opting for simpler hover card design ...
+- [9bec90f]  commit: Add: lodash
+
 ## v0.1.1
 
 #### Introduced requirejs to popup/* scripts
@@ -19,3 +27,6 @@
 - [9bec90f] commit: Add: lodash
 - [32b9812] commit: Add: generate docs in `dev` task and `$ gulp build --with-docs`
 
+## v0.1.0
+
+Just sketching, really. :)
