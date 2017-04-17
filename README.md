@@ -40,7 +40,7 @@ Sets build into DEV mode
  - Enables console.debug messages
 
    ![](./_img/devlog.png)
- - Includes and loads [module:bg/dev](./app/scripts.babel/bg/dev.js)
+ - Includes and loads [module:bg/dev](https://rbeer.github.io/nebenan-extension/0.2.0/module-bg_dev.html)
    Exposing `window.bgApp`, `bgApp.dev`, ...
  - Watch out for the [preprocess](https://www.npmjs.com/package/preprocess) parts in
    script files!
