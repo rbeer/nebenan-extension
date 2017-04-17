@@ -1,32 +1,67 @@
-## v0.2.0
+# [Nebenan.de](https://nebenan.de) Chrome Extension
 
-- [53a9239]  commit: Fix: bgApp.init
-- [c0d2f27]  commit: Add: options dialog
-- [6fd4af0]  commit: Add: NList and NListItem web component classes
-- [7f7b87f]  commit: Change: Opting for simpler hover card design ...
-- [9bec90f]  commit: Add: lodash
+## Quick Start
 
-## v0.1.1
+1. To build the extension from its sources, you will need [gulp](http://gulpjs.com/), as well as [lodash-cli](https://www.npmjs.com/package/lodash-cli).
+  
+```bash
+npm i -g gulp lodash-cli
+```
 
-#### Introduced requirejs to popup/* scripts
-- [fcf62b0] commit: Add: requirejs for popup
-- [420dc86] commit: Chore: Move rjs configs into own dir (/.rjs/)
+2. Clone repo, install dependencies, build
 
-#### Overhauled messaging between bg/app and popup/app
+```bash
+git clone https://github.com/rbeer/nebenan-extension.git
+npm i
+gulp
+```
 
-- [901abaf] commit: Add/Change: error message handling in popup/app, ...
-- [d320a7f] commit: Add: intersect handlers, use bgApp.getStats to serve 'setStats' data
-- [5a82961] commit: Refactor: send stats via Messaging
-- [641c374] commit: Add: Messaging, Messaging.Message
+3. Install
 
-#### Handle popup DOM elements in popup/ui
-- [40ca3c1] commit: Add: module:popup/ui
+![](./_img/load_dev_crx.png)
 
-#### Added lodash library generation (see /.lodash.json)
-- [e961f67] commit: Meta: Finish lodash library generation/inclusion
-- [9bec90f] commit: Add: lodash
-- [32b9812] commit: Add: generate docs in `dev` task and `$ gulp build --with-docs`
+## Gulp
 
-## v0.1.0
+### Main Tasks
+This is a list of the main tasks, only.
+There are plenty of auxiliary tasks, such as `clean`, `watch`, `requirejs`, ...
 
-Just sketching, really. :)
+|     Task      | depends      | implied flags | does |
+|---------------|--------------|---------------|------|
+| **build**/default | clean        | --with-lodash | Main build chain; *production* |
+| **dev**           | clean, watch | --dev, --with-docs | Build in developement mode and watch /app/; development builds are suffixed by -dev, e.g. 0.2.0-dev |
+| **docs**          |              | --with-docs | Generates jsdoc for current version in /docs/ |
+| **package**       |              |               | Package/Zip /dist/; meant for publication in Chrome Webstore; this does **not** create a valid .crx! |
+
+### Flags
+
+#### --dev
+Sets build into DEV mode
+ - Enables console.debug messages
+
+   ![](./_img/devlog.png)
+ - Includes and loads [module:bg/dev](./app/scripts.babel/bg/dev.js)
+   Exposing `window.bgApp`, `bgApp.dev`, ...
+ - Watch out for the [preprocess](https://www.npmjs.com/package/preprocess) parts in
+   script files!
+
+```js
+ // @if DEV=true
+ // included in .rjs-dev
+ require(['bg/dev'], (dev) => {
+   bgApp.dev = dev;
+   bgApp.dev.init(bgApp);
+ });
+ // @endif
+```
+
+   A search for `// @` over
+   `/app/scripts.babel/` should reveal them all.
+
+#### --with-docs
+ - Includes (js)docs generation
+
+#### --with-lodash
+Generating the [custom lodash library](https://lodash.com/custom-builds) takes up to 5 seconds - waaaay too long
+when `watch`ing (e.g. in `dev` task), so the current (lodash) build will be copied, by default.
+- `--with-lodash` forces gulp to generate the library.
