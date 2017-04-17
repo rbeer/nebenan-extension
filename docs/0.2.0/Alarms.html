@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Alarms - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alarms.html">Alarms</a><ul class='methods'><li data-type='method'><a href="Alarms.html#.handleAlarms">handleAlarms</a></li><li data-type='method'><a href="Alarms.html#fireStats">fireStats</a></li><li data-type='method'><a href="Alarms.html#startStats">startStats</a></li><li data-type='method'><a href="Alarms.html#stopStats">stopStats</a></li></ul></li><li><a href="APIClient.html">APIClient</a><ul class='methods'><li data-type='method'><a href="APIClient.html#.callAPI">callAPI</a></li><li data-type='method'><a href="APIClient.html#.getCounterStats">getCounterStats</a></li><li data-type='method'><a href="APIClient.html#.getNotifications">getNotifications</a></li></ul></li><li><a href="APIClient.NItem.html">NItem</a></li><li><a href="APIClient.NMessage.html">NMessage</a></li><li><a href="APIClient.NMessageType.html">NMessageType</a></li><li><a href="APIClient.NSubset.html">NSubset</a></li><li><a href="APIClient.NType.html">NType</a></li><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method'><a href="Auth.html#.getToken">getToken</a></li><li data-type='method'><a href="Auth.html#.removeToken">removeToken</a></li><li data-type='method'><a href="Auth.html#canAuthenticate">canAuthenticate</a></li></ul></li><li><a href="Messaging.html">Messaging</a><ul class='methods'><li data-type='method'><a href="Messaging.html#.sendMessage">sendMessage</a></li><li data-type='method'><a href="Messaging.html#receive">receive</a></li><li data-type='method'><a href="Messaging.html#send">send</a></li></ul></li><li><a href="Messaging.Message.html">Message</a><ul class='methods'><li data-type='method'><a href="Messaging.Message.html#.fromObject">fromObject</a></li><li data-type='method'><a href="Messaging.Message.html#cloneForAnswer">cloneForAnswer</a></li><li data-type='method'><a href="Messaging.Message.html#toObject">toObject</a></li></ul></li><li><a href="NList.html">NList</a><ul class='methods'><li data-type='method'><a href="NList.html#add">add</a></li></ul></li><li><a href="NListItem.html">NListItem</a><ul class='methods'><li data-type='method'><a href="NListItem.html#dismiss">dismiss</a></li><li data-type='method'><a href="NListItem.html#populate">populate</a></li></ul></li><li><a href="RequestCache.html">RequestCache</a></li><li><a href="RequestCache.StatsCache.html">StatsCache</a><ul class='methods'><li data-type='method'><a href="RequestCache.StatsCache.html#.StatsCache.sanitizeStats">StatsCache.sanitizeStats</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-bg_app.html">bg/app</a><ul class='methods'><li data-type='method'><a href="module-bg_app.html#.bgApp.getNotifications">bgApp.getNotifications</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.getStats">bgApp.getStats</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.init">bgApp.init</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.updateBrowserAction">bgApp.updateBrowserAction</a></li></ul></li><li><a href="module-bg_dev.html">bg/dev</a><ul class='methods'><li data-type='method'><a href="module-bg_dev.html#.dev.buildFunctionTag">dev.buildFunctionTag</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.getNotifications">dev.getNotifications</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.log">dev.log</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.toggleLoggedIn">dev.toggleLoggedIn</a></li></ul></li><li><a href="module-popup_app.html">popup/app</a><ul class='methods'><li data-type='method'><a href="module-popup_app.html#.popupApp.init">popupApp.init</a></li></ul></li><li><a href="module-popup_ui.html">popup/ui</a><ul class='methods'><li data-type='method'><a href="module-popup_ui.html#.ui.addNotification">ui.addNotification</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.handleClicks">ui.handleClicks</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.init">ui.init</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.setStats">ui.setStats</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.showLoginUI">ui.showLoginUI</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Alarms</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Alarms
+        </h2>
+        
+            <div class="class-description"><p>Handles periodical API requests</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Alarms"><span class="type-signature"></span>new Alarms<span class="signature">(parentApp)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>parentApp</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">module:bgApp</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_alarms.js.html">bg/alarms.js</a>, <a href="bg_alarms.js.html#line8">line 8</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".handleAlarms"><span class="type-signature">(static) </span>handleAlarms<span class="signature">(alarm)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Receives fired alarms and refers them to their handlers</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="Alarms.html">Alarms</a></li></ul>
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>alarm</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">chrome.alarms.Alarm</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Fired alarm</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_alarms.js.html">bg/alarms.js</a>, <a href="bg_alarms.js.html#line46">line 46</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><p><a href="https://developer.chrome.com/extensions/alarms#type-Alarm">chrome.alarms.Alarm</a></p></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="fireStats"><span class="type-signature"></span>fireStats<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Handler for counter_stats alarm</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_alarms.js.html">bg/alarms.js</a>, <a href="bg_alarms.js.html#line72">line 72</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="startStats"><span class="type-signature"></span>startStats<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Schedules periodical alarm for counter_stats</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_alarms.js.html">bg/alarms.js</a>, <a href="bg_alarms.js.html#line60">line 60</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="stopStats"><span class="type-signature"></span>stopStats<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Stops counter_stats requests</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_alarms.js.html">bg/alarms.js</a>, <a href="bg_alarms.js.html#line94">line 94</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Apr 17 2017 06:10:09 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

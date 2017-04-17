@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>bg/apiclient.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alarms.html">Alarms</a><ul class='methods'><li data-type='method'><a href="Alarms.html#.handleAlarms">handleAlarms</a></li><li data-type='method'><a href="Alarms.html#fireStats">fireStats</a></li><li data-type='method'><a href="Alarms.html#startStats">startStats</a></li><li data-type='method'><a href="Alarms.html#stopStats">stopStats</a></li></ul></li><li><a href="APIClient.html">APIClient</a><ul class='methods'><li data-type='method'><a href="APIClient.html#.callAPI">callAPI</a></li><li data-type='method'><a href="APIClient.html#.getCounterStats">getCounterStats</a></li><li data-type='method'><a href="APIClient.html#.getNotifications">getNotifications</a></li></ul></li><li><a href="APIClient.NItem.html">NItem</a></li><li><a href="APIClient.NMessage.html">NMessage</a></li><li><a href="APIClient.NMessageType.html">NMessageType</a></li><li><a href="APIClient.NSubset.html">NSubset</a></li><li><a href="APIClient.NType.html">NType</a></li><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method'><a href="Auth.html#.getToken">getToken</a></li><li data-type='method'><a href="Auth.html#.removeToken">removeToken</a></li><li data-type='method'><a href="Auth.html#canAuthenticate">canAuthenticate</a></li></ul></li><li><a href="Messaging.html">Messaging</a><ul class='methods'><li data-type='method'><a href="Messaging.html#.sendMessage">sendMessage</a></li><li data-type='method'><a href="Messaging.html#receive">receive</a></li><li data-type='method'><a href="Messaging.html#send">send</a></li></ul></li><li><a href="Messaging.Message.html">Message</a><ul class='methods'><li data-type='method'><a href="Messaging.Message.html#.fromObject">fromObject</a></li><li data-type='method'><a href="Messaging.Message.html#cloneForAnswer">cloneForAnswer</a></li><li data-type='method'><a href="Messaging.Message.html#toObject">toObject</a></li></ul></li><li><a href="NList.html">NList</a><ul class='methods'><li data-type='method'><a href="NList.html#add">add</a></li></ul></li><li><a href="NListItem.html">NListItem</a><ul class='methods'><li data-type='method'><a href="NListItem.html#dismiss">dismiss</a></li><li data-type='method'><a href="NListItem.html#populate">populate</a></li></ul></li><li><a href="RequestCache.html">RequestCache</a></li><li><a href="RequestCache.StatsCache.html">StatsCache</a><ul class='methods'><li data-type='method'><a href="RequestCache.StatsCache.html#.StatsCache.sanitizeStats">StatsCache.sanitizeStats</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-bg_app.html">bg/app</a><ul class='methods'><li data-type='method'><a href="module-bg_app.html#.bgApp.getNotifications">bgApp.getNotifications</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.getStats">bgApp.getStats</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.init">bgApp.init</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.updateBrowserAction">bgApp.updateBrowserAction</a></li></ul></li><li><a href="module-bg_dev.html">bg/dev</a><ul class='methods'><li data-type='method'><a href="module-bg_dev.html#.dev.buildFunctionTag">dev.buildFunctionTag</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.getNotifications">dev.getNotifications</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.log">dev.log</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.toggleLoggedIn">dev.toggleLoggedIn</a></li></ul></li><li><a href="module-popup_app.html">popup/app</a><ul class='methods'><li data-type='method'><a href="module-popup_app.html#.popupApp.init">popupApp.init</a></li></ul></li><li><a href="module-popup_ui.html">popup/ui</a><ul class='methods'><li data-type='method'><a href="module-popup_ui.html#.ui.addNotification">ui.addNotification</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.handleClicks">ui.handleClicks</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.init">ui.init</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.setStats">ui.setStats</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.showLoginUI">ui.showLoginUI</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">bg/apiclient.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+define([
+  'bg/auth',
+  'bg/apiclient/nitem',
+  'bg/apiclient/nmessage',
+  'bg/apiclient/ntype'
+], (auth, NItem, NMessage, NType) => {
+  /**
+   * @class Client to nebenan.de API
+   */
+  class APIClient {
+
+    constructor() {
+      this.options = APIClient.XHR_DEFAULTS;
+    }
+
+    // sub classes
+    static get NItem() {
+      return NItem;
+    }
+    static get NMessage() {
+      return NMessage;
+    }
+    static get NType() {
+      return NType;
+    }
+
+    /**
+     * @typedef XHROptions
+     * @memberOf APIClient
+     * @static
+     * @property {string} method - Request method, e.g. `'GET', 'POST'`
+     * @property {string} url    - API endpoint URL to call
+     * @property {string} token  - Auth token to send with request
+     */
+
+    /**
+     * Default XHROptions
+     */
+    static get XHR_DEFAULTS() {
+      return {
+        method: 'GET',
+        url: 'https://api.nebenan.de/api/v2',
+        token: ''
+      };
+    }
+
+    /**
+     * Executes XMLHttpRequest
+     * @memberOf APIClient
+     * @static
+     * @param  {!APIClient.XHROptions} options - Options passed to XMLHttpRequest
+     * @throws {TypeError} if (!options)
+     * @return {Promise}                       - Resolves with response body
+     */
+    static callAPI(options) {
+
+      if (!options) {
+        throw new TypeError('First argument must be an XHROptions object.');
+      }
+
+      return new Promise((resolve, reject) => {
+
+        // request object
+        let xhr = new XMLHttpRequest();
+
+        // response handler
+        xhr.onreadystatechange = function() {
+          if (this.readyState === 4) {
+            resolve(this.response);
+          }
+        };
+
+        // error handler
+        xhr.onerror = (err) => {
+          xhr.abort();
+          reject(err);
+        };
+
+        // open connection
+        xhr.open(options.method, options.url);
+
+        // set request headers
+        xhr.setRequestHeader('Accept', 'application/json');
+        xhr.setRequestHeader('X-AUTH-TOKEN', options.token);
+
+        // send
+        xhr.send();
+      });
+    }
+
+    /**
+     * Requests counter_stats.json
+     * @property {?object} cached - Cached data; undefined if API should be called
+     * @see APIClient.callAPI
+     * @memberOf APIClient
+     * @static
+     * @return {Promise} - Resolves with response body from APIClient.callAPI
+     */
+    static getCounterStats(cached) {
+      if (cached) {
+        return auth.canAuthenticate().then(() => cached);
+      }
+      return auth.canAuthenticate()
+      .then(() => {
+        let xhrOptions = APIClient.XHR_DEFAULTS;
+        xhrOptions.url += '/profile/counter_stats.json';
+        xhrOptions.token = auth.token;
+        return xhrOptions;
+      })
+      .then(APIClient.callAPI);
+    }
+
+    /**
+     * Requests notifications.json
+     * @param {?Number} lower - UNIX epoch timestamp, ms precision; request only
+     *                          notifications older than this value
+     * @memberOf APIClient
+     * @static
+     * @see APIClient.callAPI
+     * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
+     */
+    static getNotifications(lower, perPage, cached) {
+      lower = lower || 0;
+      perPage = perPage || 7;
+      if (cached) {
+        return auth.canAuthenticate().then(() => cached);
+      }
+      return auth.canAuthenticate()
+      .then(() => {
+        let xhrOptions = APIClient.XHR_DEFAULTS;
+        xhrOptions.url += '/notifications.json?per_page=' + perPage;
+        if (lower) {
+          xhrOptions.url += '&amp;lower=' + lower;
+        }
+        xhrOptions.token = auth.token;
+        return xhrOptions;
+      })
+      .then(APIClient.callAPI);
+    }
+  };
+
+  return APIClient;
+
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Apr 17 2017 06:10:09 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

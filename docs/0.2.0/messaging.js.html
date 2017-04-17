@@ -1,0 +1,316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>messaging.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alarms.html">Alarms</a><ul class='methods'><li data-type='method'><a href="Alarms.html#.handleAlarms">handleAlarms</a></li><li data-type='method'><a href="Alarms.html#fireStats">fireStats</a></li><li data-type='method'><a href="Alarms.html#startStats">startStats</a></li><li data-type='method'><a href="Alarms.html#stopStats">stopStats</a></li></ul></li><li><a href="APIClient.html">APIClient</a><ul class='methods'><li data-type='method'><a href="APIClient.html#.callAPI">callAPI</a></li><li data-type='method'><a href="APIClient.html#.getCounterStats">getCounterStats</a></li><li data-type='method'><a href="APIClient.html#.getNotifications">getNotifications</a></li></ul></li><li><a href="APIClient.NItem.html">NItem</a></li><li><a href="APIClient.NMessage.html">NMessage</a></li><li><a href="APIClient.NMessageType.html">NMessageType</a></li><li><a href="APIClient.NSubset.html">NSubset</a></li><li><a href="APIClient.NType.html">NType</a></li><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method'><a href="Auth.html#.getToken">getToken</a></li><li data-type='method'><a href="Auth.html#.removeToken">removeToken</a></li><li data-type='method'><a href="Auth.html#canAuthenticate">canAuthenticate</a></li></ul></li><li><a href="Messaging.html">Messaging</a><ul class='methods'><li data-type='method'><a href="Messaging.html#.sendMessage">sendMessage</a></li><li data-type='method'><a href="Messaging.html#receive">receive</a></li><li data-type='method'><a href="Messaging.html#send">send</a></li></ul></li><li><a href="Messaging.Message.html">Message</a><ul class='methods'><li data-type='method'><a href="Messaging.Message.html#.fromObject">fromObject</a></li><li data-type='method'><a href="Messaging.Message.html#cloneForAnswer">cloneForAnswer</a></li><li data-type='method'><a href="Messaging.Message.html#toObject">toObject</a></li></ul></li><li><a href="NList.html">NList</a><ul class='methods'><li data-type='method'><a href="NList.html#add">add</a></li></ul></li><li><a href="NListItem.html">NListItem</a><ul class='methods'><li data-type='method'><a href="NListItem.html#dismiss">dismiss</a></li><li data-type='method'><a href="NListItem.html#populate">populate</a></li></ul></li><li><a href="RequestCache.html">RequestCache</a></li><li><a href="RequestCache.StatsCache.html">StatsCache</a><ul class='methods'><li data-type='method'><a href="RequestCache.StatsCache.html#.StatsCache.sanitizeStats">StatsCache.sanitizeStats</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-bg_app.html">bg/app</a><ul class='methods'><li data-type='method'><a href="module-bg_app.html#.bgApp.getNotifications">bgApp.getNotifications</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.getStats">bgApp.getStats</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.init">bgApp.init</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.updateBrowserAction">bgApp.updateBrowserAction</a></li></ul></li><li><a href="module-bg_dev.html">bg/dev</a><ul class='methods'><li data-type='method'><a href="module-bg_dev.html#.dev.buildFunctionTag">dev.buildFunctionTag</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.getNotifications">dev.getNotifications</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.log">dev.log</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.toggleLoggedIn">dev.toggleLoggedIn</a></li></ul></li><li><a href="module-popup_app.html">popup/app</a><ul class='methods'><li data-type='method'><a href="module-popup_app.html#.popupApp.init">popupApp.init</a></li></ul></li><li><a href="module-popup_ui.html">popup/ui</a><ul class='methods'><li data-type='method'><a href="module-popup_ui.html#.ui.addNotification">ui.addNotification</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.handleClicks">ui.handleClicks</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.init">ui.init</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.setStats">ui.setStats</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.showLoginUI">ui.showLoginUI</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">messaging.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+define(['lodash'], (_) => {
+
+  let typeCheck = (failCondition, msg, code) => {
+    if (failCondition) {
+      let err = new TypeError(msg);
+      err.code = code;
+      throw err;
+    }
+  };
+
+  /**
+   * @class Handles messaging between background and popup app
+   */
+  class Messaging {
+
+    /**
+     * @param  {!Object.&lt;String, Function>} handlers - Set of handlers, Messages can
+     *                                                 request to be handled by
+     * @param  {!String}                    parentId - Module id of parent, serving as sender
+     * @return {Messaging}
+     */
+    constructor(handlers, parentId) {
+      typeCheck(!handlers,
+                'Messaging needs a set of handlers.',
+                'ENOSETOHANDLERS');
+      typeCheck((typeof parentId !== 'string'),
+                'Messaging needs a parentId to identify itself (Message.sender).',
+                'ENOPARENTID');
+      this.handlers = handlers;
+      // @if DEV=true
+      this.handlers.dev = (message, respond) => {
+        devlog('Receiving message:', message);
+      };
+      // @endif
+      this.parentId = parentId;
+    }
+
+    static get Message() {
+      return Message;
+    }
+
+    listen() {
+      devlog('Listening to incoming Messages ...');
+      chrome.runtime.onMessage.addListener(this.receive.bind(this));
+    }
+
+    /**
+     * Receives message
+     * @param  {Object}     message - Message object (not yet an instance!), received
+     * @param  {?Object}    sender  - Sender information from Chrome API
+     * @param  {?Function}  respond - Respond to message
+     * @return {Bool} - Always returns `true` to keep port open for response
+     */
+    receive(message, sender, respond) {
+      // ignore messages not for this instance
+      if (message.to === this.parentId) {
+        let self = this;
+
+        // create Message instance
+        let msg = Message.fromObject(message);
+
+        // find matching handlers (intersection available/requested)
+        let mhandlers = _.intersection(msg.handlers, Object.keys(this.handlers));
+
+        mhandlers.forEach((handler) => {
+          self.handlers[handler].call(self, msg, respond);
+        });
+
+        // @if DEV=true
+        this.handlers.dev.call(this, msg);
+        // @endif
+      }
+
+      return true;
+    };
+
+    /**
+     * Sends a Message instance
+     * @param  {Messaging.Message} message - Message instance to send
+     * @this    Messaging                 - Messaging instance sending the message
+     * @throws {typeCheck} If `this` is not an instance of Messaging
+     */
+    static sendMessage(message) {
+      typeCheck(!(this instanceof Messaging),
+                'sendMessage must be bound to an instanece of Messaging.',
+                'ENOMESSAGINGTHIS');
+      typeCheck(!(message instanceof Message),
+                'sendMessage expects \'message\' to be an instance of Messaging.Message.',
+                'ENOMESSAGE');
+
+      let self = this;
+
+      chrome.runtime.sendMessage(message.toObject(), (response) => {
+        if (!response) {
+          let crx_le = chrome.runtime.lastError;
+
+          console.error('Sending a Message has failed.');
+          console.error(message);
+          console.error(chrome.runtime.lastError);
+          if (crx_le.message.includes('before a reponse was received')) {
+            console.warn('Did you call the `respond` callback in the message ' +
+                         'handler on the other end?');
+          }
+          return;
+        }
+        self.receive(response);
+        return true;
+      });
+    }
+
+    /**
+     * Sends a Message, constructed from given parameters
+     *  - sender is added from Messaging.parentId
+     * @see Messaging.Message
+     * @param  {!String}         to       Recipient of the message
+     * @param  {!Array.&lt;String>} handlers Names of the Messaging handlers that should
+     *                                    receive this message on recipients end
+     * @param  {?Object}         payload  Message payload data
+     */
+    send(to, handlers, payload) {
+
+      let m = new Message(this.parentId, to, handlers, payload);
+      Messaging.sendMessage.call(this, m);
+    }
+
+    static get Message() {
+      return Message;
+    }
+  }
+
+  /**
+   * @class Message sent between background and popup app
+   * @memberOf Messaging
+   */
+  class Message {
+
+    /**
+     * Constructs new message
+     * @param  {!String}                sender    - Sender of the message
+     * @param  {!String}                to        - Recipient of the message
+     * @param  {!String|Array.&lt;String>} handlers  - Name(s) of the Messaging handler(s) that should receive this message
+     * @param  {?Object}                payload   - Message payload data
+     * @return {Messaging.Message}
+     */
+    constructor(sender, to, handlers, payload) {
+      typeCheck((typeof sender !== 'string'),
+                'Message needs a sender of type string.',
+                'ENOSENDER');
+      typeCheck((typeof to !== 'string'),
+                'Message needs a recipient (to).',
+                'ENOTO');
+      typeCheck(((typeof handlers !== 'string') &amp;&amp; !(handlers instanceof Array)),
+                'Message needs one or more handler names.',
+                'ENOHANDLER');
+
+      /**
+       * Name of Message sender
+       * @type {!String}
+       * @memberOf Messaging.Message
+       */
+      this.sender = sender;
+      /**
+       * Name of message recipient
+       * @type {!String}
+       * @memberOf Messaging.Message
+       */
+      this.to = to;
+      /**
+       * Names of handlers on the receiving end, expected
+       * to process this Message
+       * @type {!Array.&lt;String>}
+       * @memberOf Messaging.Message
+       */
+      this.handlers = typeof handlers === 'string' ? [ handlers ] : handlers;
+      /**
+       * Payload data to send with the Message
+       * @type {?Object}
+       * @memberOf Messaging.Message
+       */
+      this.payload = payload || null;
+      /**
+       * Message (.toObject) that triggered this Message
+       *   - Message is a trigger itself, if `null`
+       * @type {Object}
+       * @memberOf Messaging.Message
+       */
+      this.trigger = null;
+    }
+
+    /**
+     * Creates new Message instance from an Object
+     * @param  {!Object} obj - Object you want to turn into a Message
+     * @return {Messaging.Message}
+     */
+    static fromObject(obj) {
+      typeCheck(!obj,
+                'From what object, exactly?',
+                'ENOOBJECT');
+
+      let params = [ null ];
+      for (let key in obj) {
+        params.push(obj[key]);
+      }
+
+      let m = new (Function.prototype.bind.apply(Message, params));
+      m.trigger = obj.trigger;
+      return m;
+    }
+
+    /**
+     * Creates a response (new) Message, based on `this` instance
+     * and with passed set of handler names and payload
+     * @param  {!String|!Array.&lt;String>} handlers - Set of handler names the receiving end
+     *                                      should handle the response Message with
+     * @param  {?Object}         payload  - Payload data, e.g. stats object on 'getStats'
+     * @return {Messaging.Message} - New instance of Message, serving as response to `this`
+     */
+    cloneForAnswer(handlers, payload) {
+      typeCheck(((typeof handlers !== 'string') &amp;&amp; !(handlers instanceof Array)),
+                'Message needs one or more handler names.',
+                'ENOHANDLER');
+
+      let bareClone = {
+        sender: this.to,
+        to: this.sender,
+        handlers: (typeof handlers === 'string') ? [ handlers ] : handlers,
+        payload: payload,
+        trigger: this.toObject()
+      };
+      let clone = Message.fromObject(bareClone);
+      return clone;
+    }
+
+    /**
+     * Returns instance's data as clean object.
+     * @type {Object}
+     */
+    toObject() {
+      let obj = {
+        sender: this.sender,
+        to: this.to,
+        handlers: this.handlers,
+        trigger: this.trigger
+      };
+      if (this.payload !== null) {
+        obj.payload = this.payload;
+      }
+      return obj;
+    }
+
+  }
+
+  return Messaging;
+
+});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Apr 17 2017 06:10:09 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

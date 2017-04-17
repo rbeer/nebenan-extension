@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>StatsCache - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alarms.html">Alarms</a><ul class='methods'><li data-type='method'><a href="Alarms.html#.handleAlarms">handleAlarms</a></li><li data-type='method'><a href="Alarms.html#fireStats">fireStats</a></li><li data-type='method'><a href="Alarms.html#startStats">startStats</a></li><li data-type='method'><a href="Alarms.html#stopStats">stopStats</a></li></ul></li><li><a href="APIClient.html">APIClient</a><ul class='methods'><li data-type='method'><a href="APIClient.html#.callAPI">callAPI</a></li><li data-type='method'><a href="APIClient.html#.getCounterStats">getCounterStats</a></li><li data-type='method'><a href="APIClient.html#.getNotifications">getNotifications</a></li></ul></li><li><a href="APIClient.NItem.html">NItem</a></li><li><a href="APIClient.NMessage.html">NMessage</a></li><li><a href="APIClient.NMessageType.html">NMessageType</a></li><li><a href="APIClient.NSubset.html">NSubset</a></li><li><a href="APIClient.NType.html">NType</a></li><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method'><a href="Auth.html#.getToken">getToken</a></li><li data-type='method'><a href="Auth.html#.removeToken">removeToken</a></li><li data-type='method'><a href="Auth.html#canAuthenticate">canAuthenticate</a></li></ul></li><li><a href="Messaging.html">Messaging</a><ul class='methods'><li data-type='method'><a href="Messaging.html#.sendMessage">sendMessage</a></li><li data-type='method'><a href="Messaging.html#receive">receive</a></li><li data-type='method'><a href="Messaging.html#send">send</a></li></ul></li><li><a href="Messaging.Message.html">Message</a><ul class='methods'><li data-type='method'><a href="Messaging.Message.html#.fromObject">fromObject</a></li><li data-type='method'><a href="Messaging.Message.html#cloneForAnswer">cloneForAnswer</a></li><li data-type='method'><a href="Messaging.Message.html#toObject">toObject</a></li></ul></li><li><a href="NList.html">NList</a><ul class='methods'><li data-type='method'><a href="NList.html#add">add</a></li></ul></li><li><a href="NListItem.html">NListItem</a><ul class='methods'><li data-type='method'><a href="NListItem.html#dismiss">dismiss</a></li><li data-type='method'><a href="NListItem.html#populate">populate</a></li></ul></li><li><a href="RequestCache.html">RequestCache</a></li><li><a href="RequestCache.StatsCache.html">StatsCache</a><ul class='methods'><li data-type='method'><a href="RequestCache.StatsCache.html#.StatsCache.sanitizeStats">StatsCache.sanitizeStats</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-bg_app.html">bg/app</a><ul class='methods'><li data-type='method'><a href="module-bg_app.html#.bgApp.getNotifications">bgApp.getNotifications</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.getStats">bgApp.getStats</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.init">bgApp.init</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.updateBrowserAction">bgApp.updateBrowserAction</a></li></ul></li><li><a href="module-bg_dev.html">bg/dev</a><ul class='methods'><li data-type='method'><a href="module-bg_dev.html#.dev.buildFunctionTag">dev.buildFunctionTag</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.getNotifications">dev.getNotifications</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.log">dev.log</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.toggleLoggedIn">dev.toggleLoggedIn</a></li></ul></li><li><a href="module-popup_app.html">popup/app</a><ul class='methods'><li data-type='method'><a href="module-popup_app.html#.popupApp.init">popupApp.init</a></li></ul></li><li><a href="module-popup_ui.html">popup/ui</a><ul class='methods'><li data-type='method'><a href="module-popup_ui.html#.ui.addNotification">ui.addNotification</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.handleClicks">ui.handleClicks</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.init">ui.init</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.setStats">ui.setStats</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.showLoginUI">ui.showLoginUI</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">StatsCache</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+            <span class="ancestors"><a href="RequestCache.html">RequestCache</a>.</span>
+        
+        StatsCache
+        </h2>
+        
+            <div class="class-description"><p>Cache for counter_stats.json</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="StatsCache"><span class="type-signature"></span>new StatsCache<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line62">line 62</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+        <h3 class="subsection-title">Extends</h3>
+
+        
+
+
+    <ul>
+        <li><a href="RequestCache.html">RequestCache</a></li>
+    </ul>
+
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+        <h3 class="subsection-title">Members</h3>
+
+        
+            
+<h4 class="name" id="data"><span class="type-signature">(static) </span>StatsCache#data<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Sanitized counter_stats.json from API</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>data</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Response data</p>
+                <h6>Properties</h6>
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>messages</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p># of unread messages</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>notifications</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p># of unread notifications (i.e. feed activity)</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>users</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p># of 'active' users</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>all</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>messages + notifications (for display on browserAction badge)</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+            </td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>lastUpdate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>epoch timestamp of last API request</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line80">line 80</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+    <dt class="tag-todo">To Do:</dt>
+    <dd class="tag-todo">
+        <ul>
+            <li>- There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bg/app.sanitizeStats and can be used (name tdb)
+      - New property discovered @ 17/03/28: 'house_group_user_ids' is an Array.<number>, holding id's of online people from ones own apartment house?</li>
+        </ul>
+    </dd>
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="_data"><span class="type-signature"></span>_data<span class="type-signature"> :Object</span></h4>
+
+
+
+
+<div class="description">
+    <p>Data, sanitized for internal use</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="RequestCache.html#_data">RequestCache#_data</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line27">line 27</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="hasExpired"><span class="type-signature"></span>hasExpired<span class="type-signature"> :Bool</span></h4>
+
+
+
+
+<div class="description">
+    <p>Returns whether cache has expired or not</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Bool</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="RequestCache.html#hasExpired">RequestCache#hasExpired</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line46">line 46</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+            
+<h4 class="name" id="lastUpdate"><span class="type-signature"></span>lastUpdate<span class="type-signature"> :Number</span></h4>
+
+
+
+
+<div class="description">
+    <p>UNIX epoch tstamp (in microseconds!) of last successfull API call</p>
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">Number</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+    <dt class="inherited-from">Inherited From:</dt>
+    <dd class="inherited-from"><ul class="dummy"><li>
+        <a href="RequestCache.html#lastUpdate">RequestCache#lastUpdate</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line32">line 32</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+        
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".StatsCache.sanitizeStats"><span class="type-signature">(static) </span>StatsCache.sanitizeStats<span class="signature">(stats)</span><span class="type-signature"> &rarr; {Object}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sanitizes API's counter_stats.json for internal use.</p>
+<ul>
+<li><strong>NOTE</strong>: Mutates passed object.</li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>stats</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Parsed counter_stats.json</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="bg_request-cache.js.html">bg/request-cache.js</a>, <a href="bg_request-cache.js.html#line95">line 95</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Sanitized input</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Apr 17 2017 06:10:09 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

@@ -1,0 +1,866 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>Messaging - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="Alarms.html">Alarms</a><ul class='methods'><li data-type='method'><a href="Alarms.html#.handleAlarms">handleAlarms</a></li><li data-type='method'><a href="Alarms.html#fireStats">fireStats</a></li><li data-type='method'><a href="Alarms.html#startStats">startStats</a></li><li data-type='method'><a href="Alarms.html#stopStats">stopStats</a></li></ul></li><li><a href="APIClient.html">APIClient</a><ul class='methods'><li data-type='method'><a href="APIClient.html#.callAPI">callAPI</a></li><li data-type='method'><a href="APIClient.html#.getCounterStats">getCounterStats</a></li><li data-type='method'><a href="APIClient.html#.getNotifications">getNotifications</a></li></ul></li><li><a href="APIClient.NItem.html">NItem</a></li><li><a href="APIClient.NMessage.html">NMessage</a></li><li><a href="APIClient.NMessageType.html">NMessageType</a></li><li><a href="APIClient.NSubset.html">NSubset</a></li><li><a href="APIClient.NType.html">NType</a></li><li><a href="Auth.html">Auth</a><ul class='methods'><li data-type='method'><a href="Auth.html#.getToken">getToken</a></li><li data-type='method'><a href="Auth.html#.removeToken">removeToken</a></li><li data-type='method'><a href="Auth.html#canAuthenticate">canAuthenticate</a></li></ul></li><li><a href="Messaging.html">Messaging</a><ul class='methods'><li data-type='method'><a href="Messaging.html#.sendMessage">sendMessage</a></li><li data-type='method'><a href="Messaging.html#receive">receive</a></li><li data-type='method'><a href="Messaging.html#send">send</a></li></ul></li><li><a href="Messaging.Message.html">Message</a><ul class='methods'><li data-type='method'><a href="Messaging.Message.html#.fromObject">fromObject</a></li><li data-type='method'><a href="Messaging.Message.html#cloneForAnswer">cloneForAnswer</a></li><li data-type='method'><a href="Messaging.Message.html#toObject">toObject</a></li></ul></li><li><a href="NList.html">NList</a><ul class='methods'><li data-type='method'><a href="NList.html#add">add</a></li></ul></li><li><a href="NListItem.html">NListItem</a><ul class='methods'><li data-type='method'><a href="NListItem.html#dismiss">dismiss</a></li><li data-type='method'><a href="NListItem.html#populate">populate</a></li></ul></li><li><a href="RequestCache.html">RequestCache</a></li><li><a href="RequestCache.StatsCache.html">StatsCache</a><ul class='methods'><li data-type='method'><a href="RequestCache.StatsCache.html#.StatsCache.sanitizeStats">StatsCache.sanitizeStats</a></li></ul></li></ul><h3>Modules</h3><ul><li><a href="module-bg_app.html">bg/app</a><ul class='methods'><li data-type='method'><a href="module-bg_app.html#.bgApp.getNotifications">bgApp.getNotifications</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.getStats">bgApp.getStats</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.init">bgApp.init</a></li><li data-type='method'><a href="module-bg_app.html#.bgApp.updateBrowserAction">bgApp.updateBrowserAction</a></li></ul></li><li><a href="module-bg_dev.html">bg/dev</a><ul class='methods'><li data-type='method'><a href="module-bg_dev.html#.dev.buildFunctionTag">dev.buildFunctionTag</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.getNotifications">dev.getNotifications</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.log">dev.log</a></li><li data-type='method'><a href="module-bg_dev.html#.dev.toggleLoggedIn">dev.toggleLoggedIn</a></li></ul></li><li><a href="module-popup_app.html">popup/app</a><ul class='methods'><li data-type='method'><a href="module-popup_app.html#.popupApp.init">popupApp.init</a></li></ul></li><li><a href="module-popup_ui.html">popup/ui</a><ul class='methods'><li data-type='method'><a href="module-popup_ui.html#.ui.addNotification">ui.addNotification</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.handleClicks">ui.handleClicks</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.init">ui.init</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.setStats">ui.setStats</a></li><li data-type='method'><a href="module-popup_ui.html#.ui.showLoginUI">ui.showLoginUI</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">Messaging</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        <h2>
+        Messaging
+        </h2>
+        
+            <div class="class-description"><p>Handles messaging between background and popup app</p></div>
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+
+    
+    <h2>Constructor</h2>
+    
+
+    <h4 class="name" id="Messaging"><span class="type-signature"></span>new Messaging<span class="signature">(handlers<span class="signature-attributes">non-null</span>, parentId<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>handlers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object.&lt;String, function()></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Set of handlers, Messages can
+                                                request to be handled by</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>parentId</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Module id of parent, serving as sender</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="messaging.js.html">messaging.js</a>, <a href="messaging.js.html#line16">line 16</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+    </div>
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Classes</h3>
+
+        <dl>
+            <dt><a href="Messaging.Message.html">Message</a></dt>
+            <dd></dd>
+        </dl>
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".sendMessage"><span class="type-signature">(static) </span>sendMessage<span class="signature">(message)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sends a Message instance</p>
+</div>
+
+
+
+
+
+
+
+    <h5>This:</h5>
+    <ul><li><a href="Messaging.html">Messaging</a></li></ul>
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="Messaging.Message.html">Messaging.Message</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>Message instance to send</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="messaging.js.html">messaging.js</a>, <a href="messaging.js.html#line85">line 85</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+<h5>Throws:</h5>
+
+        
+
+<dl>
+    <dt>
+        <div class="param-desc">
+        <p>If <code>this</code> is not an instance of Messaging</p>
+        </div>
+    </dt>
+    <dd></dd>
+    <dt>
+        <dl>
+            <dt>
+                Type
+            </dt>
+            <dd>
+                
+<span class="param-type">typeCheck</span>
+
+
+            </dd>
+        </dl>
+    </dt>
+    <dd></dd>
+</dl>
+
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="receive"><span class="type-signature"></span>receive<span class="signature">(message, sender<span class="signature-attributes">nullable</span>, respond<span class="signature-attributes">nullable</span>)</span><span class="type-signature"> &rarr; {Bool}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Receives message</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>message</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Message object (not yet an instance!), received</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>sender</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Sender information from Chrome API</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>respond</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">function</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Respond to message</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="messaging.js.html">messaging.js</a>, <a href="messaging.js.html#line56">line 56</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <ul>
+<li>Always returns <code>true</code> to keep port open for response</li>
+</ul>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">Bool</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id="send"><span class="type-signature"></span>send<span class="signature">(to<span class="signature-attributes">non-null</span>, handlers<span class="signature-attributes">non-null</span>, payload<span class="signature-attributes">nullable</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Sends a Message, constructed from given parameters</p>
+<ul>
+<li>sender is added from Messaging.parentId</li>
+</ul>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+        <th>Attributes</th>
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>to</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Recipient of the message</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>handlers</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;String></span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Names of the Messaging handlers that should
+                                   receive this message on recipients end</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>payload</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+                <td class="attributes">
+                
+
+                
+                    &lt;nullable><br>
+                
+
+                
+                </td>
+            
+
+            
+
+            <td class="description last"><p>Message payload data</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="messaging.js.html">messaging.js</a>, <a href="messaging.js.html#line122">line 122</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+    <dt class="tag-see">See:</dt>
+    <dd class="tag-see">
+        <ul>
+            <li><a href="Messaging.Message.html">Messaging.Message</a></li>
+        </ul>
+    </dd>
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.3</a> on Mon Apr 17 2017 06:10:09 GMT+0200 (CEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>
