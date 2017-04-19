@@ -18,8 +18,8 @@
         Array.from(mRecord.target.children).forEach((li) => {
           if (li.querySelector(targetClasses.MARKET) ||
               li.querySelector(targetClasses.MARKET_PREVIEW)) {
-            console.debug('removing:', li);
-            li.remove();
+            console.debug('hiding:', li);
+            li.setAttribute('hidden', '');
           }
         });
       }
@@ -36,6 +36,5 @@
   window.onpopstate = () => {
     console.debug('records:', ulObserver.takeRecords());
   };
-
 
 })();
