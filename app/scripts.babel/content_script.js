@@ -32,9 +32,4 @@
   let ulObserver = new MutationObserver(filterEntries);
   ulObserver.observe(document.body, { childList: true, subtree: true });
 
-  //
-  window.onpopstate = () => {
-    console.debug('records:', ulObserver.takeRecords());
-  };
-
 })();
