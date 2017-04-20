@@ -7,30 +7,55 @@
    */
   const selectors = {
     // root Node for feed list
-    LIST: 'section.c-feed_list',
-    // actual feed list Node
-    LISTITEM: 'ul.c-feed_list-item',
+    SECTION: 'section.c-feed_list',
+    // actual feed list <ul> Node
+    LIST: 'ul.c-feed_list-content',
+    // entry <li> Node
+    LISTITEM: 'li.c-feed_list-item',
     // Nodes to filter / hide
     UNWANTED: [ '.c-feed_marketplace', 'article.c-feed_marketplace_preview' ]
   };
 
   /**
    * Filters unwanted entries when <section.c-feed_list> has been populated, initially
-   *   - As opposed to e.g. infinite scroll adding new items
-   * @param  {Array.<MutationRecord>} mRecords - MutationRecords caught by initObserver
+   *   - As opposed to e.g. infinite scroll adding new items (see filterOnUlObservation)
+   * @param  {Array.<MutationRecord>} mRecords - MutationRecords caught by sectionObserver
    */
-  let filterOnInitObservation = (mRecords) => {
+  let filterOnSectionObservation = (mRecords) => {
 
     // <section.c-feed_list> receives <ul.c-feed_list-content> Element, only
     let list = mRecords[0].addedNodes.item(0);
     console.debug('.c-feed_list-content:', list);
 
     // hide unwanted entries from initial state
-    let liNodes = Array.from(list.querySelectorAll(selectors.UNWANTED + '')).map(findParentLI);
+    let liNodes = Array.from(list.querySelectorAll(selectors.UNWANTED + ''))
+                  .map(findParentLI);
     hideEntries(liNodes);
 
     // stop observing root Node <section.c-feed_list>
-    initObserver.disconnect();
+    sectionObserver.disconnect();
+    // start observing <ul.c-feed_list-content>
+    // for additions e.g. due to infinte scroll
+    ulObserver.observe(list, { childList: true });
+  };
+
+  /**
+   * Catches newly added (to <ul.c-feed_list-content>) items
+   * @param  {Array.<MutationRecord>} mRecords - MutationRecords caught by ulObserver
+   */
+  let filterOnUlObservation = (mRecords) => {
+    let liNodes = Array.from(mRecords).map((mRecord) => {
+
+      if (mRecord.addedNodes.length > 0) {
+        let addedNode = mRecord.addedNodes.item(0);
+        let unwantedContent = addedNode.querySelector(selectors.UNWANTED + '');
+        return unwantedContent !== null ? addedNode : null;
+      } else {
+        return null;
+      }
+    }).filter((node) => !!node);
+
+    hideEntries(liNodes);
   };
 
   /**
@@ -56,14 +81,21 @@
    * @param  {Array.<Node>} liNodes - Nodes to hide
    */
   let hideEntries = (liNodes) => {
+    console.debug('hiding:', liNodes);
     liNodes.forEach((node) => node.setAttribute('hidden', ''));
   };
 
   // react creates the entire <ul.c-feed_list-content> (with its <li> children)
   // and dumps it as one into the DOM; target Element is <section.c-feed_list>,
   // so let that be our observation target, as well. :)
-  let initTarget = document.querySelector(selectors.LIST);
-  let initObserver = new MutationObserver(filterOnInitObservation);
-  initObserver.observe(initTarget, { childList: true });
+  let sectionTarget = document.querySelector(selectors.SECTION);
+  let sectionObserver = new MutationObserver(filterOnSectionObservation);
+  sectionObserver.observe(sectionTarget, { childList: true });
+
+  // once <ul.c-feed_list-content> is in the DOM, <li> additions
+  // wouldn't be recognized by sectionObserver (unless option { Subtree: true },
+  // but that again catches way too much Nodes); so this more narrow observer
+  // will take over.
+  let ulObserver = new MutationObserver(filterOnUlObservation);
 
 })();
