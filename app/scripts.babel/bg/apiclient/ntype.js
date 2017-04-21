@@ -18,6 +18,7 @@ define(() => {
     static get ID_MAP() {
       return {
         300: 'EVENT',
+        309: 'POLL',
         400: 'FEED',
         401: 'ANSWER',
         404: 'THANKS',
@@ -32,6 +33,10 @@ define(() => {
      */
     static get EVENT() {
       return 300;
+    }
+
+    static get POLL() {
+      return 309;
     }
 
     /**
