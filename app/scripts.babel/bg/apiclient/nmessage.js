@@ -23,6 +23,7 @@ define([
      * @param {Number}   raw.hood_message_type_id      - Id of message type (e.g. deleted = 4)
      * @param {Number}   raw.hood_message_category_id  - ! UNKNOWN !
      * @param {?Number}  raw.hood_group_id             - Id of group, message was posted in
+     * @param {?Number}  raw.parent_hood_message_id    - ID of parent message (used for links to e.g. "thanks" or answer messages)
      * @param {String}   raw.body                      - Message body
      * @param {Number}   raw.hood_id                   - Id of author's hood
      * @param {String}   raw.subject                   - Message's title
@@ -54,7 +55,7 @@ define([
       };
 
       let subsetKeys = [
-        'id', 'created', 'user_id',
+        'id', 'created', 'user_id', 'parent_hood_message_id',
         'body', 'subject', 'images',
         'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
         'hood_id', 'house_group', slimUser

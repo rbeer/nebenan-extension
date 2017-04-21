@@ -1,6 +1,9 @@
 'use strict';
 
-define(['bg/apiclient/nitem'], (NItem) => {
+define([
+  'bg/apiclient/nitem',
+  'bg/apiclient/ntype'
+], (NItem, NType) => {
 
   /**
    * @class Item for NList
@@ -55,14 +58,19 @@ define(['bg/apiclient/nitem'], (NItem) => {
 
       // set element's attributes
       let nMsg = nItem.hood_message;
+      let _typeId = nItem.notification_type_id.id;
 
-      this.type = nItem.notification_type_id;
+      // answers and "thanks" link to their parent post
+      let linkToParent = [ NType.ANSWER, NType.THANKS ].includes(_typeId);
+      let linkId = linkToParent ? nMsg.parent_hood_message_id : nMsg.id;
+
+      this.type = _typeId;
       this.id = nItem.id;
       this.seen = nItem.seen;
 
       this.title = nMsg.subject;
       this.body = nMsg.body;
-      this.link = 'https://nebenan.de/feed/' + nMsg.id;
+      this.link = 'https://nebenan.de/feed/' + linkId;
 
       // set thumbnail
       this.setThumb(nMsg);
@@ -70,8 +78,8 @@ define(['bg/apiclient/nitem'], (NItem) => {
       return this;
     }
 
-    set type(nType) {
-      this.setAttribute('type', nType.id);
+    set type(nTypeId) {
+      this.setAttribute('type', nTypeId);
     }
 
     set id(id) {
