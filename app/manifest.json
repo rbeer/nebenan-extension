@@ -14,17 +14,11 @@
     ],
     "persistent": false
   },
-  "content_scripts": [{
-    "matches": [ "https://nebenan.de/feed" ],
-    "js": [ "scripts/content_script.js" ],
-    "run_at": "document_end"
-  }],
   "permissions": [
     "tabs",
     "cookies",
     "notifications",
     "alarms",
-    "webNavigation",
     "https://api.nebenan.de/*",
     "https://nebenan.de/"
   ],
