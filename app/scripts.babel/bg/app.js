@@ -139,7 +139,7 @@ define([
    * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
    */
   bgApp.getNotifications = () => {
-    return bgApp.api.getNotifications(0, 7, null)
+    return bgApp.api.getNotifications(7, 0, null)
     .then((notifications) => {
       let parsed;
       if (typeof notifications !== 'string') {

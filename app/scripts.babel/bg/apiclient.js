@@ -114,19 +114,19 @@ define([
 
     /**
      * Requests notifications.json
-     * @param {?Number} lower - UNIX epoch timestamp, ms precision; request only
-     *                          notifications older than this value
+     * @param {?Number} perPage=7 - # of notifications to request
+     * @param {?Number} lower     - UNIX epoch timestamp, ms precision; request only
+     *                              notifications older than this value
      * @memberOf APIClient
      * @static
      * @see APIClient.callAPI
      * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
      */
-    static getNotifications(lower, perPage, cached) {
-      lower = lower || null;
-      perPage = perPage || 7;
-      if (cached) {
-        return auth.canAuthenticate().then(() => cached);
+    static getNotifications(perPage, lower, cached) {
+      if (cached || typeof lower === 'object') {
+        return auth.canAuthenticate().then(() => cached || lower);
       }
+      perPage = perPage || 7;
       return auth.canAuthenticate()
       .then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;

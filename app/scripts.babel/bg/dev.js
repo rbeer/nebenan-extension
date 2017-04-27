@@ -72,8 +72,8 @@ define(() => {
    *                         notifications older than this value
    * @memberOf module:bg/dev
    */
-  dev.getNotifications = (lower) => {
-    dev.bgApp.api.getNotifications(lower)
+  dev.getNotifications = (perPage, lower) => {
+    dev.bgApp.api.getNotifications(null, lower)
     .then((nitems) => {
       devlog('nitems:', nitems);
     })
