@@ -122,7 +122,7 @@ define([
      * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
      */
     static getNotifications(lower, perPage, cached) {
-      lower = lower || 0;
+      lower = lower || null;
       perPage = perPage || 7;
       if (cached) {
         return auth.canAuthenticate().then(() => cached);
