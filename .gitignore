@@ -1,12 +1,15 @@
-node_modules
-temp
-.tmp
-dist
+# dependencies
+node_modules/
 .sass-cache
-package
-docs/
-.api/
-app/scripts
-app/lodash.js
 
+# build chain results
+app/scripts/
+app/lodash.js
+dist/
+docs/
+package/
+
+# misc dev files, e.g. dummy data .json
+.api/
+_devdata/
 *.sublime-*
