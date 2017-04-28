@@ -175,7 +175,6 @@ define([
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
-    console.log('Updating browserAction with:', stats);
 
     let allNew = stats.messages + stats.notifications;
     let hasNew = allNew > 0;

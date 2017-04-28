@@ -18,15 +18,6 @@ define([
   class NListItem extends HTMLLIElement {
 
     /**
-     * @typedef {Object} NListItemData
-     * @property {Number}   id
-     * @property {Number}   created - UNIX epoch timestamp, millisecond precision
-     * @property {NType}    typeId  - Notification type id (NListItem.NType)
-     * @property {NMessage} message - Message that caused the notification
-     * @memberOf NListItem
-     */
-
-    /**
      * @constructor
      * @memberOf NListItem
      * @returns {NListItem}
@@ -68,7 +59,9 @@ define([
       this.id = nItem.id;
       this.seen = nItem.seen;
 
-      this.title = nMsg.subject;
+      // TODO: i18n
+      this.title = nMsg.parentSubject ? 'Antwort auf: ' + nMsg.parentSubject :
+                                        nMsg.subject;
       this.body = nMsg.body;
       this.link = 'https://nebenan.de/feed/' + linkId;
 

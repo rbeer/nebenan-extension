@@ -89,7 +89,8 @@ define(() => {
 
       xhr.onreadystatechange = () => {
         if (xhr.readyState === XMLHttpRequest.DONE) {
-          dev.bgApp.messaging.send('popup/app', 'addNotifications', [ JSON.parse(xhr.responseText) ]);
+          dev.bgApp.messaging.send('popup/app', 'addNotifications',
+                                   [ JSON.parse(xhr.responseText) ]);
         }
       };
 
