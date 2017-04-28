@@ -6,7 +6,7 @@
     "node": ">=0.8.0"
   },
   "scripts": {
-    "rjs": "gulp clean && gulp build && r.js -o .rjs"
+    "cloc": "cloc --exclude-dir=.devdata,scripts,docs,node_modules,dist,package,.api ./"
   },
   "devDependencies": {
     "almond": "^0.3.3",
