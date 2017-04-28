@@ -11,5 +11,5 @@ package/
 
 # misc dev files, e.g. dummy data .json
 .api/
-_devdata/
+.devdata/
 *.sublime-*

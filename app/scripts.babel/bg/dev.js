@@ -83,6 +83,21 @@ define(() => {
     });
   };
 
+  dev.pushDummyNotification = (type) => {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          dev.bgApp.messaging.send('popup/app', 'addNotifications', [ JSON.parse(xhr.responseText) ]);
+        }
+      };
+
+      xhr.open('GET', '../../.devdata/' + type + '.json');
+      xhr.send();
+    });
+  };
+
   return dev;
 
 });
