@@ -139,7 +139,7 @@ define([
    * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
    */
   bgApp.getNotifications = () => {
-    return bgApp.api.getNotifications(0, 7, null)
+    return bgApp.api.getNotifications(7, 0, null)
     .then((notifications) => {
       let parsed;
       if (typeof notifications !== 'string') {
@@ -147,10 +147,14 @@ define([
       } else {
         parsed = JSON.parse(notifications).notifications;
       }
-      // strip notifications that defy the standard object layout
-      // e.g. NType.NEWGROUP (501) doesn't have a hood_message
-      // member. Skip everything but some standard messages, until
-      // proper error/NType handling is implemented
+
+      /**
+       * strip notifications that defy the standard object layout
+       * e.g. NType.NEWGROUP (501) doesn't have a hood_message
+       * member. Skip everything but some standard messages
+       * @todo proper error/NType handling
+       * @type {Array.<Number>}
+       */
       let safeTypes = [
         APIClient.NType.EVENT,
         APIClient.NType.MARKET,
@@ -158,15 +162,7 @@ define([
         APIClient.NType.FEED
       ];
       parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id));
-      // exclude deleted messages
-      // site doesn't filter, so I assume there's no flag to
-      // safely identify deleted messages;
-      // working around with:
-      // { subject: 'gelöscht', body: 'gelöscht-gelöscht' } detection
-      // I don't have to mention that this is highly VOLATILE, right? :smirk:
-      parsed = parsed.filter((n) => n.hood_message.subject !== 'gelöscht' &&
-                                    n.hood_message.body !== 'gelöscht-gelöscht');
-      // P.S. - 6:1 (comments:code) ratio is a good thing, isn't it? :sweat_smile:
+      parsed = parsed.filter((n) => !n.hood_message.is_deleted);
 
       return parsed.map((n) => new APIClient.NItem(n));
     });
@@ -179,7 +175,6 @@ define([
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
-    console.log('Updating browserAction with:', stats);
 
     let allNew = stats.messages + stats.notifications;
     let hasNew = allNew > 0;

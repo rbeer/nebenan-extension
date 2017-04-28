@@ -21,7 +21,6 @@ define([
      * @param {Number}   raw.created                   - UNIX epoch timestamp, millisecond precision
      * @param {Number}   raw.user_id                   - Author's id
      * @param {Number}   raw.hood_message_type_id      - Id of message type (e.g. deleted = 4)
-     * @param {Number}   raw.hood_message_category_id  - ! UNKNOWN !
      * @param {?Number}  raw.hood_group_id             - Id of group, message was posted in
      * @param {?Number}  raw.parent_hood_message_id    - ID of parent message (used for links to e.g. "thanks" or answer messages)
      * @param {String}   raw.body                      - Message body
@@ -40,10 +39,11 @@ define([
      * @param {Number}   raw.user.hood_id              - ID of author's hood
      * @param {String}   raw.user.hood_title           - Name of author's hood
      * @param {String}   raw.user.sex_id               - Author's sex (0: female, 1: male)
+     * @param {?Object}  parentMessage                 - Message's parent Message. Used for e.g. title generation of NType.ANSWER Messages
      * @constructor
      * @return {NMessage}
      */
-    constructor(raw) {
+    constructor(raw, parentMessage) {
 
       let userSubsetKeys = [
         'id', 'firstname', 'lastname', 'sex_id',
@@ -57,10 +57,14 @@ define([
       let subsetKeys = [
         'id', 'created', 'user_id', 'parent_hood_message_id',
         'body', 'subject', 'images',
-        'hood_message_type_id', 'hood_message_category_id', 'hood_group_id',
+        'hood_message_type_id', 'hood_group_id',
         'hood_id', 'house_group', slimUser
       ];
       super(subsetKeys, raw);
+
+      if (parentMessage) {
+        this.parentSubject = parentMessage.subject;
+      }
     }
   };
 

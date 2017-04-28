@@ -53,7 +53,8 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
 // a/k/a meta data :smirk:
 
 gulp.task('extras', () => {
-  return gulp.src([
+
+  let paths = [
     'app/_locales/**',
     'app/fonts/*.woff',
     'app/images/**/*',
@@ -62,7 +63,12 @@ gulp.task('extras', () => {
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html'
-  ], {
+  ];
+
+  if (DEV) {
+    paths.unshift('app/.devdata/**');
+  }
+  return gulp.src(paths, {
     base: 'app',
     dot: true
   }).pipe(gulp.dest('dist'));
@@ -313,7 +319,7 @@ gulp.task('dev', cb => {
 gulp.task('package', () => {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.if(manifest.version_name.endsWith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
+      .pipe($.if(manifest.version_name.endsWaith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
       .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
       .pipe(gulp.dest('package'));
 });

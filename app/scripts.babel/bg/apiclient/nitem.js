@@ -17,25 +17,26 @@ define([
      * @param {Object}   raw - Raw notification object as it comes from the API. The subset
      *                         will consist of:
      * @param {Number}   raw.id
-     * @param {NMessage} raw.hood_message          - Message that triggered the notification
+     * @param {Object}   raw.hood_message          - Message that triggered the notification
      * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
      * @param {NType}    raw.notification_type_id  - Type of notification (market, feed, group, message)
      * @param {Bool}     raw.seen                  - Whether notification has been clicked / content visited
+     * @param {?Object}  raw.parent_hood_message   - Parent Message if NType.ANSWER
      * @constructor
      * @return {NItem}
      */
     constructor(raw) {
 
-      let extractMessage = function() {
-        this.hood_message = new NMessage(raw.hood_message);
-      };
-
       let wrapNType = function() {
         this.notification_type_id = new NType(raw.notification_type_id);
       };
 
+      let extractMessage = function() {
+        this.hood_message = new NMessage(raw.hood_message, raw.parent_hood_message);
+      };
+
       let subsetKeys = [
-        'id', extractMessage, 'created_at_timestamp', wrapNType, 'seen'
+        'id', wrapNType, extractMessage, 'created_at_timestamp', 'seen'
       ];
       super(subsetKeys, raw);
     }
