@@ -89,11 +89,25 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('version', () => {
+gulp.task('manifest', () => {
+  let pkg = require('./package.json');
   return gulp.src('app/manifest.json')
         .pipe($.jsonEditor((manifest) => {
           // add '-dev' to version_name, if in DEV mode
-          manifest.version_name = manifest.version + (DEV ? '-dev' : '');
+          manifest.version = pkg.version;
+          manifest.version_name = pkg.version;
+          if (DEV) {
+            let d = new Date();
+            let dString = [
+              (d.getFullYear() + '').slice(2),
+              d.getMonth(),
+              d.getDay(),
+              d.getHours(),
+              d.getMinutes()
+            ];
+            manifest.version_name += '-dev_' + dString.join('');
+          }
+
           return manifest;
         }))
         .pipe(gulp.dest('dist'));
@@ -284,7 +298,7 @@ gulp.task('build', cb => {
   DOCS = DOCS || process.argv.includes('--with-docs');
 
   let buildTasks = [
-    'lint', 'babel', 'scripts', 'lodash', 'version',
+    'lint', 'babel', 'scripts', 'lodash', 'manifest',
     ['html', 'styles', 'extras'],
     'requirejs', 'size', cb
   ];
