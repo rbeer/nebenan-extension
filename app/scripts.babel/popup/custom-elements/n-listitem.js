@@ -6,8 +6,8 @@ define([
 ], (NItem, NType) => {
 
   /**
-   * @class Item for NList
-   * @extends {HTMLElement}
+   * @class Notification Item for NList
+   * @extends {HTMLLIElement}
    * @example
    * ...
    *   <n-list>
