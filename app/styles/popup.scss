@@ -71,8 +71,13 @@ a:hover {
 }
 
 /* stop confusing MouseEvent.target */
-[aria-role="button"][action] * {
-  pointer-events: none;
+[aria-role="button"][action] {
+
+  cursor: pointer;
+
+  * {
+    pointer-events: none;
+  }
 }
 /** ----------- **/
 
