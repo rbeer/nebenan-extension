@@ -1,6 +1,9 @@
 'use strict';
 
-define(['popup/components/status', 'popup/components/n-list'], (StatusElement, nlist) => {
+define([
+  'popup/custom-elements/status',
+  'popup/custom-elements/n-list'
+], (StatusElement, nlist) => {
 
   /**
    * Popup DOM interaction

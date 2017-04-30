@@ -2,7 +2,7 @@
 
 define([
   'bg/apiclient/nitem',
-  'popup/components/n-listitem'
+  'popup/custom-elements/n-listitem'
 ], (NItem, NListItem) => {
 
   /**
