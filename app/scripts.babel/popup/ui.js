@@ -23,8 +23,11 @@ define([
         prompt: null
       },
       status: null,
-      slider: null,
-      nlist: null
+      slider: null
+    },
+    nlists: {
+      notifications: null,
+      private_conversations: null
     },
     scrollOverlayTimeout: null
   };
@@ -59,13 +62,16 @@ define([
       loginEls[name] = document.querySelector(`.login-${name}`);
     }
 
+    // reference private_conversation list
+    ui.nlists.private_conversations = document.querySelector('n-list[type="private_conversations"]');
+
     // reference notification list
-    ui.elements.nlist = document.getElementById('n-list');
+    ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.elements.nlist.parentElement.addEventListener('scroll',
-                                            ui.showScrollbar.bind(null, overlay));
+    ui.nlists.notifications.parentElement.addEventListener('scroll',
+      ui.showScrollbar.bind(null, overlay));
   };
 
   ui.showScrollbar = (overlay, evt) => {
@@ -86,7 +92,11 @@ define([
    * @see NList.add
    */
   ui.addNotification = (nItem) => {
-    ui.elements.nlist.add(nItem).hookLink(ui.handleClicks);
+    ui.nlists.notifications.add(nItem).hookLink(ui.handleClicks);
+  };
+
+  ui.addConversation = (pcItem) => {
+    ui.nlists.private_conversations.add(pcItem);
   };
 
   /**

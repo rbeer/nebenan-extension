@@ -3,8 +3,9 @@
 define([
   'messaging',
   'popup/ui',
-  'bg/apiclient/notifications/nitem'
-], (Messaging, ui, NItem) => {
+  'bg/apiclient/notifications/nitem',
+  'bg/apiclient/messages/pcitem'
+], (Messaging, ui, NItem, PCItem) => {
 
   window.devlog = console.debug;
 
@@ -34,6 +35,7 @@ define([
     popupApp.messaging = new Messaging({
       setStats: popupApp.setStats,                 // response for bg/app:getStats
       addNotifications: popupApp.addNotifications, // response for bg/app:getNotifications
+      addConversations: popupApp.addConversations, // response for bg/app:getConversations
       error: handleErrorMessages
     }, 'popup/app');
 
@@ -44,6 +46,8 @@ define([
 
     // query bgApp for notifications
     popupApp.messaging.send('bg/app', ['getNotifications']);
+    // query bgApp for private_conversations
+    popupApp.messaging.send('bg/app', ['getConversations']);
 
   };
 
@@ -67,6 +71,14 @@ define([
       let nitem = new NItem(nItemObject);
       devlog(nitem);
       popupApp.ui.addNotification(nitem);
+    });
+  };
+
+  popupApp.addConversations = (msg) => {
+    devlog(msg);
+    msg.payload.forEach((pcItemObject) => {
+      let pcItem = new PCItem(pcItemObject);
+      popupApp.ui.addConversation(pcItem);
     });
   };
 

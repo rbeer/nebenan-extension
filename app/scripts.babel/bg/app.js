@@ -83,6 +83,18 @@ define([
           let response = msg.cloneForAnswer(['error'], err);
           respond(response);
         });
+      },
+      getConversations: (msg, respond) => {
+        bgApp.getConversations()
+        .then((pcItems) => {
+          devlog('pcItems:', pcItems);
+          let response = msg.cloneForAnswer(['addConversations'], pcItems);
+          respond(response);
+        })
+        .catch((err) => {
+          let response = msg.cloneForAnswer(['error'], err);
+          respond(response);
+        });
       }
     }, 'bg/app');
     // start listening for messages
