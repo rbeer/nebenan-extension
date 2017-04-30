@@ -1,9 +1,11 @@
 'use strict';
 
 define([
-  'bg/apiclient/notifications/nitem',
-  'popup/custom-elements/n-listitem'
-], (NItem, NListItem) => {
+  'bg/apiclient/nsubset',
+  'bg/apiclient/messages/pcitem',
+  'popup/custom-elements/n-listitem',
+  'popup/custom-elements/pc-listitem'
+], (NSubset, PCItem, NListItem) => {
 
   /**
    * @class Notification List
@@ -23,24 +25,43 @@ define([
 
     /**
      * Adds an NListItem to the list
-     * @param {!APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
-     *                                             NListeItem from; or a fully prepared,
-     *                                             as in .populate called, NListItem.
-     * @returns {NListItem} - NListItem that has actually been added
+     * @param {APIClient.NSubset|HTMLLIElement} setOrElement - Either an APIClient.NSubset to build from;
+     *                                                         or a fully prepared, as in .populate
+     *                                                         called, *ListItem.
+     * @returns {NListItem|PCListItem} - ListItem that has actually been added
      */
-    add(nItem) {
-      let nListItem;
-      if (nItem instanceof NListItem) {
-        nListItem = nItem;
-      } else if (nItem instanceof NItem) {
-        nListItem = document.createElement('n-listitem');
-        nListItem.populate(nItem);
-      } else {
-        throw new TypeError('First parameter must be of type ' +
-                            'APIClient.NItem or NListItem');
+    add(setOrElement) {
+
+      let listItem, elementName;
+
+      let createElement = () => {
+        let element = document.createElement(elementName);
+        element.populate(setOrElement);
+        return element;
+      };
+
+      switch (this.getAttribute('type')) {
+        case 'notifications':
+          elementName = 'n-listitem';
+          break;
+        case 'private_conversations':
+          elementName = 'pc-listitem';
+          break;
+        default:
+          throw new ReferenceError('n-list Element expects a \'type="notifications|private_conversations"\' attribute.');
       }
-      this.append(nListItem);
-      return nListItem;
+
+      if (setOrElement instanceof HTMLLIElement) {
+        listItem = setOrElement;
+      } else if (setOrElement instanceof NSubset) {
+        listItem = createElement();
+      } else {
+        throw new TypeError('First parameter must be an instanceof ' +
+                            'APIClient.NSubset or HTMLLIElement');
+      }
+
+      this.append(listItem);
+      return listItem;
     }
   }
 
