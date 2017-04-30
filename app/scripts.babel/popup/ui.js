@@ -2,8 +2,9 @@
 
 define([
   'popup/custom-elements/status',
-  'popup/custom-elements/n-list'
-], (StatusElement, nlist) => {
+  'popup/custom-elements/n-list',
+  'lodash'
+], (StatusElement, nlist, _) => {
 
   /**
    * Popup DOM interaction
@@ -95,10 +96,7 @@ define([
    */
   ui.setStats = (values) => {
     let statsEls = ui.elements.stats;
-
-    statsEls.notifications.value = values.notifications;
-    statsEls.messages.value = values.messages;
-    statsEls.users.value = values.users;
+    _.forEach(statsEls, (el, key) => (el.value = values[key]));
   };
 
   /**
