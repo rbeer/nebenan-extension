@@ -1,8 +1,8 @@
 'use strict';
 
 define([
-  'bg/apiclient/nsubset',
-  'bg/apiclient/nmessage-type'
+  'bg/apiclient/notifications/nsubset',
+  'bg/apiclient/notifications/nmessage-type'
 ], (NSubset, NMessageType) => {
 
   /**

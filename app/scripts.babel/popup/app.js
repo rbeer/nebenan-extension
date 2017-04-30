@@ -1,6 +1,10 @@
 'use strict';
 
-define(['messaging', 'popup/ui', 'bg/apiclient/nitem'], (Messaging, ui, NItem) => {
+define([
+  'messaging',
+  'popup/ui',
+  'bg/apiclient/notifications/nitem'
+], (Messaging, ui, NItem) => {
 
   window.devlog = console.debug;
 

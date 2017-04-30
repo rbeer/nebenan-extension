@@ -1,8 +1,8 @@
 'use strict';
 
 define([
-  'bg/apiclient/nitem',
-  'bg/apiclient/ntype'
+  'bg/apiclient/notifications/nitem',
+  'bg/apiclient/notifications/ntype'
 ], (NItem, NType) => {
 
   /**

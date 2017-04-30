@@ -1,7 +1,7 @@
 'use strict';
 
 define([
-  'bg/apiclient/nitem',
+  'bg/apiclient/notifications/nitem',
   'popup/custom-elements/n-listitem'
 ], (NItem, NListItem) => {
 

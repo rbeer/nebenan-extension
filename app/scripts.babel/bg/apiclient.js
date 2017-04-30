@@ -2,9 +2,9 @@
 
 define([
   'bg/auth',
-  'bg/apiclient/nitem',
-  'bg/apiclient/nmessage',
-  'bg/apiclient/ntype'
+  'bg/apiclient/notifications/nitem',
+  'bg/apiclient/notifications/nmessage',
+  'bg/apiclient/notifications/ntype'
 ], (auth, NItem, NMessage, NType) => {
   /**
    * @class Client to nebenan.de API
