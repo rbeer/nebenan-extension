@@ -1,7 +1,7 @@
 'use strict';
 
 define([
-  'bg/apiclient/notifications/nsubset',
+  'bg/apiclient/nsubset',
   'bg/apiclient/notifications/nmessage',
   'bg/apiclient/notifications/ntype'
 ], (NSubset, NMessage, NType) => {
@@ -43,5 +43,4 @@ define([
   };
 
   return NItem;
-
 });

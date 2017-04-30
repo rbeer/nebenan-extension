@@ -8,7 +8,8 @@ define([
     constructor(raw, partner) {
 
       let wrapMessage = function wrapMessage() {
-        this.last_private_conversation_message = new PCMessage(raw);
+        this.last_private_conversation_message =
+          new PCMessage(raw.last_private_conversation_message);
       };
       let addThumbUrl = function addThumbUrl() {
         this.thumb_url = partner.photo_thumb_url;
