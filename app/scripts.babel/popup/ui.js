@@ -46,7 +46,7 @@ define([
     let statsEls = ui.elements.stats;
     for (let type in statsEls) {
       statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type);
+      statsEls[type].populate(type, ui.handleClicks);
       ui.elements.status.appendChild(statsEls[type]);
     }
 
@@ -117,7 +117,7 @@ define([
     let action;
     let value;
     let splitActionValue = (str) => {
-      let matches = str.match(/(\w+)\.(.*)/);
+      let matches = str.match(/([\w\-]+)\.(.*)/);
       return [ matches[1], matches[2] ];
     };
 
@@ -133,11 +133,19 @@ define([
 
     evt.preventDefault();
 
-    if (action === 'newtab') {
-      chrome.tabs.create({
-        url: (value.startsWith('https') ? value : 'https://nebenan.de/' + value),
-        active: true
-      });
+    switch (action) {
+      case 'newtab':
+        chrome.tabs.create({
+          url: (value.startsWith('https') ? value : 'https://nebenan.de/' + value),
+          active: true
+        });
+        break;
+      case 'select-panel':
+        evt.target.select();
+        break;
+      default:
+        console.warn('Unknown click action:', action);
+        console.info('Arguments:', args);
     }
 
     return false;

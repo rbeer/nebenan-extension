@@ -7,9 +7,10 @@ define(() => {
       super();
     }
 
-    populate(type) {
+    populate(type, clickHandler) {
       this.setAttribute('type', type);
 
+      /** Element/Children Setup */
       // clone DOM Elements from <template>
       // append to `this` <status-element>
       let tpl = document.getElementById('status-element');
@@ -17,6 +18,12 @@ define(() => {
 
       this.firstElementChild.className = 'status-' + type;
 
+      /** Clickable Setup */
+      this.setAttribute('aria-role', 'button');
+      this.setAttribute('action', 'select-panel.' + this.type);
+      this.addEventListener('click', clickHandler.bind(this, this.getAttribute('action')));
+
+      /** Set Initial Counter Value */
       this.valueSpan = this.querySelector('span');
       this.value = 0;
 
@@ -25,6 +32,13 @@ define(() => {
 
     set value(n) {
       this.valueSpan.textContent = n;
+    }
+    get type() {
+      return this.getAttribute('type');
+    }
+
+    select() {
+      this.setAttribute('selected', true);
     }
   }
 
