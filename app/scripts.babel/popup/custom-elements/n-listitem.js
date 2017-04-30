@@ -85,13 +85,13 @@ define([
 
     set title(text) {
       this.setAttribute('title', text);
-      this.querySelector('.n-listitem-title').innerText = text;
+      this.querySelector('.title').innerText = text;
     }
 
     set body(text) {
       let singleLine = text.slice(0, 52).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
-      this.querySelector('.n-listitem-body').innerText = singleLine;
+      this.querySelector('.body').innerText = singleLine;
     }
 
     set link(url) {
@@ -105,7 +105,7 @@ define([
     setThumb(nMessage) {
 
       let url;
-      let thumbStyle = this.querySelector('.n-listitem-thumb').style;
+      let thumbStyle = this.querySelector('.thumb').style;
       // use (first) image attached to message
       // or user's thumbnail
       // or random dummy avatar as last resort (based on sex)
@@ -138,7 +138,7 @@ define([
     }
 
     hookLink(handler) {
-      this.querySelector('.n-listitem-body')
+      this.querySelector('.body')
           .addEventListener('click', handler.bind(this, 'newtab.' + this.link));
     }
 

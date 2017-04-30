@@ -24,11 +24,16 @@ define(() => {
      */
     populate(pcItem) {
 
+      let lastSenderId = pcItem.last_private_conversation_message.sender_id;
+      let sent = lastSenderId !== pcItem.partner_id;
+
       // clone DOM Elements from <template>
       // append to `this` <n-listitem>
       let tpl = document.getElementById('pc-listitem');
       this.appendChild(document.importNode(tpl.content, true));
       devlog('populating PCListItem with:', pcItem);
+
+      this.setAttribute('type', sent ? 'sent' : 'received');
 
       return this;
     }
