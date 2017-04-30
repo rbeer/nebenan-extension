@@ -1,3 +1,4 @@
+@import 'custom-elements/status';
 
 .header {
   position: absolute;
@@ -54,10 +55,4 @@
     font-size: 100px;
     line-height: 36px;
   }
-}
-
-.status {
-  float: right;
-  margin-top: 6px;
-  font-weight: bold;
 }

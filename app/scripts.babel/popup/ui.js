@@ -23,6 +23,7 @@ define([
         prompt: null
       },
       status: null,
+      slider: null,
       nlist: null
     },
     scrollOverlayTimeout: null
@@ -40,7 +41,9 @@ define([
     }
 
     // reference status container element
+    // and selection slider
     ui.elements.status = document.getElementById('status');
+    ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
 
     // add status elements
     let statsEls = ui.elements.stats;
@@ -141,7 +144,7 @@ define([
         });
         break;
       case 'select-panel':
-        evt.target.select();
+        ui.moveSelectSlider(evt.target);
         break;
       default:
         console.warn('Unknown click action:', action);
@@ -149,6 +152,12 @@ define([
     }
 
     return false;
+  };
+
+  ui.moveSelectSlider = (target) => {
+    let sliderStyle = ui.elements.slider.style;
+    sliderStyle.width = target.offsetWidth + 'px';
+    sliderStyle.left = `${target.offsetLeft - 208}px`;
   };
 
   /**

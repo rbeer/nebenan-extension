@@ -36,10 +36,6 @@ define(() => {
     get type() {
       return this.getAttribute('type');
     }
-
-    select() {
-      this.setAttribute('selected', true);
-    }
   }
 
   // register Custom Elements

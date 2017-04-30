@@ -1,0 +1,13 @@
+.status {
+  float: right;
+  margin-top: 6px;
+  font-weight: bold;
+
+  .status-select-slider {
+    position: relative;
+    top: 37px;
+    left: 0;
+    width: 30%;
+    border-bottom: 4px solid $TEXT_GREEN;
+  }
+}

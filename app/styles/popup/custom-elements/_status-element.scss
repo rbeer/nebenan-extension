@@ -12,10 +12,6 @@ status-element {
     content: '\e83a';
   }
 
-  &[selected] {
-    border-bottom: 4px solid $TEXT_GREEN;
-  }
-
   i {
     vertical-align: middle;
     font-size: 16px;
