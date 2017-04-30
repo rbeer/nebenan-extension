@@ -155,6 +155,7 @@ define([
         break;
       case 'select-panel':
         ui.moveSelectSlider(evt.target);
+        ui.movePanels(evt.target.type === 'notifications' ? 0 : 350);
         break;
       default:
         console.warn('Unknown click action:', action);
@@ -163,6 +164,8 @@ define([
 
     return false;
   };
+
+  ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));
 
   ui.moveSelectSlider = (target) => {
     let sliderStyle = ui.elements.slider.style;

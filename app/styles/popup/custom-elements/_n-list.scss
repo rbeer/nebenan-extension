@@ -3,6 +3,10 @@
 @import 'n-type-icons';
 
 .n-list-container {
+  display: grid;
+  grid-template-columns: repeat(2, 340px);
+  grid-template-rows: 100%;
+  grid-column-gap: 7px;
   position: relative;
   left: 0;
   top: 0;
@@ -28,6 +32,17 @@
 
   &:hover .n-list-scrollthumb-overlay {
     opacity: 0;
+  }
+
+  .n-list[type="notifications"] {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row: 1;
+  }
+  .n-list[type="private_conversations"] {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row: 1;
   }
 }
 
@@ -61,6 +76,9 @@ n-listitem {
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
   max-height: 340px;
+  position: relative;
+  left: 0;
+  transition: left 0.3s ease-out;
 
   .n-list-slot {
     position: relative;

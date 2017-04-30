@@ -24,7 +24,7 @@ define([
     }
 
     /**
-     * Adds an NListItem to the list
+     * Adds a *ListItem to the list
      * @param {APIClient.NSubset|HTMLLIElement} setOrElement - Either an APIClient.NSubset to build from;
      *                                                         or a fully prepared, as in .populate
      *                                                         called, *ListItem.
@@ -62,6 +62,10 @@ define([
 
       this.append(listItem);
       return listItem;
+    }
+
+    setLeft(n) {
+      this.style.left = n + 'px';
     }
   }
 
