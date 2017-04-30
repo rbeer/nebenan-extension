@@ -1,6 +1,6 @@
 'use strict';
 
-define(['popup/n-list'], (nlist) => {
+define(['popup/components/status', 'popup/components/n-list'], (StatusElement, nlist) => {
 
   /**
    * Popup DOM interaction
@@ -9,18 +9,19 @@ define(['popup/n-list'], (nlist) => {
   let ui = {
     elements: {
       stats: {
-        users: null,
+        notifications: null,
         messages: null,
-        notifications: null
+        users: null
       },
       login: {
         blur: null,
         overlay: null,
         prompt: null
       },
-      nlist: null,
-      scrollOverlayTimeout: null
-    }
+      status: null,
+      nlist: null
+    },
+    scrollOverlayTimeout: null
   };
 
   /**
@@ -34,10 +35,15 @@ define(['popup/n-list'], (nlist) => {
       element.addEventListener('click', ui.handleClicks);
     }
 
-    // reference status elements
+    // reference status container element
+    ui.elements.status = document.getElementById('status');
+
+    // add status elements
     let statsEls = ui.elements.stats;
-    for (let name in statsEls) {
-      statsEls[name] = document.querySelector(`.status-${name} span`);
+    for (let type in statsEls) {
+      statsEls[type] = document.createElement('status-element');
+      statsEls[type].populate(type);
+      ui.elements.status.appendChild(statsEls[type]);
     }
 
     // reference login prompt overlay elements
@@ -47,11 +53,11 @@ define(['popup/n-list'], (nlist) => {
     }
 
     // reference notification list
-    ui.nlist = document.getElementById('n-list');
+    ui.elements.nlist = document.getElementById('n-list');
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.nlist.parentElement.addEventListener('scroll',
+    ui.elements.nlist.parentElement.addEventListener('scroll',
                                             ui.showScrollbar.bind(null, overlay));
   };
 
@@ -73,7 +79,7 @@ define(['popup/n-list'], (nlist) => {
    * @see NList.add
    */
   ui.addNotification = (nItem) => {
-    ui.nlist.add(nItem).hookLink(ui.handleClicks);
+    ui.elements.nlist.add(nItem).hookLink(ui.handleClicks);
   };
 
   /**
@@ -87,9 +93,9 @@ define(['popup/n-list'], (nlist) => {
   ui.setStats = (values) => {
     let statsEls = ui.elements.stats;
 
-    statsEls.notifications.textContent = values.notifications;
-    statsEls.messages.textContent = values.messages;
-    statsEls.users.textContent = values.users;
+    statsEls.notifications.value = values.notifications;
+    statsEls.messages.value = values.messages;
+    statsEls.users.value = values.users;
   };
 
   /**
