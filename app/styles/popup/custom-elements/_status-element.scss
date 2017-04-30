@@ -1,0 +1,26 @@
+status-element {
+  display: inline-block;
+  float: left;
+
+  &[type="notifications"] i:before {
+    content: '\e807';
+  }
+  &[type="messages"] i:before {
+    content: '\e828';
+  }
+  &[type="users"] i:before {
+    content: '\e83a';
+  }
+
+  &[selected] {
+    border-bottom: 4px solid $TEXT_GREEN;
+  }
+
+  i {
+    vertical-align: middle;
+    font-size: 16px;
+  }
+
+  div { padding: 8px; }
+
+}

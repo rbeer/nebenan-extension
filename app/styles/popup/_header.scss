@@ -60,25 +60,4 @@
   float: right;
   margin-top: 6px;
   font-weight: bold;
-
-  div {
-    float: left;
-    text-shadow: 0.3px 0.6px 0.3px rgba(33, 33, 33, 0.3);
-    padding: 8px;
-
-    i {
-      vertical-align: middle;
-      font-size: 16px;
-    }
-  }
-}
-
-.status-notifications i:before {
-  content: '\e807';
-}
-.status-messages i:before {
-  content: '\e828';
-}
-.status-users i:before {
-  content: '\e83a';
 }
