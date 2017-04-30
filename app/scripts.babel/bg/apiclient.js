@@ -4,8 +4,10 @@ define([
   'bg/auth',
   'bg/apiclient/notifications/nitem',
   'bg/apiclient/notifications/nmessage',
-  'bg/apiclient/notifications/ntype'
-], (auth, NItem, NMessage, NType) => {
+  'bg/apiclient/notifications/ntype',
+  'bg/apiclient/messages/pcitem',
+  'bg/apiclient/messages/pcmessage'
+], (auth, NItem, NMessage, NType, PCItem, PCMessage) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -24,6 +26,12 @@ define([
     }
     static get NType() {
       return NType;
+    }
+    static get PCMessage() {
+      return PCMessage;
+    }
+    static get PCItem() {
+      return PCItem;
     }
 
     /**
@@ -120,15 +128,14 @@ define([
      * @memberOf APIClient
      * @static
      * @see APIClient.callAPI
-     * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItem} instances, parsed from the response body APIClient.callAPI resolved with
+     * @return {Promise} - Resolves with the response body APIClient.callAPI resolved with
      */
     static getNotifications(perPage, lower, cached) {
       if (cached || typeof lower === 'object') {
         return auth.canAuthenticate().then(() => cached || lower);
       }
       perPage = perPage || 7;
-      return auth.canAuthenticate()
-      .then(() => {
+      return auth.canAuthenticate().then(() => {
         let xhrOptions = APIClient.XHR_DEFAULTS;
         xhrOptions.url += '/notifications.json?per_page=' + perPage;
         if (lower) {
@@ -136,8 +143,23 @@ define([
         }
         xhrOptions.token = auth.token;
         return xhrOptions;
-      })
-      .then(APIClient.callAPI);
+      }).then(APIClient.callAPI);
+    }
+
+    static getConversations(perPage, page, cached) {
+      if (cached || typeof page === 'object') {
+        return auth.canAuthenticate().then(() => cached || page);
+      }
+      perPage = perPage || 7;
+      return auth.canAuthenticate().then(() => {
+        let xhrOptions = APIClient.XHR_DEFAULTS;
+        xhrOptions.url += '/private_conversations.json?per_page=' + perPage;
+        if (page) {
+          xhrOptions.url += '&page=' + page;
+        }
+        xhrOptions.token = auth.token;
+        return xhrOptions;
+      }).then(APIClient.callAPI);
     }
   };
 

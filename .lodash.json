@@ -1,6 +1,6 @@
 {
   "moduleId": "lodash",
   "exports": "amd",
-  "include": "intersection, assign, forEach",
+  "include": "intersection, assign, forEach, find",
   "-o": "./app/lodash.js"
 }
