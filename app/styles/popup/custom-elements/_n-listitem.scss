@@ -1,3 +1,5 @@
+@import 'n-type-icons';
+
 n-listitem {
   position: relative;
   transition: right 0.3s ease-out;
@@ -6,6 +8,7 @@ n-listitem {
   &.out {
     right: -350px;
   }
+
   .content {
     position: absolute;
     width: 100%;
@@ -33,11 +36,6 @@ n-listitem {
       margin-left: 5px;
       width: 240px;
       height: 100%;
-
-      .type {
-        font-size: 20px;
-        float: left;
-      }
 
       .title, .body {
         display: block;
