@@ -61,7 +61,7 @@ define([
       this.body = nMsg.body;
 
       // set attributes for/on clickable elements
-      this.querySelector('.body').setAttribute('action', 'feed/' + linkId);
+      this.querySelector('.body').setAttribute('action', 'newtab.feed/' + linkId);
       this.querySelector('.body').setAttribute('aria-role', 'button');
 
       // set thumbnail
