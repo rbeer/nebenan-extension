@@ -7,7 +7,7 @@ define(() => {
    * Manages clickable elements
    * @module popup/ui/clickables
    */
-  let clickables = {};
+  let clickables = { observers: [] };
 
   /**
    * Gets all `[aria-role="button"][action]` elements currently in
@@ -42,6 +42,39 @@ define(() => {
         console.warn('This isn\'t a `clickables` element:', element);
       }
     }
+  };
+
+  /**
+   * Creates a MutationObserver on input `element`, watching for
+   * clickable elements, hooking found ones. Returns a id for use
+   * with stop(id)
+   * @param  {HTMLElement} element - Any HTMLElement that is expected to have clickable elements inserted
+   * @return {Number} MutationObserver ID, used for stop(id)
+   */
+  clickables.watch = (element) => {
+    let observer = new MutationObserver(parseMutations);
+    observer.observe(element, { childList: true });
+    clickables.observers.push(observer);
+    return clickables.observers.length - 1;
+  };
+
+  let parseMutations = (mutations) => {
+    mutations.forEach((mutation) => {
+      let elements = mutation.addedNodes.item(0)
+                     .querySelectorAll('[aria-role="button"][action]');
+      if (elements) {
+        clickables.hook(Array.from(elements));
+      }
+    });
+  };
+
+  /**
+   * Stops and destroys the MutationObserver with given `id`,
+   * @param  {Number} id - MutationObserver id, as returned by watch(element)
+   */
+  clickables.stop = (id) => {
+    clickables.observers[id].disconnect();
+    clickables.observers[id] = null;
   };
 
   /**

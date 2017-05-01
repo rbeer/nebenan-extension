@@ -38,24 +38,11 @@ define([
    * @memberOf module:popup/ui
    */
   ui.init = () => {
-    // hook clickable elements
-    clickables.init(ui);
-    // detect and automatically hook new [aria-role=button][action] elements
-    /*clickables.watch(ui.nlists.notifications);
-    clickables.watch(ui.nlists.conversations);*/
 
     // reference status container element
     // and selection slider
     ui.elements.status = document.getElementById('status');
     ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
-
-    // add status elements
-    let statsEls = ui.elements.stats;
-    for (let type in statsEls) {
-      statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type, clickables.handleClicks);
-      ui.elements.status.appendChild(statsEls[type]);
-    }
 
     // reference login prompt overlay elements
     let loginEls = ui.elements.login;
@@ -68,6 +55,20 @@ define([
 
     // reference notification list
     ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
+
+    // hook clickable elements
+    clickables.init(ui);
+    // detect and automatically hook new [aria-role=button][action] elements
+    clickables.watch(ui.nlists.notifications);
+    clickables.watch(ui.nlists.conversations);
+
+    // add status elements
+    let statsEls = ui.elements.stats;
+    for (let type in statsEls) {
+      statsEls[type] = document.createElement('status-element');
+      statsEls[type].populate(type, clickables.handleClicks);
+      ui.elements.status.appendChild(statsEls[type]);
+    }
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
@@ -93,7 +94,7 @@ define([
    * @see NList.add
    */
   ui.addNotification = (nItem) => {
-    ui.nlists.notifications.add(nItem).hookLink(clickables.handleClicks);
+    ui.nlists.notifications.add(nItem);
   };
 
   ui.addConversation = (pcItem) => {

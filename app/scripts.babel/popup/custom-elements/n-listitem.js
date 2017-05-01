@@ -43,10 +43,6 @@ define([
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
 
-      // dismiss click
-      this.querySelector('[aria-role="button"]')
-          .addEventListener('click', this.dismiss.bind(this));
-
       // set element's attributes
       let nMsg = nItem.hood_message;
       let _typeId = nItem.notification_type_id.id;
@@ -64,6 +60,10 @@ define([
                                         nMsg.subject;
       this.body = nMsg.body;
       this.link = 'https://nebenan.de/feed/' + linkId;
+
+      // set attributes for/on clickable elements
+      this.querySelector('.body').setAttribute('action', 'newtab.' + this.link);
+      this.querySelector('.body').setAttribute('aria-role', 'button');
 
       // set thumbnail
       this.setThumb(nMsg);
@@ -135,11 +135,6 @@ define([
      */
     dismiss() {
       return this.slideOut().then(this.remove.bind(this));
-    }
-
-    hookLink(handler) {
-      this.querySelector('.body')
-          .addEventListener('click', handler.bind(this, 'newtab.' + this.link));
     }
 
     slideIn() {}
