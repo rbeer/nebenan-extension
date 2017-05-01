@@ -1,0 +1,67 @@
+pc-listitem {
+  .content {
+    position: absolute;
+    width: 100%;
+    height: 50px;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 5px;
+  }
+
+  .thumb {
+    width: 50px;
+    height: 50px;
+    float: left;
+    border: $CARD_BORDER;
+    border-radius: 0;
+    /* background-image: url  --- Set in PCListItem.setThumb */
+    background-size: cover;
+    background-position: 0 0;
+    border: $CARD_BORDER;
+    box-shadow: $CARD_SHADOW;
+  }
+
+  .bubble {
+    position: relative;
+    float: left;
+    margin-left: 10px;
+    width: 250px;
+    height: 100%;
+    border: $CARD_BORDER;
+    border-radius: 0;
+    box-shadow: $CARD_SHADOW;
+    background: $CARD_BG;
+
+    .body {
+      font-size: 85%;
+      line-height: 16px;
+      cursor: pointer;
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 3px 20px;
+      height: 44px;
+      white-space: pre;
+    }
+  }
+
+  &[type] .content .bubble::before {
+    content: '';
+    position: absolute;
+    bottom: 18px;
+    border-width: 0 6px 12px;
+    border-color: rgba(0, 0, 0, 0.3) transparent;
+    border-style: solid;
+  }
+
+  &[type="sent"] .content .bubble::before {
+    border-color: #b2ca06 transparent;
+    right: 0;
+    transform: rotate(-90deg);
+  }
+  &[type="received"] .content .bubble::before {
+    border-color: #919191 transparent;
+    left: 0;
+    transform: rotate(90deg);
+  }
+}

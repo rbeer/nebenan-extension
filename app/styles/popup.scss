@@ -17,6 +17,12 @@ $SCROLLBAR_GRADIENT_1: $BTN_GREEN_BG;
 $SCROLLBAR_GRADIENT_2: $BTN_GREEN_HOVER_BG;
 
 $HEADER_HEIGHT: 46px;
+
+$CARD_BORDER: 1px solid rgba(0, 0, 0, .5);
+$CARD_SHADOW: 1px 1px 0.3px rgba(0, 0, 0, .3);
+$CARD_BG: rgb(237, 237, 233);
+$BUBBLE_SENT_BG: #e7f498;
+$BUBBLE_RECEIVED_BG: #edede9;
 /** --------- **/
 
 /** MAIN LAYOUT **/
@@ -71,8 +77,13 @@ a:hover {
 }
 
 /* stop confusing MouseEvent.target */
-[aria-role="button"][action] * {
-  pointer-events: none;
+[aria-role="button"][action] {
+
+  cursor: pointer;
+
+  * {
+    pointer-events: none;
+  }
 }
 /** ----------- **/
 
@@ -81,4 +92,6 @@ a:hover {
 /** Login Prompt; showing when user is not logged in **/
 @import 'popup/login-prompt';
 /** Notification List **/
-@import 'popup/n-list';
+@import 'popup/custom-elements/n-list';
+/** Status Elements */
+@import 'popup/custom-elements/status-element'

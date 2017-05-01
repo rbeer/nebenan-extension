@@ -59,7 +59,7 @@ define(['lodash'], (_) => {
         let self = this;
 
         // create Message instance
-        let msg = Message.fromObject(message);
+        let msg = new Message(message);
 
         // find matching handlers (intersection available/requested)
         let mhandlers = _.intersection(msg.handlers, Object.keys(this.handlers));
@@ -80,7 +80,7 @@ define(['lodash'], (_) => {
      * Sends a Message instance
      * @param  {Messaging.Message} message - Message instance to send
      * @this    Messaging                 - Messaging instance sending the message
-     * @throws {typeCheck} If `this` is not an instance of Messaging
+     * @throws {TypeError} If `this` is not an instance of Messaging
      */
     static sendMessage(message) {
       typeCheck(!(this instanceof Messaging),
@@ -137,21 +137,38 @@ define(['lodash'], (_) => {
   class Message {
 
     /**
-     * Constructs new message
-     * @param  {!String}                sender    - Sender of the message
+     * The constructor of is overloaded to accept
+     * the data as single Object parameter
+     * @param  {!String|Object}         sender    - Sender of the message
+     * @param  {!String}                sender.sender    - Sender of the message
+     * @param  {!String}                sender.to        - Recipient of the message
+     * @param  {String|Array.<String>} sender.handlers  - Name(s) of the Messaging handler(s) that should receive this message
+     * @param  {?Object}                sender.payload   - Message payload data
+     * @param  {?Messaging.Message}     sender.trigger   - Message got triggered by this request Message
      * @param  {!String}                to        - Recipient of the message
-     * @param  {!String|Array.<String>} handlers  - Name(s) of the Messaging handler(s) that should receive this message
+     * @param  {String|Array.<String>} handlers  - Name(s) of the Messaging handler(s) that should receive this message
      * @param  {?Object}                payload   - Message payload data
      * @return {Messaging.Message}
      */
     constructor(sender, to, handlers, payload) {
-      typeCheck((typeof sender !== 'string'),
+
+      let data = {
+        sender: sender,
+        to: to,
+        handlers: handlers,
+        payload: payload,
+        trigger: null
+      };
+      _.assign(data, typeof sender === 'object' ? sender : {});
+
+      typeCheck((typeof data.sender !== 'string'),
                 'Message needs a sender of type string.',
                 'ENOSENDER');
-      typeCheck((typeof to !== 'string'),
+      typeCheck((typeof data.to !== 'string'),
                 'Message needs a recipient (to).',
                 'ENOTO');
-      typeCheck(((typeof handlers !== 'string') && !(handlers instanceof Array)),
+      typeCheck(((typeof data.handlers !== 'string') &&
+                  !(data.handlers instanceof Array)),
                 'Message needs one or more handler names.',
                 'ENOHANDLER');
 
@@ -160,53 +177,34 @@ define(['lodash'], (_) => {
        * @type {!String}
        * @memberOf Messaging.Message
        */
-      this.sender = sender;
+      this.sender = data.sender;
       /**
        * Name of message recipient
        * @type {!String}
        * @memberOf Messaging.Message
        */
-      this.to = to;
+      this.to = data.to;
       /**
        * Names of handlers on the receiving end, expected
        * to process this Message
        * @type {!Array.<String>}
        * @memberOf Messaging.Message
        */
-      this.handlers = typeof handlers === 'string' ? [ handlers ] : handlers;
+      this.handlers = typeof data.handlers === 'string' ? [ data.handlers ] :
+                                                          data.handlers;
       /**
        * Payload data to send with the Message
        * @type {?Object}
        * @memberOf Messaging.Message
        */
-      this.payload = payload || null;
+      this.payload = data.payload || null;
       /**
        * Message (.toObject) that triggered this Message
        *   - Message is a trigger itself, if `null`
-       * @type {Object}
+       * @type {?Object}
        * @memberOf Messaging.Message
        */
-      this.trigger = null;
-    }
-
-    /**
-     * Creates new Message instance from an Object
-     * @param  {!Object} obj - Object you want to turn into a Message
-     * @return {Messaging.Message}
-     */
-    static fromObject(obj) {
-      typeCheck(!obj,
-                'From what object, exactly?',
-                'ENOOBJECT');
-
-      let params = [ null ];
-      for (let key in obj) {
-        params.push(obj[key]);
-      }
-
-      let m = new (Function.prototype.bind.apply(Message, params));
-      m.trigger = obj.trigger;
-      return m;
+      this.trigger = data.trigger;
     }
 
     /**
@@ -225,11 +223,11 @@ define(['lodash'], (_) => {
       let bareClone = {
         sender: this.to,
         to: this.sender,
-        handlers: (typeof handlers === 'string') ? [ handlers ] : handlers,
+        handlers: handlers,
         payload: payload,
         trigger: this.toObject()
       };
-      let clone = Message.fromObject(bareClone);
+      let clone = new Message(bareClone);
       return clone;
     }
 
@@ -241,11 +239,13 @@ define(['lodash'], (_) => {
       let obj = {
         sender: this.sender,
         to: this.to,
-        handlers: this.handlers,
-        trigger: this.trigger
+        handlers: this.handlers
       };
       if (this.payload !== null) {
         obj.payload = this.payload;
+      }
+      if (this.trigger !== null) {
+        obj.trigger = this.trigger;
       }
       return obj;
     }

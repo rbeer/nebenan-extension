@@ -1,10 +1,13 @@
 'use strict';
 
-define(['bg/apiclient/nitem'], (NItem) => {
+define([
+  'bg/apiclient/notifications/nitem',
+  'bg/apiclient/notifications/ntype'
+], (NItem, NType) => {
 
   /**
-   * @class Item for NList
-   * @extends {HTMLElement}
+   * @class Notification Item for NList
+   * @extends {HTMLLIElement}
    * @example
    * ...
    *   <n-list>
@@ -13,15 +16,6 @@ define(['bg/apiclient/nitem'], (NItem) => {
    * ...
    */
   class NListItem extends HTMLLIElement {
-
-    /**
-     * @typedef {Object} NListItemData
-     * @property {Number}   id
-     * @property {Number}   created - UNIX epoch timestamp, millisecond precision
-     * @property {NType}    typeId  - Notification type id (NListItem.NType)
-     * @property {NMessage} message - Message that caused the notification
-     * @memberOf NListItem
-     */
 
     /**
      * @constructor
@@ -34,7 +28,7 @@ define(['bg/apiclient/nitem'], (NItem) => {
 
     /**
      * Populates new <n-listitem> with initial values.
-     * After this, the item must be ready to be displayed.
+     * After this, the item must be ready for display.
      * @param {!APIClient.NItem} nItem - Data from API
      * @return {NListItem} `this`
      */
@@ -49,20 +43,26 @@ define(['bg/apiclient/nitem'], (NItem) => {
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
 
-      // dismiss click
-      this.querySelector('[aria-role="button"]')
-          .addEventListener('click', this.dismiss.bind(this));
-
       // set element's attributes
       let nMsg = nItem.hood_message;
+      let _typeId = nItem.notification_type_id.id;
 
-      this.type = nItem.notification_type_id;
+      // answers and "thanks" link to their parent post
+      let linkToParent = [ NType.ANSWER, NType.THANKS ].includes(_typeId);
+      let linkId = linkToParent ? nMsg.parent_hood_message_id : nMsg.id;
+
+      this.type = _typeId;
       this.id = nItem.id;
       this.seen = nItem.seen;
 
-      this.title = nMsg.subject;
+      // TODO: i18n
+      this.title = nMsg.parentSubject ? 'Antwort auf: ' + nMsg.parentSubject :
+                                        nMsg.subject;
       this.body = nMsg.body;
-      this.link = 'https://nebenan.de/feed/' + nMsg.id;
+
+      // set attributes for/on clickable elements
+      this.querySelector('.body').setAttribute('action', 'newtab.feed/' + linkId);
+      this.querySelector('.body').setAttribute('aria-role', 'button');
 
       // set thumbnail
       this.setThumb(nMsg);
@@ -70,8 +70,8 @@ define(['bg/apiclient/nitem'], (NItem) => {
       return this;
     }
 
-    set type(nType) {
-      this.setAttribute('type', nType.id);
+    set type(nTypeId) {
+      this.setAttribute('type', nTypeId);
     }
 
     set id(id) {
@@ -84,27 +84,19 @@ define(['bg/apiclient/nitem'], (NItem) => {
 
     set title(text) {
       this.setAttribute('title', text);
-      this.querySelector('.n-listitem-title').innerText = text;
+      this.querySelector('.title').innerText = text;
     }
 
     set body(text) {
       let singleLine = text.slice(0, 52).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
-      this.querySelector('.n-listitem-body').innerText = singleLine;
-    }
-
-    set link(url) {
-      this.setAttribute('link', url);
-    }
-
-    get link() {
-      return this.getAttribute('link');
+      this.querySelector('.body').innerText = singleLine;
     }
 
     setThumb(nMessage) {
 
       let url;
-      let thumbStyle = this.querySelector('.n-listitem-thumb').style;
+      let thumbStyle = this.querySelector('.thumb').style;
       // use (first) image attached to message
       // or user's thumbnail
       // or random dummy avatar as last resort (based on sex)
@@ -134,11 +126,6 @@ define(['bg/apiclient/nitem'], (NItem) => {
      */
     dismiss() {
       return this.slideOut().then(this.remove.bind(this));
-    }
-
-    hookLink(handler) {
-      this.querySelector('.n-listitem-body')
-          .addEventListener('click', handler.bind(this, 'newtab.' + this.link));
     }
 
     slideIn() {}

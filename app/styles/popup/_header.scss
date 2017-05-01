@@ -1,6 +1,8 @@
+@import 'custom-elements/status';
 
 .header {
   position: absolute;
+  z-index: 1;
   top: 0;
   left: 0;
   width: 100%;
@@ -54,31 +56,4 @@
     font-size: 100px;
     line-height: 36px;
   }
-}
-
-.status {
-  float: right;
-  margin-top: 6px;
-  font-weight: bold;
-
-  div {
-    float: left;
-    text-shadow: 0.3px 0.6px 0.3px rgba(33, 33, 33, 0.3);
-    padding: 8px;
-
-    i {
-      vertical-align: middle;
-      font-size: 16px;
-    }
-  }
-}
-
-.status-notifications i:before {
-  content: '\e807';
-}
-.status-messages i:before {
-  content: '\e828';
-}
-.status-users i:before {
-  content: '\e83a';
 }

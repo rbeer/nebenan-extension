@@ -53,7 +53,8 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
 // a/k/a meta data :smirk:
 
 gulp.task('extras', () => {
-  return gulp.src([
+
+  let paths = [
     'app/_locales/**',
     'app/fonts/*.woff',
     'app/images/**/*',
@@ -62,7 +63,12 @@ gulp.task('extras', () => {
     '!app/scripts.babel',
     '!app/*.json',
     '!app/*.html'
-  ], {
+  ];
+
+  if (DEV) {
+    paths.unshift('app/.devdata/**');
+  }
+  return gulp.src(paths, {
     base: 'app',
     dot: true
   }).pipe(gulp.dest('dist'));
@@ -83,11 +89,25 @@ gulp.task('styles', () => {
     .pipe(gulp.dest('dist/styles'));
 });
 
-gulp.task('version', () => {
+gulp.task('manifest', () => {
+  let pkg = require('./package.json');
   return gulp.src('app/manifest.json')
         .pipe($.jsonEditor((manifest) => {
           // add '-dev' to version_name, if in DEV mode
-          manifest.version_name = manifest.version + (DEV ? '-dev' : '');
+          manifest.version = pkg.version;
+          manifest.version_name = pkg.version;
+          if (DEV) {
+            let d = new Date();
+            let dString = [
+              (d.getFullYear() + '').slice(2),
+              d.getMonth(),
+              d.getDay(),
+              d.getHours(),
+              d.getMinutes()
+            ];
+            manifest.version_name += '-dev_' + dString.join('');
+          }
+
           return manifest;
         }))
         .pipe(gulp.dest('dist'));
@@ -278,7 +298,7 @@ gulp.task('build', cb => {
   DOCS = DOCS || process.argv.includes('--with-docs');
 
   let buildTasks = [
-    'lint', 'babel', 'scripts', 'lodash', 'version',
+    'lint', 'babel', 'scripts', 'lodash', 'manifest',
     ['html', 'styles', 'extras'],
     'requirejs', 'size', cb
   ];
@@ -313,7 +333,7 @@ gulp.task('dev', cb => {
 gulp.task('package', () => {
   var manifest = require('./dist/manifest.json');
   return gulp.src('dist/**')
-      .pipe($.if(manifest.version_name.endsWith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
+      .pipe($.if(manifest.version_name.endsWaith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
       .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
       .pipe(gulp.dest('package'));
 });

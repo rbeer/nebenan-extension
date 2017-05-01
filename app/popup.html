@@ -14,34 +14,13 @@
             <i class="na-icon"></i>
           </div>
         </div>
-        <div class="status">
-          <div class="status-notifications">
-            <i class="na-icon"></i> <span>--</span>
-          </div>
-          <div class="status-messages">
-            <i class="na-icon"></i> <span>--</span>
-          </div>
-          <div class="status-users">
-            <i class="na-icon"></i> <span>--</span>
-          </div>
+        <div id="status" class="status">
+          <div class="status-select-slider"></div>
         </div>
       </div>
       <div class="n-list-container">
-        <n-list id="n-list" class="n-list"></n-list>
-
-        <template id="n-listitem">
-          <div class="n-list-slot">
-            <div class="n-listitem">
-              <span class="n-listitem-thumb"></span>
-              <div class="n-listitem-preview">
-                <span class="n-listitem-type na-icon"></span>
-                <span class="n-listitem-title"></span>
-                <span class="n-listitem-body"></span>
-              </div>
-              <div class="n-listitem-dismiss na-icon" aria-role="button"></div>
-            </div>
-          </div>
-        </template>
+        <n-list class="n-list" type="notifications"></n-list>
+        <n-list class="n-list" type="conversations"></n-list>
       </div>
       <div class="n-list-scrollthumb-overlay"></div>
     </div>
@@ -61,6 +40,38 @@
     </div>
 
     <div class="login-overlay hidden"></div>
+
+    <!-- Custom Elements Templates -->
+    <template id="status-element">
+      <div class="">
+        <i class="na-icon"></i> <span>--</span>
+      </div>
+    </template>
+
+    <template id="n-listitem">
+      <div class="n-list-slot">
+        <div class="content">
+          <span class="thumb"></span>
+          <div class="preview">
+            <span class="type-icon na-icon"></span>
+            <span class="title"></span>
+            <span class="body"></span>
+          </div>
+          <div class="dismiss na-icon" aria-role="button"></div>
+        </div>
+      </div>
+    </template>
+
+    <template id="pc-listitem">
+      <div class="n-list-slot">
+        <div class="content">
+          <span class="thumb"></span>
+          <div class="bubble">
+            <span class="body"></span>
+          </div>
+        </div>
+      </div>
+    </template>
 
     <script src="scripts/builds/popup.js"></script>
   </body>

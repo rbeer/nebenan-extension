@@ -1,0 +1,81 @@
+@import 'n-type-icons';
+
+n-listitem {
+  position: relative;
+  transition: right 0.3s ease-out;
+  right: 0;
+
+  &.out {
+    right: -350px;
+  }
+
+  .content {
+    position: absolute;
+    width: 100%;
+    padding-top: 4px;
+    padding-bottom: 4px;
+    padding-left: 5px;
+    background: $CARD_BG;
+    border: $CARD_BORDER;
+    box-shadow: $CARD_SHADOW;
+
+    .thumb {
+      width: 50px;
+      height: 50px;
+      float: left;
+      border: $CARD_BORDER;
+      /* background-image: url  --- Set in NListItem.setThumb */
+      background-size: cover;
+      background-position: 0 0;
+    }
+
+    .preview {
+      float: left;
+      margin-left: 15px;
+      width: 230px;
+      height: 100%;
+
+      .title, .body {
+        display: block;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .title {
+        width: 200px;
+        margin-left: 5px;
+        float: left;
+        margin-top: 2px;
+      }
+
+      .body {
+        width: 100%;
+        font-size: 85%;
+        line-height: 20px;
+        cursor: pointer;
+      }
+
+    }
+
+    .dismiss {
+      position: absolute;
+      top: 2px;
+      right: 5px;
+      width: 10px;
+      height: 10px;
+      cursor: pointer;
+      font-size: 10px;
+      color: $BG_DARK;
+
+      &:before {
+        content: '\e810';
+      }
+
+      &:hover {
+        color: $TEXT_GREEN;
+      }
+    }
+
+  }
+}

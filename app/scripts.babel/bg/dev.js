@@ -72,14 +72,41 @@ define(() => {
    *                         notifications older than this value
    * @memberOf module:bg/dev
    */
-  dev.getNotifications = (lower) => {
-    dev.bgApp.api.getNotifications(lower)
+  dev.getNotifications = (perPage, lower) => {
+    dev.bgApp.api.getNotifications(null, lower)
     .then((nitems) => {
       devlog('nitems:', nitems);
     })
     .catch((err) => {
       devlog('caught error:', err.message);
       console.error(err);
+    });
+  };
+
+  dev.getConversations = (perPage, page) => {
+    dev.bgApp.api.getConversations(null, 1)
+    .then((conversations) => {
+      devlog('conversations:', conversations);
+    })
+    .catch((err) => {
+      devlog('caught error:', err.message);
+      console.error(err);
+    });
+  };
+
+  dev.pushDummyNotification = (type) => {
+    return new Promise((resolve, reject) => {
+      let xhr = new XMLHttpRequest();
+
+      xhr.onreadystatechange = () => {
+        if (xhr.readyState === XMLHttpRequest.DONE) {
+          dev.bgApp.messaging.send('popup/app', 'addNotifications',
+                                   [ JSON.parse(xhr.responseText) ]);
+        }
+      };
+
+      xhr.open('GET', '../../.devdata/' + type + '.json');
+      xhr.send();
     });
   };
 
