@@ -1,4 +1,4 @@
-
+/* eslint max-len: [1, 91, 2, { ignoreComments: true }] */
 define(() => {
   'use strict';
 

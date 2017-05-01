@@ -44,11 +44,12 @@ define([
         case 'notifications':
           elementName = 'n-listitem';
           break;
-        case 'private_conversations':
+        case 'conversations':
           elementName = 'pc-listitem';
           break;
         default:
-          throw new ReferenceError('n-list Element expects a \'type="notifications|private_conversations"\' attribute.');
+          throw new ReferenceError('n-list Element expects a ' +
+                                   '\'type="notifications|conversations"\' attribute.');
       }
 
       if (setOrElement instanceof HTMLLIElement) {

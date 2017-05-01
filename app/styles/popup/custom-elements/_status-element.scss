@@ -17,6 +17,9 @@ status-element {
     font-size: 16px;
   }
 
-  div { padding: 8px; }
+  div {
+    padding: 8px;
+    user-select: none;
+  }
 
 }

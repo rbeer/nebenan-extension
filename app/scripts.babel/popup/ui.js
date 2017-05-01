@@ -27,7 +27,7 @@ define([
     },
     nlists: {
       notifications: null,
-      private_conversations: null
+      conversations: null
     },
     scrollOverlayTimeout: null
   };
@@ -63,7 +63,7 @@ define([
     }
 
     // reference private_conversation list
-    ui.nlists.private_conversations = document.querySelector('n-list[type="private_conversations"]');
+    ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
 
     // reference notification list
     ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
@@ -96,7 +96,7 @@ define([
   };
 
   ui.addConversation = (pcItem) => {
-    ui.nlists.private_conversations.add(pcItem);
+    ui.nlists.conversations.add(pcItem);
   };
 
   /**
