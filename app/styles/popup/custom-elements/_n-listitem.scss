@@ -15,17 +15,15 @@ n-listitem {
     padding-top: 4px;
     padding-bottom: 4px;
     padding-left: 5px;
-    background: $BG_LIGHT;
-    border: 1px solid #AAA;
-    border-radius: 3px;
-    box-shadow: 1px 1px 0.3px rgba(0, 0, 0, .3);
+    background: $CARD_BG;
+    border: $CARD_BORDER;
+    box-shadow: $CARD_SHADOW;
 
     .thumb {
       width: 50px;
       height: 50px;
       float: left;
-      border: 1px solid #CCC;
-      border-radius: 7px;
+      border: $CARD_BORDER;
       /* background-image: url  --- Set in NListItem.setThumb */
       background-size: cover;
       background-position: 0 0;
@@ -33,8 +31,8 @@ n-listitem {
 
     .preview {
       float: left;
-      margin-left: 5px;
-      width: 240px;
+      margin-left: 15px;
+      width: 230px;
       height: 100%;
 
       .title, .body {
@@ -45,8 +43,8 @@ n-listitem {
       }
 
       .title {
-        width: 210px;
-        margin-left: 10px;
+        width: 200px;
+        margin-left: 5px;
         float: left;
         margin-top: 2px;
       }
