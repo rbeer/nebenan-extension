@@ -35,6 +35,12 @@ define(() => {
 
       // set attributes
       this.type = sent ? 'sent' : 'received';
+      this.partner_id = pcItem.partner_id;
+
+      // set attributes for/on clickable elements
+      let body = this.querySelector('span.body');
+      body.setAttribute('aria-role', 'button');
+      body.setAttribute('action', 'newtab.messages/' + this.partner_id);
 
       // set contents
       this.body = pcItem.last_private_conversation_message.body;
@@ -60,6 +66,7 @@ define(() => {
       let thumbStyle = this.querySelector('span.thumb').style;
       thumbStyle.backgroundImage = `url(${url})`;
     }
+
   }
 
   // register Custom Elements
