@@ -59,10 +59,9 @@ define([
       this.title = nMsg.parentSubject ? 'Antwort auf: ' + nMsg.parentSubject :
                                         nMsg.subject;
       this.body = nMsg.body;
-      this.link = 'https://nebenan.de/feed/' + linkId;
 
       // set attributes for/on clickable elements
-      this.querySelector('.body').setAttribute('action', 'newtab.' + this.link);
+      this.querySelector('.body').setAttribute('action', 'feed/' + linkId);
       this.querySelector('.body').setAttribute('aria-role', 'button');
 
       // set thumbnail
@@ -92,14 +91,6 @@ define([
       let singleLine = text.slice(0, 52).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
       this.querySelector('.body').innerText = singleLine;
-    }
-
-    set link(url) {
-      this.setAttribute('link', url);
-    }
-
-    get link() {
-      return this.getAttribute('link');
     }
 
     setThumb(nMessage) {
