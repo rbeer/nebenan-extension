@@ -1,3 +1,27 @@
+## v0.3.0
+
+#### Added private conversations
+
+- [b9aed21] commit: Change: Use clickables module to hook status elements
+- [ad6b1f4] commit: Remove: NListItem.link attribute
+- [d9766a0] commit: Add: module:popup/ui/clickables to handle element clicks
+- [6c9ade8] commit: Add: APIClient.NUser for user objects; use in NItem, PCItem
+- [a7bfcac] commit: Add/Change: pc-listitem styles / remove round corners
+- [40f398e] commit: Add: switching panels on status symbol/counter clicks
+- [6197b3d] commit: Add: query bgApp for conversations and add to n-list
+- [09f300d] commit: Add: PCListItem, being private_conversation NList items
+- [cedb234] commit: Add: NSubsets for private_conversations; NSubset.SUBSET_TYPE
+- [915e7c5] commit: Add: query API for conversations
+- [7ef48db] commit: Refactor: Rename popup/components/ -> popup/custom-elements/
+
+## v0.2.1
+
+- [32ffa36] commit: Meta: Add _YYMMDDhhmm to -dev version strings
+- [7f8e67b] commit: Add: Create title for ANSWER notifications from parent's subject
+- [d851f37] commit: Refactor: Messaging.Message constructor overload
+- [bc7303f] commit: Change: use hoode_message.is_deleted flag
+- [2b4ed80] commit: Add: content script to remove unwanted (market) entries
+
 ## v0.2.0
 
 - [53a9239]  commit: Fix: bgApp.init
