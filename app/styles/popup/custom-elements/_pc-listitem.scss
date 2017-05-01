@@ -35,13 +35,14 @@ pc-listitem {
 
     .body {
       font-size: 85%;
-      line-height: 20px;
+      line-height: 16px;
       cursor: pointer;
       display: block;
-      white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      margin: 3px 20px 0 20px;
+      margin: 3px 20px;
+      height: 44px;
+      white-space: pre;
     }
   }
 
@@ -54,28 +55,14 @@ pc-listitem {
     border-style: solid;
   }
 
-  &[type="sent"] {
-
-    .content {
-      .bubble {
-        &::before {
-          border-color: #b2ca06 transparent;
-          right: 0;
-          transform: rotate(-90deg);
-        }
-      }
-    }
+  &[type="sent"] .content .bubble::before {
+    border-color: #b2ca06 transparent;
+    right: 0;
+    transform: rotate(-90deg);
   }
-  &[type="received"] {
-
-     .content {
-      .bubble {
-        &::before {
-          border-color: #919191 transparent;
-          left: 0;
-          transform: rotate(90deg);
-        }
-      }
-    }
+  &[type="received"] .content .bubble::before {
+    border-color: #919191 transparent;
+    left: 0;
+    transform: rotate(90deg);
   }
 }

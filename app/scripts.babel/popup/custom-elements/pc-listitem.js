@@ -35,7 +35,13 @@ define(() => {
 
       this.setAttribute('type', sent ? 'sent' : 'received');
 
+      this.body = pcItem.last_private_conversation_message.body;
+
       return this;
+    }
+
+    set body(text) {
+      this.querySelector('span.body').textContent = text;
     }
   }
 
