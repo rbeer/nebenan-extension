@@ -36,12 +36,19 @@ define(() => {
       this.setAttribute('type', sent ? 'sent' : 'received');
 
       this.body = pcItem.last_private_conversation_message.body;
+      this.thumb = pcItem.photo_thumb_url;
 
       return this;
     }
 
     set body(text) {
       this.querySelector('span.body').textContent = text;
+    }
+
+    set thumb(url) {
+      devlog('setting thumb image to:', url);
+      let thumbStyle = this.querySelector('span.thumb').style;
+      thumbStyle.backgroundImage = `url(${url})`;
     }
   }
 

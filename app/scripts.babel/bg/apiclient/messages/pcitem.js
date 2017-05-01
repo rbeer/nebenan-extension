@@ -13,9 +13,7 @@ define([
           new PCMessage(raw.last_private_conversation_message);
       };
       let addThumbUrl = function addThumbUrl() {
-        if (!raw.photo_thumb_url) {
-          this.photo_thumb_url = partner.photo_thumb_url;
-        }
+        this.photo_thumb_url = raw.photo_thumb_url || partner.photo_thumb_url;
       };
 
       let subsetKeys = [
