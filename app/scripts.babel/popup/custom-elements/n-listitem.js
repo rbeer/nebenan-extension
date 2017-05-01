@@ -28,7 +28,7 @@ define([
 
     /**
      * Populates new <n-listitem> with initial values.
-     * After this, the item must be ready to be displayed.
+     * After this, the item must be ready for display.
      * @param {!APIClient.NItem} nItem - Data from API
      * @return {NListItem} `this`
      */

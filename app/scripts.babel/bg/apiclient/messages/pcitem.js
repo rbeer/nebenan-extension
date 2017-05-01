@@ -1,23 +1,23 @@
 define([
   'bg/apiclient/nsubset',
+  'bg/apiclient/nuser',
   'bg/apiclient/messages/pcmessage'
-], (NSubset, PCMessage) => {
+], (NSubset, NUser, PCMessage) => {
   'use strict';
 
   class PCItem extends NSubset {
     constructor(raw, partner) {
-      devlog(partner);
 
       let wrapMessage = function wrapMessage() {
         this.last_private_conversation_message =
           new PCMessage(raw.last_private_conversation_message);
       };
-      let addThumbUrl = function addThumbUrl() {
-        this.photo_thumb_url = raw.photo_thumb_url || partner.photo_thumb_url;
+      let addPartner = function addPartner() {
+        this.partner = new NUser(raw.partner || partner);
       };
 
       let subsetKeys = [
-        'created_at', wrapMessage, 'partner_id', 'unseen', addThumbUrl
+        'created_at', wrapMessage, 'partner_id', 'unseen', addPartner
       ];
       super(subsetKeys, raw);
     }

@@ -18,7 +18,7 @@ define(() => {
 
     /**
      * Populates new <pc-listitem> with initial values.
-     * After this, the item must be ready to be displayed.
+     * After this, the item must be ready for display.
      * @param  {!APIClient.PCItem} pcItem - Data from API
      * @return {PCListItem} `this`
      */
@@ -33,12 +33,22 @@ define(() => {
       this.appendChild(document.importNode(tpl.content, true));
       devlog('populating PCListItem with:', pcItem);
 
-      this.setAttribute('type', sent ? 'sent' : 'received');
+      // set attributes
+      this.type = sent ? 'sent' : 'received';
 
+      // set contents
       this.body = pcItem.last_private_conversation_message.body;
-      this.thumb = pcItem.photo_thumb_url;
+      this.thumb = pcItem.partner.photo_thumb_url;
 
       return this;
+    }
+
+    set type(type) {
+      this.setAttribute('type', type);
+      return this.getAttribute('type');
+    }
+    get type() {
+      return this.getAttribute('type');
     }
 
     set body(text) {
