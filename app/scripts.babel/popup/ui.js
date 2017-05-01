@@ -3,8 +3,9 @@
 define([
   'popup/custom-elements/status',
   'popup/custom-elements/n-list',
+  'popup/ui/clickables',
   'lodash'
-], (StatusElement, nlist, _) => {
+], (StatusElement, nlist, clickables, _) => {
 
   /**
    * Popup DOM interaction
@@ -23,8 +24,11 @@ define([
         prompt: null
       },
       status: null,
-      slider: null,
-      nlist: null
+      slider: null
+    },
+    nlists: {
+      notifications: null,
+      conversations: null
     },
     scrollOverlayTimeout: null
   };
@@ -34,24 +38,11 @@ define([
    * @memberOf module:popup/ui
    */
   ui.init = () => {
-    // hook clickable elements
-    let clickables = document.querySelectorAll('[aria-role="button"][action]');
-    for (let element of clickables) {
-      element.addEventListener('click', ui.handleClicks);
-    }
 
     // reference status container element
     // and selection slider
     ui.elements.status = document.getElementById('status');
     ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
-
-    // add status elements
-    let statsEls = ui.elements.stats;
-    for (let type in statsEls) {
-      statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type, ui.handleClicks);
-      ui.elements.status.appendChild(statsEls[type]);
-    }
 
     // reference login prompt overlay elements
     let loginEls = ui.elements.login;
@@ -59,13 +50,31 @@ define([
       loginEls[name] = document.querySelector(`.login-${name}`);
     }
 
+    // reference private_conversation list
+    ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
+
     // reference notification list
-    ui.elements.nlist = document.getElementById('n-list');
+    ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
+
+    // hook clickable elements
+    clickables.init(ui);
+    // detect and automatically hook new [aria-role=button][action] elements
+    clickables.watch(ui.nlists.notifications);
+    clickables.watch(ui.nlists.conversations);
+
+    // add status elements
+    let statsEls = ui.elements.stats;
+    for (let type in statsEls) {
+      statsEls[type] = document.createElement('status-element');
+      statsEls[type].populate(type);
+      clickables.hook(statsEls[type]);
+      ui.elements.status.appendChild(statsEls[type]);
+    }
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.elements.nlist.parentElement.addEventListener('scroll',
-                                            ui.showScrollbar.bind(null, overlay));
+    ui.nlists.notifications.parentElement.addEventListener('scroll',
+      ui.showScrollbar.bind(null, overlay));
   };
 
   ui.showScrollbar = (overlay, evt) => {
@@ -82,11 +91,15 @@ define([
    *                                             NListeItem from; or a fully prepared,
    *                                             as in .populate called, NListItem.
    * @memberOf module:popup/ui
-   * @see module:popup/ui.handleClicks
+   * @see module:popup/ui/clickables.handleClicks
    * @see NList.add
    */
   ui.addNotification = (nItem) => {
-    ui.elements.nlist.add(nItem).hookLink(ui.handleClicks);
+    ui.nlists.notifications.add(nItem);
+  };
+
+  ui.addConversation = (pcItem) => {
+    ui.nlists.conversations.add(pcItem);
   };
 
   /**
@@ -102,57 +115,7 @@ define([
     _.forEach(statsEls, (el, key) => (el.value = values[key]));
   };
 
-  /**
-   * Handler for DOM clicks (<* aria-role="button" action="action.value">)
-   * - newtab - Creates a new tab.
-   *            The value can be either a path relative to https://nebenan.de/
-   *            (e.g. newtab.feed -> https://nebenan.de/feed) or an absolute
-   *            (starting with `https`!) one
-   * @param {?String}     actionValue - First parameter is the `action.value` String, when called explicitly by an NListItem
-   * @param {!MouseEvent} evt         - First parameter is a MousrEvent, when hooked by module:popup/ui.init; second otherwise
-   * @memberOf module:popup/ui
-   * @returns {Bool} `false`
-   * @see NListItem#hookLink
-   */
-  ui.handleClicks = (...args) => {
-
-    let evt;
-    let action;
-    let value;
-    let splitActionValue = (str) => {
-      let matches = str.match(/([\w\-]+)\.(.*)/);
-      return [ matches[1], matches[2] ];
-    };
-
-    if (args.length === 1) {
-      // event mode - args[0] is the MouseEvent
-      evt = args[0];
-      [ action, value ] = splitActionValue(evt.target.getAttribute('action'));
-    } else {
-      // explicit mode - args[1] is the MouseEvent
-      evt = args[1];
-      [ action, value ] = splitActionValue(args[0]);
-    }
-
-    evt.preventDefault();
-
-    switch (action) {
-      case 'newtab':
-        chrome.tabs.create({
-          url: (value.startsWith('https') ? value : 'https://nebenan.de/' + value),
-          active: true
-        });
-        break;
-      case 'select-panel':
-        ui.moveSelectSlider(evt.target);
-        break;
-      default:
-        console.warn('Unknown click action:', action);
-        console.info('Arguments:', args);
-    }
-
-    return false;
-  };
+  ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));
 
   ui.moveSelectSlider = (target) => {
     let sliderStyle = ui.elements.slider.style;

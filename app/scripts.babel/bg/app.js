@@ -6,8 +6,9 @@ define([
   'bg/auth',
   'bg/livereload',
   'bg/request-cache',
-  'messaging'
-], (Alarms, APIClient, auth, lreload, RequestCache, Messaging) => {
+  'messaging',
+  'lodash'
+], (Alarms, APIClient, auth, lreload, RequestCache, Messaging, _) => {
 
   /**
    * Background Main App
@@ -82,6 +83,18 @@ define([
           let response = msg.cloneForAnswer(['error'], err);
           respond(response);
         });
+      },
+      getConversations: (msg, respond) => {
+        bgApp.getConversations()
+        .then((pcItems) => {
+          devlog('pcItems:', pcItems);
+          let response = msg.cloneForAnswer(['addConversations'], pcItems);
+          respond(response);
+        })
+        .catch((err) => {
+          let response = msg.cloneForAnswer(['error'], err);
+          respond(response);
+        });
       }
     }, 'bg/app');
     // start listening for messages
@@ -140,12 +153,12 @@ define([
    */
   bgApp.getNotifications = () => {
     return bgApp.api.getNotifications(7, 0, null)
-    .then((notifications) => {
+    .then((raw) => {
       let parsed;
-      if (typeof notifications !== 'string') {
-        parsed = notifications;
+      if (typeof raw !== 'string') {
+        parsed = raw;
       } else {
-        parsed = JSON.parse(notifications).notifications;
+        parsed = JSON.parse(raw).notifications;
       }
 
       /**
@@ -161,10 +174,30 @@ define([
         APIClient.NType.ANSWER,
         APIClient.NType.FEED
       ];
-      parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id));
-      parsed = parsed.filter((n) => !n.hood_message.is_deleted);
+      parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id) &&
+                                    !n.hood_message.is_deleted);
 
       return parsed.map((n) => new APIClient.NItem(n));
+    });
+  };
+
+  bgApp.getConversations = () => {
+    return bgApp.api.getConversations(7, 1, null)
+    .then((raw) => {
+      let parsed;
+      if (typeof raw !== 'string') {
+        parsed = raw;
+      } else {
+        parsed = JSON.parse(raw);
+      }
+
+      let conversations = parsed.private_conversations;
+      let linked_users = parsed.linked_users;
+
+      return conversations.map((conversation) => {
+        let partner = _.find(linked_users, [ 'id', conversation.partner_id]);
+        return new APIClient.PCItem(conversation, partner);
+      });
     });
   };
 

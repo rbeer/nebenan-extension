@@ -2,8 +2,9 @@
 
 define([
   'bg/apiclient/nsubset',
-  'bg/apiclient/nmessage-type'
-], (NSubset, NMessageType) => {
+  'bg/apiclient/nuser',
+  'bg/apiclient/notifications/nmessage-type'
+], (NSubset, NUser, NMessageType) => {
 
   /**
    * @class Message, linked to an NItem
@@ -45,13 +46,8 @@ define([
      */
     constructor(raw, parentMessage) {
 
-      let userSubsetKeys = [
-        'id', 'firstname', 'lastname', 'sex_id',
-        'photo_thumb_url', 'hood_id', 'hood_title'
-      ];
-
       let slimUser = function() {
-        this.user = new NSubset(userSubsetKeys, raw.user);
+        this.user = new NUser(raw.user);
       };
 
       let subsetKeys = [

@@ -1,13 +1,13 @@
 'use strict';
 
 define([
-  'bg/apiclient/nitem',
-  'bg/apiclient/ntype'
+  'bg/apiclient/notifications/nitem',
+  'bg/apiclient/notifications/ntype'
 ], (NItem, NType) => {
 
   /**
-   * @class Item for NList
-   * @extends {HTMLElement}
+   * @class Notification Item for NList
+   * @extends {HTMLLIElement}
    * @example
    * ...
    *   <n-list>
@@ -28,7 +28,7 @@ define([
 
     /**
      * Populates new <n-listitem> with initial values.
-     * After this, the item must be ready to be displayed.
+     * After this, the item must be ready for display.
      * @param {!APIClient.NItem} nItem - Data from API
      * @return {NListItem} `this`
      */
@@ -42,10 +42,6 @@ define([
       // append to `this` <n-listitem>
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
-
-      // dismiss click
-      this.querySelector('[aria-role="button"]')
-          .addEventListener('click', this.dismiss.bind(this));
 
       // set element's attributes
       let nMsg = nItem.hood_message;
@@ -63,7 +59,10 @@ define([
       this.title = nMsg.parentSubject ? 'Antwort auf: ' + nMsg.parentSubject :
                                         nMsg.subject;
       this.body = nMsg.body;
-      this.link = 'https://nebenan.de/feed/' + linkId;
+
+      // set attributes for/on clickable elements
+      this.querySelector('.body').setAttribute('action', 'newtab.feed/' + linkId);
+      this.querySelector('.body').setAttribute('aria-role', 'button');
 
       // set thumbnail
       this.setThumb(nMsg);
@@ -85,27 +84,19 @@ define([
 
     set title(text) {
       this.setAttribute('title', text);
-      this.querySelector('.n-listitem-title').innerText = text;
+      this.querySelector('.title').innerText = text;
     }
 
     set body(text) {
       let singleLine = text.slice(0, 52).replace(/\n/g, ' ');
       this.setAttribute('body', singleLine);
-      this.querySelector('.n-listitem-body').innerText = singleLine;
-    }
-
-    set link(url) {
-      this.setAttribute('link', url);
-    }
-
-    get link() {
-      return this.getAttribute('link');
+      this.querySelector('.body').innerText = singleLine;
     }
 
     setThumb(nMessage) {
 
       let url;
-      let thumbStyle = this.querySelector('.n-listitem-thumb').style;
+      let thumbStyle = this.querySelector('.thumb').style;
       // use (first) image attached to message
       // or user's thumbnail
       // or random dummy avatar as last resort (based on sex)
@@ -135,11 +126,6 @@ define([
      */
     dismiss() {
       return this.slideOut().then(this.remove.bind(this));
-    }
-
-    hookLink(handler) {
-      this.querySelector('.n-listitem-body')
-          .addEventListener('click', handler.bind(this, 'newtab.' + this.link));
     }
 
     slideIn() {}

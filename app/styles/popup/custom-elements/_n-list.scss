@@ -1,8 +1,9 @@
 
-// type icon glyphs
-@import 'n-type-icons';
-
 .n-list-container {
+  display: grid;
+  grid-template-columns: repeat(2, 340px);
+  grid-template-rows: 100%;
+  grid-column-gap: 7px;
   position: relative;
   left: 0;
   top: 0;
@@ -29,15 +30,16 @@
   &:hover .n-list-scrollthumb-overlay {
     opacity: 0;
   }
-}
 
-n-listitem {
-  position: relative;
-  transition: right 0.3s ease-out;
-  right: 0;
-
-  &.out {
-    right: -350px;
+  .n-list[type="notifications"] {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row: 1;
+  }
+  .n-list[type="private_conversations"] {
+    grid-column-start: 2;
+    grid-column-end: 3;
+    grid-row: 1;
   }
 }
 
@@ -61,6 +63,9 @@ n-listitem {
   -webkit-margin-before: 0;
   -webkit-margin-after: 0;
   max-height: 340px;
+  position: relative;
+  left: 0;
+  transition: left 0.3s ease-out;
 
   .n-list-slot {
     position: relative;
@@ -68,82 +73,7 @@ n-listitem {
     height: 60px;
     width: 325px;
   }
-
-  .n-listitem {
-
-    position: absolute;
-    width: 100%;
-    padding-top: 4px;
-    padding-bottom: 4px;
-    padding-left: 5px;
-    background: $BG_LIGHT;
-    border: 1px solid #AAA;
-    border-radius: 3px;
-    box-shadow: 1px 1px 0.3px rgba(0, 0, 0, .3);
-
-    .n-listitem-thumb {
-      width: 50px;
-      height: 50px;
-      float: left;
-      border: 1px solid #CCC;
-      border-radius: 7px;
-      /* background-image: url  --- Set in NListItem.setThumb */
-      background-size: cover;
-      background-position: 0 0;
-    }
-
-    .n-listitem-preview {
-      float: left;
-      margin-left: 5px;
-      width: 240px;
-      height: 100%;
-
-      .n-listitem-type {
-        font-size: 20px;
-        float: left;
-      }
-
-      .n-listitem-title, .n-listitem-body {
-        display: block;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-
-      .n-listitem-title {
-        width: 210px;
-        margin-left: 10px;
-        float: left;
-        margin-top: 2px;
-      }
-
-      .n-listitem-body {
-        width: 100%;
-        font-size: 85%;
-        line-height: 20px;
-        cursor: pointer;
-      }
-
-    }
-
-    .n-listitem-dismiss {
-      position: absolute;
-      top: 2px;
-      right: 5px;
-      width: 10px;
-      height: 10px;
-      cursor: pointer;
-      font-size: 10px;
-      color: $BG_DARK;
-
-      &:before {
-        content: '\e810';
-      }
-
-      &:hover {
-        color: $TEXT_GREEN;
-      }
-    }
-
-  }
 }
+
+@import 'n-listitem';
+@import 'pc-listitem';

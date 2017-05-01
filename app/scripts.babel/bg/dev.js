@@ -83,6 +83,17 @@ define(() => {
     });
   };
 
+  dev.getConversations = (perPage, page) => {
+    dev.bgApp.api.getConversations(null, 1)
+    .then((conversations) => {
+      devlog('conversations:', conversations);
+    })
+    .catch((err) => {
+      devlog('caught error:', err.message);
+      console.error(err);
+    });
+  };
+
   dev.pushDummyNotification = (type) => {
     return new Promise((resolve, reject) => {
       let xhr = new XMLHttpRequest();

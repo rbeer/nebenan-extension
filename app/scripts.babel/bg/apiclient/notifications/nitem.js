@@ -2,8 +2,8 @@
 
 define([
   'bg/apiclient/nsubset',
-  'bg/apiclient/nmessage',
-  'bg/apiclient/ntype'
+  'bg/apiclient/notifications/nmessage',
+  'bg/apiclient/notifications/ntype'
 ], (NSubset, NMessage, NType) => {
   /**
    * @class Notification Data
@@ -43,5 +43,4 @@ define([
   };
 
   return NItem;
-
 });
