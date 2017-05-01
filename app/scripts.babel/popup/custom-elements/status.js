@@ -1,4 +1,3 @@
-/* eslint max-len: [1, 91, 2, { ignoreComments: true }] */
 define(() => {
   'use strict';
 
@@ -7,7 +6,7 @@ define(() => {
       super();
     }
 
-    populate(type, clickHandler) {
+    populate(type) {
       this.setAttribute('type', type);
 
       /** Element/Children Setup */
@@ -21,7 +20,6 @@ define(() => {
       /** Clickable Setup */
       this.setAttribute('aria-role', 'button');
       this.setAttribute('action', 'select-panel.' + this.type);
-      this.addEventListener('click', clickHandler.bind(this, this.getAttribute('action')));
 
       /** Set Initial Counter Value */
       this.valueSpan = this.querySelector('span');

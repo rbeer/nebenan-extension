@@ -66,7 +66,8 @@ define([
     let statsEls = ui.elements.stats;
     for (let type in statsEls) {
       statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type, clickables.handleClicks);
+      statsEls[type].populate(type);
+      clickables.hook(statsEls[type]);
       ui.elements.status.appendChild(statsEls[type]);
     }
 
