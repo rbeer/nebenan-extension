@@ -96,6 +96,7 @@ define(() => {
     let value;
     let splitActionValue = (str) => {
       let matches = str.match(/([\w\-]+)\.(.*)/);
+      devlog(matches);
       return [ matches[1], matches[2] ];
     };
 
@@ -121,6 +122,10 @@ define(() => {
       case 'select-panel':
         _ui.moveSelectSlider(evt.target);
         _ui.movePanels(evt.target.type === 'notifications' ? 0 : 350);
+        break;
+      case 'dismiss':
+        let [ tag, id ] = value.split(':');
+        document.querySelector(`${tag}[id="${id}"]`).dismiss();
         break;
       default:
         console.warn('Unknown click action:', action);

@@ -61,8 +61,14 @@ define([
       this.body = nMsg.body;
 
       // set attributes for/on clickable elements
-      this.querySelector('.body').setAttribute('action', 'newtab.feed/' + linkId);
-      this.querySelector('.body').setAttribute('aria-role', 'button');
+      let bodyElement = this.querySelector('.body');
+      bodyElement.setAttribute('action', 'newtab.feed/' + linkId);
+      bodyElement.setAttribute('aria-role', 'button');
+
+      let dismissElement = this.querySelector('.dismiss');
+      dismissElement.setAttribute('action',
+                                  `dismiss.${this.tagName.toLowerCase()}:${nItem.id}`);
+      dismissElement.setAttribute('aria-role', 'button');
 
       // set thumbnail
       this.setThumb(nMsg);
