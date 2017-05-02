@@ -43,8 +43,7 @@ define([
     ui.elements.status = document.getElementById('status');
     // add status elements
     for (let type in ui.elements.stats) {
-      let element = ui.elements.stats[type];
-      element = document.createElement('status-element');
+      let element = ui.elements.stats[type] = document.createElement('status-element');
       element.populate(type);
       ui.elements.status.appendChild(element);
     }
