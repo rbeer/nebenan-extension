@@ -137,9 +137,11 @@ define([
       return this.slideOut().then(this.remove.bind(this));
     }
 
-    slideIn() {
+    slideIn(delay) {
       let self = this;
+      delay = delay || 0;
       return new Promise((resolve) => {
+        self.style.transitionDelay = delay + 's';
         self.addEventListener('transitionend', resolve);
         self.classList.remove('init');
       });

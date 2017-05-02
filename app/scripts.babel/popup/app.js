@@ -78,7 +78,7 @@ define([
       items.push(popupApp.ui.addNotification(nitem));
     });
     popupApp.ui.setLoadingDone().then(() => {
-      items.forEach((item) => item.slideIn());
+      items.forEach((item, i) => item.slideIn(i / 10));
     });
   };
 

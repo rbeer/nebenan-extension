@@ -9,6 +9,7 @@ n-listitem {
   .n-list-slot {
     opacity: 1;
     transition: all 0.3s ease-out;
+    transition-delay: inherit;
   }
 
   &.init {
@@ -42,6 +43,7 @@ n-listitem {
     border: $CARD_BORDER;
     box-shadow: $CARD_SHADOW;
     transition: box-shadow 0.3s ease-out;
+    transition-delay: inherit;
 
     .thumb {
       width: 50px;
