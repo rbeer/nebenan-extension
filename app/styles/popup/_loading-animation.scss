@@ -1,0 +1,56 @@
+/**
+ * styles from https://nebenan.de/, class names preserved
+ */
+
+.c-loading-spinner i, .c-loading-spinner:after, .c-loading-spinner:before {
+  width: 20px;
+  height: 20px;
+  display: inline-block;
+  border-radius: 50%;
+  background: #9c9c9c;
+  -webkit-animation: 1s ease infinite pulseLoaderSize;
+  -moz-animation: 1s ease infinite pulseLoaderSize;
+  -o-animation: 1s ease infinite pulseLoaderSize;
+  -ms-animation: 1s ease infinite pulseLoaderSize;
+  animation: 1s ease infinite pulseLoaderSize;
+}
+.c-loading-spinner:after, .c-loading-spinner:before {
+  content: '';
+}
+
+.c-loading-spinner i {
+  -webkit-animation-delay: .5s;
+  -moz-animation-delay: .5s;
+  -o-animation-delay: .5s;
+  -ms-animation-delay: .5s;
+  animation-delay: .5s;
+  -webkit-transform: scale(.2);
+  -moz-transform: scale(.2);
+  -o-transform: scale(.2);
+  -ms-transform: scale(.2);
+  transform: scale(.2);
+}
+
+@keyframes pulseLoaderSize {
+  0% {
+    -webkit-transform: scale(.2);
+    -moz-transform: scale(.2);
+    -o-transform: scale(.2);
+    -ms-transform: scale(.2);
+    transform: scale(.2);
+  }
+  50% {
+    -webkit-transform: scale(1);
+    -moz-transform: scale(1);
+    -o-transform: scale(1);
+    -ms-transform: scale(1);
+    transform: scale(1);
+  }
+  100% {
+    -webkit-transform: scale(.2);
+    -moz-transform: scale(.2);
+    -o-transform: scale(.2);
+    -ms-transform: scale(.2);
+    transform: scale(.2);
+  }
+}
