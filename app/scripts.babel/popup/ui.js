@@ -24,7 +24,8 @@ define([
         prompt: null
       },
       status: null,
-      slider: null
+      slider: null,
+      loading: null
     },
     nlists: {
       notifications: null,
@@ -42,6 +43,8 @@ define([
   ui.init = () => {
 
     return new Promise((resolve) => {
+      // reference loading animation / background
+      ui.elements.loading = document.getElementById('loading');
       // reference status container element
       ui.elements.status = document.getElementById('status');
       // add status elements
@@ -129,6 +132,8 @@ define([
     sliderStyle.width = target.offsetWidth + 'px';
     sliderStyle.left = `${target.offsetLeft - firstLeft}px`;
   };
+
+  ui.setLoadingDone = () => ui.elements.loading.setAttribute('done', '');
 
   /**
    * Handler for ENOTOKEN-errors.

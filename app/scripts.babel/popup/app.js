@@ -80,6 +80,7 @@ define([
   };
 
   popupApp.addConversations = (msg) => {
+    popupApp.ui.setLoadingDone();
     devlog(msg);
     msg.payload.forEach((pcItemObject) => {
       let pcItem = new PCItem(pcItemObject);
