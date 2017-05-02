@@ -15,8 +15,8 @@ define([
     elements: {
       stats: {
         notifications: null,
-        messages: null,
-        users: null
+        messages: null/*,
+        users: null*/
       },
       login: {
         blur: null,
@@ -40,9 +40,19 @@ define([
   ui.init = () => {
 
     // reference status container element
-    // and selection slider
     ui.elements.status = document.getElementById('status');
+    // add status elements
+    for (let type in ui.elements.stats) {
+      let element = ui.elements.stats[type];
+      element = document.createElement('status-element');
+      element.populate(type);
+      ui.elements.status.appendChild(element);
+    }
+
+    // reference selection slider
     ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
+    // init position and size
+    ui.moveSelectSlider(ui.elements.status.querySelector('status-element'));
 
     // reference login prompt overlay elements
     let loginEls = ui.elements.login;
@@ -61,15 +71,6 @@ define([
     // detect and automatically hook new [aria-role=button][action] elements
     clickables.watch(ui.nlists.notifications);
     clickables.watch(ui.nlists.conversations);
-
-    // add status elements
-    let statsEls = ui.elements.stats;
-    for (let type in statsEls) {
-      statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type);
-      clickables.hook(statsEls[type]);
-      ui.elements.status.appendChild(statsEls[type]);
-    }
 
     // hook scroll event to show/hide scrollbar
     let overlay = document.querySelector('.n-list-scrollthumb-overlay');
@@ -119,8 +120,9 @@ define([
 
   ui.moveSelectSlider = (target) => {
     let sliderStyle = ui.elements.slider.style;
+    let firstLeft = target.parentElement.querySelector('status-element').offsetLeft;
     sliderStyle.width = target.offsetWidth + 'px';
-    sliderStyle.left = `${target.offsetLeft - 208}px`;
+    sliderStyle.left = `${target.offsetLeft - firstLeft}px`;
   };
 
   /**
