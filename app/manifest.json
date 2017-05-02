@@ -40,6 +40,7 @@
   },
   "web_accessible_resources": [
     "images/icon_128.png",
-    "images/thumb_dummy.jpg"
+    "images/thumb_dummy.jpg",
+    "images/flower.png"
   ]
 }

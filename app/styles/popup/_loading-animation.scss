@@ -1,12 +1,15 @@
 $DOTS_SIZE: 20px;
 $CONTAINER_HEIGHT: $DOTS_SIZE + 5px;
+// height of /app/images/flowers.png
+$FLOWERS_HEIGHT: 214px;
 
 .loading-animation {
   display: grid;
   grid-template-columns: 100%;
-  grid-template-rows: $HEADER_HEIGHT 25% $CONTAINER_HEIGHT 100%;
+  grid-template-rows: $HEADER_HEIGHT 15% $CONTAINER_HEIGHT 10% $FLOWERS_HEIGHT;
   grid-column-gap: 7px;
   position: absolute;
+  z-index: -1;
   left: 0;
   top: 0;
   height: 100%;
@@ -16,11 +19,26 @@ $CONTAINER_HEIGHT: $DOTS_SIZE + 5px;
   .cell-spinner {
     grid-row: 3;
     grid-column: 1;
+    opacity: 1;
     text-align: center;
+    transition: opacity 0.3s ease-in;
   }
-  .cell-flower {
-    grid-row: 4;
+  .cell-flowers {
+    grid-row: 5;
     grid-column: 1;
+    background: url(../images/flowers.png);
+    background-repeat: no-repeat;
+    opacity: 1;
+    transition: opacity 0.3s ease-in;
+  }
+
+  &[done] {
+    .cell-flowers {
+      opacity: 0.1;
+    }
+    .cell-spinner {
+      opacity: 0;
+    }
   }
 
   /**
@@ -28,8 +46,8 @@ $CONTAINER_HEIGHT: $DOTS_SIZE + 5px;
    */
 
   .c-loading-spinner i, .c-loading-spinner:after, .c-loading-spinner:before {
-    width: 20px;
-    height: 20px;
+    width: $DOTS_SIZE;
+    height: $DOTS_SIZE;
     display: inline-block;
     border-radius: 50%;
     background: #9c9c9c;
