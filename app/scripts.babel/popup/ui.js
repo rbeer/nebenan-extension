@@ -95,21 +95,25 @@ define([
 
   /**
    * Adds a new n-listitem to the n-list
-   *   - Hooks the link of that new n-listitem
    * @param  {APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
-   *                                             NListeItem from; or a fully prepared,
-   *                                             as in .populate called, NListItem.
+   *                                             NListeItem from | a fully prepared,
+   *                                             as in .populate called, NListItem
+   * @return {NListItem} Added NListItem
    * @memberOf module:popup/ui
-   * @see module:popup/ui/clickables.handleClicks
    * @see NList.add
    */
-  ui.addNotification = (nItem) => {
-    ui.nlists.notifications.add(nItem);
-  };
+  ui.addNotification = (nItem) => ui.nlists.notifications.add(nItem);
 
-  ui.addConversation = (pcItem) => {
-    ui.nlists.conversations.add(pcItem);
-  };
+  /**
+   * Adds a new n-listitem to the n-list
+   * @param  {APIClient.PCItem|PCListItem} pcItem - Either an APIClient.PCItem to build an
+   *                                                PCListeItem from | a fully prepared,
+   *                                                as in .populate called, PCListItem
+   * @return {PCListItem} Added PCListItem
+   * @memberOf module:popup/ui
+   * @see NList.add
+   */
+  ui.addConversation = (pcItem) => ui.nlists.conversations.add(pcItem);
 
   /**
    * Sets status counter values
@@ -133,7 +137,12 @@ define([
     sliderStyle.left = `${target.offsetLeft - firstLeft}px`;
   };
 
-  ui.setLoadingDone = () => ui.elements.loading.setAttribute('done', '');
+  ui.setLoadingDone = () => {
+    return new Promise((resolve) => {
+      ui.elements.loading.addEventListener('transitionend', resolve);
+      ui.elements.loading.setAttribute('done', '');
+    });
+  };
 
   /**
    * Handler for ENOTOKEN-errors.

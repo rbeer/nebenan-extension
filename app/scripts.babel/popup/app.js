@@ -72,16 +72,17 @@ define([
   };
 
   popupApp.addNotifications = (msg) => {
+    let items = [];
     msg.payload.forEach((nItemObject) => {
       let nitem = new NItem(nItemObject);
-      devlog(nitem);
-      popupApp.ui.addNotification(nitem);
+      items.push(popupApp.ui.addNotification(nitem));
+    });
+    popupApp.ui.setLoadingDone().then(() => {
+      items.forEach((item) => item.slideIn());
     });
   };
 
   popupApp.addConversations = (msg) => {
-    popupApp.ui.setLoadingDone();
-    devlog(msg);
     msg.payload.forEach((pcItemObject) => {
       let pcItem = new PCItem(pcItemObject);
       popupApp.ui.addConversation(pcItem);

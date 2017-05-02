@@ -43,6 +43,9 @@ define([
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
 
+      // apply init class
+      this.classList.add('init');
+
       // set element's attributes
       let nMsg = nItem.hood_message;
       let _typeId = nItem.notification_type_id.id;
@@ -134,7 +137,14 @@ define([
       return this.slideOut().then(this.remove.bind(this));
     }
 
-    slideIn() {}
+    slideIn() {
+      let self = this;
+      return new Promise((resolve) => {
+        self.addEventListener('transitionend', resolve);
+        self.classList.remove('init');
+      });
+    }
+
     slideOut() {
       let self = this;
       return new Promise((resolve) => {
