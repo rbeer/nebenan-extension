@@ -1,6 +1,12 @@
 status-element {
   display: inline-block;
   float: left;
+  color: #fff;
+  transition: color 0.3s ease-out;
+
+  &[active] {
+    color: $TEXT_GREEN;
+  }
 
   &[type="notifications"] i:before {
     content: '\e807';

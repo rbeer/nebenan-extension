@@ -28,8 +28,15 @@ define(() => {
       return this;
     }
 
+    /**
+     * Sets # of notifications on this status-element
+     * @param  {Number} n - Notification count to display on this element
+     * @return {Boolean} Whether the element has been set to active (i.e. n > 0)
+     */
     set value(n) {
+      (n > 0 ? this.setAttribute : this.removeAttribute).call(this, 'active', '');
       this.valueSpan.textContent = n;
+      return this.hasAttribute('active');
     }
     get type() {
       return this.getAttribute('type');
