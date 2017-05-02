@@ -1,34 +1,60 @@
-/**
- * styles from https://nebenan.de/, class names preserved
- */
+$DOTS_SIZE: 20px;
+$CONTAINER_HEIGHT: $DOTS_SIZE + 5px;
 
-.c-loading-spinner i, .c-loading-spinner:after, .c-loading-spinner:before {
-  width: 20px;
-  height: 20px;
-  display: inline-block;
-  border-radius: 50%;
-  background: #9c9c9c;
-  -webkit-animation: 1s ease infinite pulseLoaderSize;
-  -moz-animation: 1s ease infinite pulseLoaderSize;
-  -o-animation: 1s ease infinite pulseLoaderSize;
-  -ms-animation: 1s ease infinite pulseLoaderSize;
-  animation: 1s ease infinite pulseLoaderSize;
-}
-.c-loading-spinner:after, .c-loading-spinner:before {
-  content: '';
-}
+.loading-animation {
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: $HEADER_HEIGHT 25% $CONTAINER_HEIGHT 100%;
+  grid-column-gap: 7px;
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
 
-.c-loading-spinner i {
-  -webkit-animation-delay: .5s;
-  -moz-animation-delay: .5s;
-  -o-animation-delay: .5s;
-  -ms-animation-delay: .5s;
-  animation-delay: .5s;
-  -webkit-transform: scale(.2);
-  -moz-transform: scale(.2);
-  -o-transform: scale(.2);
-  -ms-transform: scale(.2);
-  transform: scale(.2);
+  .cell-spinner {
+    grid-row: 3;
+    grid-column: 1;
+    text-align: center;
+  }
+  .cell-flower {
+    grid-row: 4;
+    grid-column: 1;
+  }
+
+  /**
+   * styles from https://nebenan.de/, class names preserved
+   */
+
+  .c-loading-spinner i, .c-loading-spinner:after, .c-loading-spinner:before {
+    width: 20px;
+    height: 20px;
+    display: inline-block;
+    border-radius: 50%;
+    background: #9c9c9c;
+    -webkit-animation: 1s ease infinite pulseLoaderSize;
+    -moz-animation: 1s ease infinite pulseLoaderSize;
+    -o-animation: 1s ease infinite pulseLoaderSize;
+    -ms-animation: 1s ease infinite pulseLoaderSize;
+    animation: 1s ease infinite pulseLoaderSize;
+  }
+  .c-loading-spinner:after, .c-loading-spinner:before {
+    content: '';
+  }
+
+  .c-loading-spinner i {
+    -webkit-animation-delay: .5s;
+    -moz-animation-delay: .5s;
+    -o-animation-delay: .5s;
+    -ms-animation-delay: .5s;
+    animation-delay: .5s;
+    -webkit-transform: scale(.2);
+    -moz-transform: scale(.2);
+    -o-transform: scale(.2);
+    -ms-transform: scale(.2);
+    transform: scale(.2);
+  }
 }
 
 @keyframes pulseLoaderSize {
