@@ -60,6 +60,9 @@ define(() => {
 
   let parseMutations = (mutations) => {
     mutations.forEach((mutation) => {
+      if (mutation.addedNodes.length < 1) {
+        return;
+      }
       let elements = mutation.addedNodes.item(0)
                      .querySelectorAll('[aria-role="button"][action]');
       if (elements) {
@@ -96,7 +99,6 @@ define(() => {
     let value;
     let splitActionValue = (str) => {
       let matches = str.match(/([\w\-]+)\.(.*)/);
-      devlog(matches);
       return [ matches[1], matches[2] ];
     };
 
