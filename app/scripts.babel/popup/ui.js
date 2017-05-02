@@ -35,46 +35,52 @@ define([
 
   /**
    * I don't know... what could .init be doing? Hmmm...
+   * @return {Promise} For flow control, only
+   * @see module:popup/app.init
    * @memberOf module:popup/ui
    */
   ui.init = () => {
 
-    // reference status container element
-    ui.elements.status = document.getElementById('status');
-    // add status elements
-    for (let type in ui.elements.stats) {
-      let element = ui.elements.stats[type] = document.createElement('status-element');
-      element.populate(type);
-      ui.elements.status.appendChild(element);
-    }
+    return new Promise((resolve) => {
+      // reference status container element
+      ui.elements.status = document.getElementById('status');
+      // add status elements
+      for (let type in ui.elements.stats) {
+        let element = ui.elements.stats[type] = document.createElement('status-element');
+        element.populate(type);
+        ui.elements.status.appendChild(element);
+      }
 
-    // reference selection slider
-    ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
-    // init position and size
-    ui.moveSelectSlider(ui.elements.status.querySelector('status-element'));
+      // reference selection slider element
+      ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
+      // init position and size
+      ui.moveSelectSlider(ui.elements.status.querySelector('status-element'));
 
-    // reference login prompt overlay elements
-    let loginEls = ui.elements.login;
-    for (let name in loginEls) {
-      loginEls[name] = document.querySelector(`.login-${name}`);
-    }
+      // reference login prompt overlay elements
+      let loginEls = ui.elements.login;
+      for (let name in loginEls) {
+        loginEls[name] = document.querySelector(`.login-${name}`);
+      }
 
-    // reference private_conversation list
-    ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
+      // reference private_conversation list
+      ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
 
-    // reference notification list
-    ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
+      // reference notification list
+      ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
 
-    // hook clickable elements
-    clickables.init(ui);
-    // detect and automatically hook new [aria-role=button][action] elements
-    clickables.watch(ui.nlists.notifications);
-    clickables.watch(ui.nlists.conversations);
+      // hook clickable elements
+      clickables.init(ui);
+      // detect and automatically hook new [aria-role=button][action] elements
+      clickables.watch(ui.nlists.notifications);
+      clickables.watch(ui.nlists.conversations);
 
-    // hook scroll event to show/hide scrollbar
-    let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.nlists.notifications.parentElement.addEventListener('scroll',
-      ui.showScrollbar.bind(null, overlay));
+      // hook scroll event to show/hide scrollbar
+      let overlay = document.querySelector('.n-list-scrollthumb-overlay');
+      ui.nlists.notifications.parentElement.addEventListener('scroll',
+        ui.showScrollbar.bind(null, overlay));
+
+      resolve();
+    });
   };
 
   ui.showScrollbar = (overlay, evt) => {

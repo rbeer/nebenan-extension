@@ -27,10 +27,6 @@ define([
    */
   popupApp.init = () => {
 
-    // init UI
-    // better safe than sorry mode
-    document.addEventListener('DOMContentLoaded', popupApp.ui.init);
-
     // init Messaging
     popupApp.messaging = new Messaging({
       setStats: popupApp.setStats,                 // response for bg/app:getStats
@@ -41,17 +37,26 @@ define([
 
     popupApp.messaging.listen();
 
-    // query bgApp for stats
-    popupApp.messaging.send('bg/app', ['getStats']);
+    // finish init when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initWithDOMLoaded);
+  };
 
-    // query bgApp for notifications
-    popupApp.messaging.send('bg/app', ['getNotifications']);
-    // query bgApp for private_conversations
-    popupApp.messaging.send('bg/app', ['getConversations']);
+  let initWithDOMLoaded = () => {
+
+    // init UI
+    popupApp.ui.init().then(() => {
+      // query bgApp for stats
+      popupApp.messaging.send('bg/app', ['getStats']);
+      // query bgApp for notifications
+      popupApp.messaging.send('bg/app', ['getNotifications']);
+      // query bgApp for private_conversations
+      popupApp.messaging.send('bg/app', ['getConversations']);
+    }).catch((err) => console.error('popupApp.ui failed!', err));
 
   };
 
   popupApp.setStats = (msg) => {
+    // TODO: delete users entirely, if f5a642f is kept
     let users = (userCount => {
       // abbreviate user counts > 999 to "1k+", "2k+", so on...
       // (current location of status elements forces "newline" when value is > 3 chars)
