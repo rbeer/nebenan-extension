@@ -142,7 +142,13 @@ define([
       delay = delay || 0;
       return new Promise((resolve) => {
         self.style.transitionDelay = delay + 's';
-        self.addEventListener('transitionend', resolve);
+        self.addEventListener('transitionend', () => {
+          let zeroSeconds = '0s';
+          self.style.transitionDelay = zeroSeconds;
+          self.firstElementChild.style.transitionDelay = zeroSeconds;
+          self.firstElementChild.firstElementChild.style.transitionDelay = zeroSeconds;
+          resolve();
+        });
         self.classList.remove('init');
       });
     }
