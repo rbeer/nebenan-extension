@@ -46,7 +46,7 @@ define(() => {
 
   /**
    * Creates a MutationObserver on input `element`, watching for
-   * clickable elements, hooking found ones. Returns a id for use
+   * clickable elements, hooking found ones. Returns an id for use
    * with stop(id)
    * @param  {HTMLElement} element - Any HTMLElement that is expected to have clickable elements inserted
    * @return {Number} MutationObserver ID, used for stop(id)

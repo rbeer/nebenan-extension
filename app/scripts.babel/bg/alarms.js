@@ -74,6 +74,7 @@ define(() => {
       let self = this;
       this.parentApp.getStats()
       .then(this.parentApp.updateBrowserAction)
+      .then(this.parentApp.pushStatsUpdate)
       .catch((err) => {
         if (err.code === 'ENOTOKEN') {
           devlog(err.message);

@@ -69,7 +69,6 @@ define(() => {
      * @property {object} data               - Response data
      * @property {number} data.messages      - \# of unread messages
      * @property {number} data.notifications - \# of unread notifications (i.e. feed activity)
-     * @property {number} data.users         - \# of 'active' users
      * @property {number} data.all           - messages + notifications (for display on browserAction badge)
      * @property {number} lastUpdate         - epoch timestamp of last API request
      * @todo - There is some error-indicating field in counter_stat.json if one is thrown; it will be inherited in module:bg/app.sanitizeStats and can be used (name tdb)
@@ -94,7 +93,6 @@ define(() => {
      */
     static sanitizeStats(stats) {
       let nameMap = [
-        [ 'users', 'hood_active_users_count' ],
         [ 'messages', 'new_messages_count' ],
         [ 'notifications', 'new_notifications_count' ]
       ];

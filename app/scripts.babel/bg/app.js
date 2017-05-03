@@ -127,15 +127,7 @@ define([
    * @param  {string} cacheName - Must be member of module:bg/app.
    * @return {Promise}          - Resolves with cached data if still in request timeout
    */
-  bgApp.getCachedDataFor = (cacheName) => {
-    if (bgApp.requestCaches[cacheName].hasExpired) {
-      devlog(`Cache for ${cacheName} has expired.`);
-      return void 0;
-    } else {
-      devlog(`Serving cached data for ${cacheName}`);
-      return bgApp.requestCaches[cacheName].data;
-    }
-  };
+  bgApp.getCache = (cacheName) => bgApp.requestCaches[cacheName];
 
   /**
    * Updates local stats
@@ -144,18 +136,43 @@ define([
    */
   bgApp.getStats = () => {
 
-    return bgApp.api.getCounterStats(bgApp.getCachedDataFor('stats'))
+    return bgApp.api.getCounterStats(bgApp.getCache('stats'))
           .then((counter_stats) => {
-            // not a string? cached data!
-            if (typeof counter_stats !== 'string') {
-              return counter_stats;
+            let statsObj;
+            // not expired cache
+            if (counter_stats.hasExpired === false) {
+              statsObj = counter_stats.data;
+              statsObj.cached = true;
             } else {
               // parse JSON string and update cache
-              let statsObj = JSON.parse(counter_stats);
+              statsObj = JSON.parse(counter_stats);
               bgApp.requestCaches.stats.data = statsObj;
-              return statsObj;
             }
+            return statsObj;
           });
+  };
+
+  bgApp.pushStatsUpdate = (stats) => {
+    // cached data can't have updates, can it?
+    if (stats.cached) {
+      return stats.data;
+    }
+    bgApp.messaging.ping('popup/app').then((res) => {
+      if (!res) {
+        return;
+      }
+      devlog('updating query result');
+      let keys = ['notifications', 'messages'];
+      let updates = { notifications: 0, messages: 0 };
+      let updatedValues = _.pick(stats, keys);
+      let cachedValues = _.pick(bgApp.getCache('stats').data, keys);
+      _.assignWith(updates, updatedValues, cachedValues, (updatedCount, cachedCount) => {
+        let newCount = updatedCount - cachedCount;
+        return newCount < 1 ? 0 : newCount;
+      });
+      bgApp.messaging.send('popup/app', ['updateStats'], updates);
+    });
+    return stats.data;
   };
 
   /**
@@ -221,6 +238,7 @@ define([
   /**
    * Update browserAction icon and badge
    * @param {module:bg/app.requestCaches.stats} stats
+   * @return {module:bg/app.requestCaches.stats} Just passing the input through
    * @memberOf module:bg/app
    */
   bgApp.updateBrowserAction = (stats) => {

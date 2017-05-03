@@ -107,7 +107,7 @@ define([
      * @return {Promise} - Resolves with response body from APIClient.callAPI
      */
     static getCounterStats(cached) {
-      if (cached) {
+      if (cached && !cached.hasExpired) {
         return auth.canAuthenticate().then(() => cached);
       }
       return auth.canAuthenticate()

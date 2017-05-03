@@ -46,6 +46,22 @@ define(['lodash'], (_) => {
       chrome.runtime.onMessage.addListener(this.receive.bind(this));
     }
 
+    ping(to) {
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
+          to: to,
+          payload: 'ping'
+        }, (response) => {
+          devlog(response);
+          if (!response) {
+            resolve();
+          } else {
+            resolve('pong');
+          }
+        });
+      });
+    }
+
     /**
      * Receives message
      * @param  {Object}     message - Message object (not yet an instance!), received
@@ -57,6 +73,10 @@ define(['lodash'], (_) => {
       // ignore messages not for this instance
       if (message.to === this.parentId) {
         let self = this;
+
+        if (message.payload === 'ping') {
+          return respond('pong');
+        }
 
         // create Message instance
         let msg = new Message(message);
