@@ -20,9 +20,8 @@ define([
 
   /**
    * Initializes main app
-   * - Gets references to DOM Elements
-   * - Sets hooks on Elements (clicks, etc.)
-   * - Sends stats-data request to module:bgApp
+   * - Initializes messaging
+   * - Queries module:bgApp for initial data (stats, notifications, conversations)
    * @memberOf module:popup/app
    */
   popupApp.init = () => {
@@ -57,18 +56,11 @@ define([
   };
 
   popupApp.setStats = (msg) => {
-    // TODO: delete users entirely, if f5a642f is kept
-    let users = (userCount => {
-      // abbreviate user counts > 999 to "1k+", "2k+", so on...
-      // (current location of status elements forces "newline" when value is > 3 chars)
-      return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
-    })(msg.payload.users);
 
     // update UI elements
     popupApp.ui.setStats({
       messages: msg.payload.messages || 0,
-      notifications: msg.payload.notifications || 0,
-      users: users
+      notifications: msg.payload.notifications || 0
     });
   };
 

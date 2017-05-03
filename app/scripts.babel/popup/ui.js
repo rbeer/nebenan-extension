@@ -15,8 +15,7 @@ define([
     elements: {
       stats: {
         notifications: null,
-        messages: null/*,
-        users: null*/
+        messages: null
       },
       login: {
         blur: null,
