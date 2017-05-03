@@ -55,12 +55,12 @@ pc-listitem {
   }
 
   &[type="sent"] .content .bubble::before {
-    border-color: #b2ca06 transparent;
+    border-color: rgb(178, 202, 6) transparent;
     right: 0;
     transform: rotate(-90deg);
   }
   &[type="received"] .content .bubble::before {
-    border-color: #919191 transparent;
+    border-color: rgb(145, 145, 145) transparent;
     left: 0;
     transform: rotate(90deg);
   }

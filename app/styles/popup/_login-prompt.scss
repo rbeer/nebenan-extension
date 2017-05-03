@@ -17,7 +17,7 @@
   i:before {
     content: '\e82d';
     font-size: 120px;
-    text-shadow: 1px 1px 3px #000;
+    text-shadow: 1px 1px 3px rgb(0, 0, 0);
   }
 
   .btn {
@@ -39,7 +39,7 @@
     user-select: none;
     cursor: pointer;
     pointer-events: auto;
-    box-shadow: 1px 1px 3px #000;
+    box-shadow: 1px 1px 3px rgb(0, 0, 0);
   }
 
   .btn-green {
