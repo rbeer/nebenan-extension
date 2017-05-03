@@ -116,10 +116,10 @@ define([
 
   /**
    * Sets status counter values
-   * @param {!Object} values
-   * @param {!String} values.notifications - \# of notifications
-   * @param {!String} values.messages      - \# of new messages
-   * @param {!String} values.users         - \# of hood users (kinda YAGNI)
+   * @param {!Object}  values
+   * @param {!String}  values.notifications - \# of notifications
+   * @param {!String}  values.messages      - \# of new messages
+   * @param {?Boolean} update               - Treat values as addends, rather than absolute values
    * @memberOf module:popup/ui
    */
   ui.setStats = (values, update) => {
