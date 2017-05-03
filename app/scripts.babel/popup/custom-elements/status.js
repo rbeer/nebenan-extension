@@ -38,6 +38,9 @@ define(() => {
       this.valueSpan.textContent = n;
       return this.hasAttribute('active');
     }
+    get value() {
+      return parseInt(this.valueSpan.textContent, 10);
+    }
     get type() {
       return this.getAttribute('type');
     }

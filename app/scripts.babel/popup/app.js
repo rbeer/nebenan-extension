@@ -29,6 +29,7 @@ define([
     // init Messaging
     popupApp.messaging = new Messaging({
       setStats: popupApp.setStats,                           // response for bg/app:getStats
+      updateStats: popupApp.setStats.bind(null, true),       // push message from bg/app:updateStats
       addNotifications: popupApp.addNotifications,           // response for bg/app:getNotifications
       addNotificationsAtTop: popupApp.addNotificationsAtTop, // response for bg/app:getNotifications {type: 'update' }
       addConversations: popupApp.addConversations,           // response for bg/app:getConversations
@@ -55,13 +56,18 @@ define([
 
   };
 
-  popupApp.setStats = (msg) => {
+  popupApp.setStats = (update, msg) => {
+
+    if (!msg) {
+      msg = update;
+      update = false;
+    }
 
     // update UI elements
     popupApp.ui.setStats({
       messages: msg.payload.messages || 0,
       notifications: msg.payload.notifications || 0
-    });
+    }, update);
   };
 
   popupApp.addNotifications = (msg, atTop) => {

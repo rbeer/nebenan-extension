@@ -122,9 +122,11 @@ define([
    * @param {!String} values.users         - \# of hood users (kinda YAGNI)
    * @memberOf module:popup/ui
    */
-  ui.setStats = (values) => {
-    let statsEls = ui.elements.stats;
-    _.forEach(statsEls, (el, key) => (el.value = values[key]));
+  ui.setStats = (values, update) => {
+    let statusElements = ui.elements.stats;
+    _.forEach(statusElements, (statusElement, key) => {
+      statusElement.value = update ? (statusElement.value += values[key]) : values[key];
+    });
   };
 
   ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));
