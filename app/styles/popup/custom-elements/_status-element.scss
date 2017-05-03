@@ -14,9 +14,6 @@ status-element {
   &[type="messages"] i:before {
     content: '\e828';
   }
-  &[type="users"] i:before {
-    content: '\e83a';
-  }
 
   i {
     vertical-align: middle;

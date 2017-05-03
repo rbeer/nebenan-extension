@@ -15,8 +15,65 @@
     display: inline-block;
     color: $TEXT_WHITE;
   }
+
 }
 
+.updates-item {
+  position: relative;
+  z-index: 2;
+  opacity: 0;
+  top: 0;
+  height: 0;
+  width: 100%;
+  margin-top: 0;
+  color: $TEXT_INACTIVE;
+  text-align: center;
+  text-transform: uppercase;
+  text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+  overflow: hidden;
+  background: $CARD_BG;
+  border: $CARD_BORDER;
+  box-shadow: $CARD_SHADOW;
+  transition: all 0.3s ease-out;
+
+  &[active] {
+    opacity: 1;
+    height: 30px;
+    margin-top: 7px;
+
+    span {
+      animation: updatesTextPulse 1s ease-in;
+      animation-iteration-count: 10;
+    }
+  }
+
+  span {
+    line-height: 30px;
+  }
+}
+
+@keyframes updatesTextPulse {
+  0% {
+    color: $TEXT_INACTIVE;
+    text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+  },
+  75% {
+    color: $TEXT_INACTIVE;
+    text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+  },
+  80% {
+    color: $TEXT_GREEN;
+    text-shadow: 0.3px 0.6px 0.3px $TEXT_GREEN;
+  },
+  95% {
+    color: $TEXT_GREEN;
+    text-shadow: 0.3px 0.6px 0.3px $TEXT_GREEN;
+  },
+  100% {
+    color: $TEXT_INACTIVE;
+    text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+  }
+}
 
 .logo {
   float: none;
