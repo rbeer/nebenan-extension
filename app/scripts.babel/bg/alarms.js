@@ -79,10 +79,7 @@ define(() => {
           devlog(err.message);
           // stop requesting stats when there is no auth token
           self.stopStats();
-          // set browserAction badge into error state
-          // TODO: refactor into module:ui or so? (net yet implemented!)
-          chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
-          chrome.browserAction.setBadgeText({ text: '!' });
+          self.parentApp.updateBrowserAction(false);
         }
       });
     }

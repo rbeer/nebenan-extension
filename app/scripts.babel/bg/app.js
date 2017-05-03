@@ -140,12 +140,10 @@ define([
   /**
    * Updates local stats
    * @memberOf module:bg/app
-   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in   * @return {Promise}
+   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
    */
   bgApp.getStats = () => {
 
-    // bgApp.api.getCounterStats passes its first paremeter
-    // (possible cache object) to resolve, when valid/not expired.
     return bgApp.api.getCounterStats(bgApp.getCachedDataFor('stats'))
           .then((counter_stats) => {
             // not a string? cached data!
@@ -227,6 +225,12 @@ define([
    */
   bgApp.updateBrowserAction = (stats) => {
     devlog('Updating browserAction with:', stats);
+
+    if (stats === false) {
+      chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
+      chrome.browserAction.setBadgeText({ text: '!' });
+      return;
+    }
 
     let allNew = stats.messages + stats.notifications;
     let hasNew = allNew > 0;
