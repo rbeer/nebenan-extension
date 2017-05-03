@@ -102,7 +102,7 @@ define([
    * @memberOf module:popup/ui
    * @see NList.add
    */
-  ui.addNotification = (nItem) => ui.nlists.notifications.add(nItem);
+  ui.addNotification = (nItem, atTop) => ui.nlists.notifications.add(nItem, atTop);
 
   /**
    * Adds a new n-listitem to the n-list
@@ -139,6 +139,9 @@ define([
 
   ui.setLoadingDone = () => {
     return new Promise((resolve) => {
+      if (ui.elements.loading.hasAttribute('done')) {
+        return resolve();
+      }
       ui.elements.loading.addEventListener('transitionend', resolve);
       ui.elements.loading.setAttribute('done', '');
     });

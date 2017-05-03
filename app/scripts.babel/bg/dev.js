@@ -110,6 +110,10 @@ define(() => {
     });
   };
 
+  dev.simulateNewNotifications = () => {
+    dev.bgApp.messaging.send('popup/app', 'setStats', { messages: 0, notifications: 1, users: 0, crx_sanitized: true });
+  };
+
   return dev;
 
 });

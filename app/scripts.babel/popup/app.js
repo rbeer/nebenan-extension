@@ -29,9 +29,10 @@ define([
 
     // init Messaging
     popupApp.messaging = new Messaging({
-      setStats: popupApp.setStats,                 // response for bg/app:getStats
-      addNotifications: popupApp.addNotifications, // response for bg/app:getNotifications
-      addConversations: popupApp.addConversations, // response for bg/app:getConversations
+      setStats: popupApp.setStats,                           // response for bg/app:getStats
+      addNotifications: popupApp.addNotifications,           // response for bg/app:getNotifications
+      addNotificationsAtTop: popupApp.addNotificationsAtTop, // response for bg/app:getNotifications {type: 'update' }
+      addConversations: popupApp.addConversations,           // response for bg/app:getConversations
       error: handleErrorMessages
     }, 'popup/app');
 
@@ -71,16 +72,18 @@ define([
     });
   };
 
-  popupApp.addNotifications = (msg) => {
+  popupApp.addNotifications = (msg, atTop) => {
     let items = [];
     msg.payload.forEach((nItemObject) => {
       let nitem = new NItem(nItemObject);
-      items.push(popupApp.ui.addNotification(nitem));
+      items.push(popupApp.ui.addNotification(nitem, atTop));
     });
     popupApp.ui.setLoadingDone().then(() => {
       items.forEach((item, i) => item.slideIn(i / 10));
     });
   };
+
+  popupApp.addNotificationsAtTop = (msg) => popupApp.addNotifications(msg, true);
 
   popupApp.addConversations = (msg) => {
     msg.payload.forEach((pcItemObject) => {

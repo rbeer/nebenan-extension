@@ -73,10 +73,24 @@ define([
         });
       },
       getNotifications: (msg, respond) => {
-        bgApp.getNotifications()
+        let params = msg.payload || {};
+        let answerHandler;
+
+        switch (params.type) {
+          case 'update':
+            // get only new notifications - MUST have params.n
+            answerHandler = 'addNotificationsAtTop';
+            break;
+          case 'loadAfter':
+            // scrolling event - MUST have params.lower
+            break;
+          default:
+            answerHandler = 'addNotifications';
+        }
+
+        bgApp.getNotifications(params.n, params.lower)
         .then((nitems) => {
-          devlog('nitems:', nitems);
-          let response = msg.cloneForAnswer(['addNotifications'], nitems);
+          let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
         })
         .catch((err) => {
@@ -151,8 +165,13 @@ define([
    * @memberOf module:bg/app
    * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
    */
-  bgApp.getNotifications = () => {
-    return bgApp.api.getNotifications(7, 0, null)
+  bgApp.getNotifications = (n, lower) => {
+
+    // defaults to the 7 most recent notifications
+    n = n || 7;
+    lower = lower || 0;
+
+    return bgApp.api.getNotifications(n, lower, null)
     .then((raw) => {
       let parsed;
       if (typeof raw !== 'string') {
