@@ -71,7 +71,15 @@ define([
       items.push(popupApp.ui.addNotification(nitem, atTop));
     });
     popupApp.ui.setLoadingDone().then(() => {
-      items.forEach((item, i) => item.slideIn(i / 10));
+      // TODO: 'init' class is taken off too quickly; delay
+      let _show = () => {
+        items.forEach((item, i) => item.slideIn(i / 10));
+      };
+      if (atTop) {
+        window.setTimeout(_show, 250);
+      } else {
+        _show();
+      }
     });
   };
 
