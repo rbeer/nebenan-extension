@@ -34,8 +34,15 @@ define(() => {
      * @return {Boolean} Whether the element has been set to active (i.e. n > 0)
      */
     set value(n) {
-      (n > 0 ? this.setAttribute : this.removeAttribute).call(this, 'active', '');
       this.valueSpan.textContent = n;
+      this.active = n > 0;
+      return this.active;
+    }
+    set active(toState) {
+      (toState ? this.setAttribute : this.removeAttribute).call(this, 'active', '');
+      return this.active;
+    }
+    get active() {
       return this.hasAttribute('active');
     }
     get value() {

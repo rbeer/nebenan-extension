@@ -15,7 +15,7 @@ define([
     elements: {
       stats: {
         notifications: null,
-        messages: null
+        conversations: null
       },
       login: {
         blur: null,
@@ -119,7 +119,7 @@ define([
    * Sets status counter values
    * @param {!Object}  values
    * @param {!String}  values.notifications - \# of notifications
-   * @param {!String}  values.messages      - \# of new messages
+   * @param {!String}  values.conversations - \# of new conversations
    * @param {?Boolean} update               - Treat values as addends, rather than absolute values
    *                                          and toggles updates-item in nlist
    * @memberOf module:popup/ui
@@ -135,7 +135,7 @@ define([
   };
 
   ui.toggleUpdatesItem = (type, n, show) => {
-    let element = document.querySelector('n-list .updates-item[type="' + type + '"]');
+    let element = document.querySelector('n-list[type="' + type + '"] .updates-item');
     show = show !== void 0 ? show : !element.hasAttribute('active');
     element.setAttribute('n', n);
     show ? element.setAttribute('active', '') : element.removeAttribute('active');

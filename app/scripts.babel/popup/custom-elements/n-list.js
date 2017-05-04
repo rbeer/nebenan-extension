@@ -62,7 +62,13 @@ define([
                             'APIClient.NSubset or HTMLLIElement');
       }
 
-      this.insertAdjacentElement(atTop ? 'afterbegin' : 'beforeend', listItem);
+      // add updates (at top) after .updates-item div
+      if (atTop) {
+        this.querySelector('.updates-item').insertAdjacentElement('afterend', listItem);
+      } else {
+        this.appendChild(listItem);
+      }
+
       return listItem;
     }
 

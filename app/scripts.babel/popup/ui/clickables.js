@@ -134,6 +134,7 @@ define(() => {
         let n = evt.target.getAttribute('n') || 0;
         _app.messaging.send('bg/app', ['get' + upperCaseType], { type: 'update', n: n });
         evt.target.removeAttribute('active');
+        _app.ui.elements.stats[value].active = false;
         break;
       default:
         console.warn('Unknown click action:', action);

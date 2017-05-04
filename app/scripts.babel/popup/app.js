@@ -65,7 +65,7 @@ define([
 
     // update UI elements
     popupApp.ui.setStats({
-      messages: msg.payload.messages || 0,
+      conversations: msg.payload.messages || 0,
       notifications: msg.payload.notifications || 0
     }, update);
   };
