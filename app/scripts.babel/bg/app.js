@@ -5,10 +5,10 @@ define([
   'bg/apiclient',
   'bg/auth',
   'bg/livereload',
-  'bg/request-cache',
+  'bg/cache',
   'messaging',
   'lodash'
-], (Alarms, APIClient, auth, lreload, RequestCache, Messaging, _) => {
+], (Alarms, APIClient, auth, lreload, cache, Messaging, _) => {
 
   /**
    * Background Main App
@@ -25,7 +25,7 @@ define([
      * @memberOf module:bg/app
      */
     requestCaches: {
-      stats: new RequestCache.StatsCache({
+      stats: new cache.StatsCache({
         messages: 0, notifications: 0,
         users: 0, all: 0
       }, 0)

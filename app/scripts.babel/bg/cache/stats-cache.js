@@ -1,65 +1,11 @@
-'use strict';
-
-define(() => {
-
-  /**
-   * @class Cached data from API requests
-   */
-  class RequestCache {
-
-    /**
-     * Creates new cache
-     * @param  {object} data       - Sanitized data to cache. Sanitized objects have
-     *                               the `crx_sanitized` flag set.
-     * @param  {number} lastUpdate - UNIX epoch tstamp (in microseconds!) of last successfull API call
-     * @return {RequestCache}
-     */
-    constructor(data, lastUpdate) {
-      if (!data.crx_sanitized) {
-        let err = new TypeError('Input data isn\'t sanitized.');
-        err.code = 'EDIRTYDATA';
-        throw err;
-      }
-      /**
-       * Data, sanitized for internal use
-       * @type {Object}
-       */
-      this._data = data;
-      /**
-       * UNIX epoch tstamp (in microseconds!) of last successfull API call
-       * @type {Number}
-       */
-      this.lastUpdate = lastUpdate / 10000000000000 > 0 ? lastUpdate : lastUpdate * 1000;
-
-      /**
-       * Cache expiration timeout in (API compliant) microseconds
-       * @type {Number}
-       * @memberOf module:bg/app.requestCaches
-       */
-      this.expiresIn = 5 * 60000000;
-    }
-
-    /**
-     * Returns whether cache has expired or not
-     * @type {Bool}
-     */
-    get hasExpired() {
-      let expires = this.lastUpdate + this.expiresIn;
-      let expiresIn = expires - Date.now();
-      return expiresIn <= 0;
-    }
-
-    static get StatsCache() {
-      return StatsCache;
-    }
-  }
-
+define(['bg/cache/item-cache'], (ItemCache) => {
+  'use strict';
   /**
    * @class Cache for counter_stats.json
    * @memberOf RequestCache
    * @extends {RequestCache}
    */
-  class StatsCache extends RequestCache {
+  class StatsCache extends ItemCache {
     constructor(rawData, lastUpdate) {
       super(StatsCache.sanitizeStats(rawData), lastUpdate);
     }
@@ -103,9 +49,7 @@ define(() => {
       stats.crx_sanitized = true;
       return stats;
     }
-
   }
 
-  return RequestCache;
-
+  return StatsCache;
 });
