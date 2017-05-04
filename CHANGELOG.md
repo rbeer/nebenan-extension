@@ -1,3 +1,23 @@
+## v0.3.3
+
+- [2565168 - 375cc5a] Add: push status update (#updated - #cached) to popup
+  - toggle updates-items on status value update
+  - load new notifications/conversations on updates-item click
+  - add new listitems after updates-item
+
+- [6a124c2] Refactor: defaulting to rgb() values
+
+## v0.3.2
+
+- [c9e39db] Change: borderless card style / thumbs inset border
+- [1ec3939 - e5083f5] Add: nlistitem appear/dismiss animations
+
+## v0.3.1
+
+- [d71995e - 4558f1f] Add: loading-animation
+- [2877921] Add: 'active' attribute; color change on status-element when 'active'
+- [f5a642f] Remove/Fix: Users from stats (diplay) / select-slider initial position/size
+
 ## v0.3.0
 
 #### Added private conversations
