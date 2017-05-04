@@ -1,7 +1,7 @@
 define(() => {
   'use strict';
 
-  let _ui;
+  let _app;
 
   /**
    * Manages clickable elements
@@ -12,11 +12,11 @@ define(() => {
   /**
    * Gets all `[aria-role="button"][action]` elements currently in
    * the DOM and hooks them.
-   * @param  {module:popup/ui} parentUI
+   * @param  {module:popup/app} parentApp
    * @memberOf module:popup/ui/clikables
    */
-  clickables.init = (parentUI) => {
-    _ui = parentUI;
+  clickables.init = (parentApp) => {
+    _app = parentApp;
     let elements = document.querySelectorAll('[aria-role="button"][action]');
     clickables.hook(Array.from(elements));
   };
@@ -122,12 +122,18 @@ define(() => {
         });
         break;
       case 'select-panel':
-        _ui.moveSelectSlider(evt.target);
-        _ui.movePanels(evt.target.type === 'notifications' ? 0 : 350);
+        _app.ui.moveSelectSlider(evt.target);
+        _app.ui.movePanels(evt.target.type === 'notifications' ? 0 : 350);
         break;
       case 'dismiss':
         let [ tag, id ] = value.split(':');
         document.querySelector(`${tag}[id="${id}"]`).dismiss();
+        break;
+      case 'update':
+        let upperCaseType = value.slice(0, 1).toUpperCase() + value.slice(1);
+        let n = evt.target.getAttribute('n') || 0;
+        _app.messaging.send('bg/app', ['get' + upperCaseType], { type: 'update', n: n });
+        evt.target.removeAttribute('active');
         break;
       default:
         console.warn('Unknown click action:', action);

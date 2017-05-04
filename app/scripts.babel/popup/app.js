@@ -45,7 +45,7 @@ define([
   let initWithDOMLoaded = () => {
 
     // init UI
-    popupApp.ui.init().then(() => {
+    popupApp.ui.init(popupApp).then(() => {
       // query bgApp for stats
       popupApp.messaging.send('bg/app', ['getStats']);
       // query bgApp for notifications

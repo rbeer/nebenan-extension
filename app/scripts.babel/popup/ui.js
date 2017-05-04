@@ -35,11 +35,12 @@ define([
 
   /**
    * I don't know... what could .init be doing? Hmmm...
+   * @param {module:bgApp} _app
    * @return {Promise} For flow control, only
    * @see module:popup/app.init
    * @memberOf module:popup/ui
    */
-  ui.init = () => {
+  ui.init = (_app) => {
 
     return new Promise((resolve) => {
       // reference loading animation / background
@@ -71,7 +72,7 @@ define([
       ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
 
       // hook clickable elements
-      clickables.init(ui);
+      clickables.init(_app);
       // detect and automatically hook new [aria-role=button][action] elements
       clickables.watch(ui.nlists.notifications);
       clickables.watch(ui.nlists.conversations);
@@ -128,17 +129,16 @@ define([
     _.forEach(statusElements, (statusElement, key) => {
       statusElement.value = update ? (statusElement.value += values[key]) : values[key];
       if (update && statusElement.value > 0) {
-        ui.toggleUpdatesItem(key, true);
+        ui.toggleUpdatesItem(key, values[key], true);
       }
     });
   };
 
-  ui.toggleUpdatesItem = (type, show) => {
-    let fn;
-    let element = document.querySelector('n-list[type="' + type + '"] .updates-item');
+  ui.toggleUpdatesItem = (type, n, show) => {
+    let element = document.querySelector('n-list .updates-item[type="' + type + '"]');
     show = show !== void 0 ? show : !element.hasAttribute('active');
-    fn = show ? element.setAttribute : element.removeAttribute;
-    fn('active', '');
+    element.setAttribute('n', n);
+    show ? element.setAttribute('active', '') : element.removeAttribute('active');
   };
 
   ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));

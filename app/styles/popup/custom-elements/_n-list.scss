@@ -41,6 +41,40 @@
     grid-column-end: 3;
     grid-row: 1;
   }
+
+  .updates-item {
+    position: relative;
+    z-index: 2;
+    opacity: 0;
+    top: 0;
+    height: 0;
+    width: 100%;
+    margin-top: 0;
+    color: $TEXT_INACTIVE;
+    text-align: center;
+    text-transform: uppercase;
+    text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+    overflow: hidden;
+    background: $CARD_BG;
+    border: $CARD_BORDER;
+    box-shadow: $CARD_SHADOW;
+    transition: all 0.3s ease-out;
+
+    &[active] {
+      opacity: 1;
+      height: 30px;
+      margin-top: 7px;
+
+      span {
+        animation: updatesTextPulse 1s ease-in;
+        animation-iteration-count: 10;
+      }
+    }
+
+    span {
+      line-height: 30px;
+    }
+  }
 }
 
 .n-list-scrollthumb-overlay {
