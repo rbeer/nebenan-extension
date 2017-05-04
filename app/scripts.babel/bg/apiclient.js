@@ -2,12 +2,13 @@
 
 define([
   'bg/auth',
+  'bg/apiclient/nstats',
   'bg/apiclient/notifications/nitem',
   'bg/apiclient/notifications/nmessage',
   'bg/apiclient/notifications/ntype',
   'bg/apiclient/messages/pcitem',
   'bg/apiclient/messages/pcmessage'
-], (auth, NItem, NMessage, NType, PCItem, PCMessage) => {
+], (auth, NStats, NItem, NMessage, NType, PCItem, PCMessage) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -18,6 +19,9 @@ define([
     }
 
     // sub classes
+    static get NStats() {
+      return NStats;
+    }
     static get NItem() {
       return NItem;
     }
