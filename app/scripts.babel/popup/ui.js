@@ -120,13 +120,25 @@ define([
    * @param {!String}  values.notifications - \# of notifications
    * @param {!String}  values.messages      - \# of new messages
    * @param {?Boolean} update               - Treat values as addends, rather than absolute values
+   *                                          and toggles updates-item in nlist
    * @memberOf module:popup/ui
    */
   ui.setStats = (values, update) => {
     let statusElements = ui.elements.stats;
     _.forEach(statusElements, (statusElement, key) => {
       statusElement.value = update ? (statusElement.value += values[key]) : values[key];
+      if (update && statusElement.value > 0) {
+        ui.toggleUpdatesItem(key, true);
+      }
     });
+  };
+
+  ui.toggleUpdatesItem = (type, show) => {
+    let fn;
+    let element = document.querySelector('n-list[type="' + type + '"] .updates-item');
+    show = show !== void 0 ? show : !element.hasAttribute('active');
+    fn = show ? element.setAttribute : element.removeAttribute;
+    fn('active', '');
   };
 
   ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));
