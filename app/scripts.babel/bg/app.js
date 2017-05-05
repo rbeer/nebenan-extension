@@ -196,6 +196,7 @@ define([
    * Update browserAction icon and badge
    * @param {APIClient.NStatus} status
    * @return {APIClient.NStatus} Just passing the input through
+   * @see Alarms#fireStats
    * @memberOf module:bg/app
    */
   bgApp.updateBrowserAction = (status) => {
@@ -207,14 +208,11 @@ define([
       return;
     }
 
-    let allNew = status.messages + status.notifications;
-    let hasNew = allNew > 0;
-
-    let iconPath = `images/icon-${hasNew ? 'unread' : 'read'}_16.png`;
+    let iconPath = `images/icon-${status.hasNew ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
 
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
-    chrome.browserAction.setBadgeText({ text: hasNew ? allNew + '' : '' });
+    chrome.browserAction.setBadgeText({ text: status.hasNew ? status.allNew + '' : '' });
 
     return status;
   };
