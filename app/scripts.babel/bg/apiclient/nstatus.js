@@ -22,8 +22,19 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
       // TODO: use API's naming convention
       // let subsetKeys = [ 'new_messages_count', 'new_notifications_count' ];
       // super(subsetKeys, raw);
+
+      this.allNew = this.messages + this.notifications;
+      this.hasNew = this.allNew > 0;
+
     }
 
+    /**
+     * Takes an API response and returns an {@link APIClient.NStatus} instance
+     * @param  {Object} raw - {@link APIClient.XHRRequest}.responseData
+     * @see APIClient.wrapResponse
+     * @see APIClient.XHRRequest
+     * @return {Array.APIClient.NStatus}
+     */
     static wrapRaw(raw) {
       return [ new NStatus(raw) ];
     }

@@ -53,7 +53,7 @@ define([
       getStats: (msg, respond) => {
         bgApp.getStats()
         .then((stats) => {
-          let response = msg.cloneForAnswer(['setStats'], stats);
+          let response = msg.cloneForAnswer(['setStats'], stats[0]);
           respond(response);
         })
         .catch((err) => {
@@ -111,9 +111,9 @@ define([
   };
 
   /**
-   * Updates local stats
+   * Queries API for counter_stats.json / {@link APIClient.NStatus}
    * @memberOf module:bg/app
-   * @return {Promise} - Resolves with an NStatus instance; Rejects with ENOTOKEN if not logged in
+   * @return {Promise.<Array.<APIClient.NStatus>, ENOTOKEN>}
    */
   bgApp.getStats = () => bgApp.api.getCounterStats();
 
@@ -143,12 +143,13 @@ define([
   };*/
 
   /**
-   * Updates notifications
+   * Queries API for notifications.json / {@link APIClient.NItem}
+   * @param {Number} n=7     - \# of notifications to request
+   * @param {Number} lower=0 - Timestamp; query for notifications older than this value
    * @memberOf module:bg/app
-   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
+   * @return {Promise.<Array.<APIClient.NItem>, ENOTOKEN>}
    */
   bgApp.getNotifications = (n, lower) => {
-
     // defaults to the 7 most recent notifications
     n = n || 7;
     lower = lower || 0;
@@ -160,8 +161,31 @@ define([
     });
   };
 
-  bgApp.getConversations = () => {
-    return bgApp.api.getConversations(7, 1)
+  /**
+   * Queries API for private_conversations.json / {@link APIClient.PCItem}
+   * @param {Number} perPage=7     - \# of conversations per request page
+   * @param {Number} page=1        - \# of page to request. order of items is DESC date/time
+   * @memberOf module:bg/app
+   * @return {Promise.<Array.<APIClient.PCItem>, ENOTOKEN>}
+   * @example
+   * let pageRanges = (perPage) => {
+   *   for (let page = 1; page <= 7; page++) {
+   *     console.log('Page #' + page);
+   *     console.log('First on page:', (page-1)*perPage);
+   *     console.log('Last on page:', (page-1)*perPage + (perPage-1));
+   *     console.log('-'.repeat(21));
+   *   }
+   * }
+   * pageRanges(15)
+   * pageRanges(1)
+   * pageRanges(0)
+   */
+  bgApp.getConversations = (perPage, page) => {
+    // defaults to first 7 conversations
+    perPage = perPage || 7;
+    page = page || 1;
+
+    return bgApp.api.getConversations(perPage, page)
     .then((conversations) => {
       devlog(conversations);
       return conversations;

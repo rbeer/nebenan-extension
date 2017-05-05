@@ -13,9 +13,8 @@ define([
   class NItem extends NSubset {
     /**
      * Takes a raw notification object from the API and creates a subset with
-     * only the members of interest to the extension.
-     * @param {Object}   raw - Raw notification object as it comes from the API. The subset
-     *                         will consist of:
+     * members of interest to the extension. Only those subset members are documented.
+     * @param {Object}   raw
      * @param {Number}   raw.id
      * @param {Object}   raw.hood_message          - Message that triggered the notification
      * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
@@ -41,6 +40,13 @@ define([
       super(subsetKeys, raw);
     }
 
+    /**
+     * Takes an API response and returns an Array of {@link APIClient.NItem}
+     * @param  {Object} raw - {@link APIClient.XHRRequest}.responseData
+     * @see APIClient.wrapResponse
+     * @see APIClient.XHRRequest
+     * @return {Array.<APIClient.NItem>}
+     */
     static wrapRaw(raw) {
       /**
        * strip notifications that defy the standard object layout
