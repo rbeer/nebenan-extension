@@ -36,7 +36,7 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
      * @return {Array.APIClient.NStatus}
      */
     static wrapRaw(raw) {
-      return [ new NStatus(raw) ];
+      return new NStatus(raw);
     }
   }
 

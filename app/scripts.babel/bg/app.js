@@ -53,7 +53,7 @@ define([
       getStats: (msg, respond) => {
         bgApp.getStats()
         .then((stats) => {
-          let response = msg.cloneForAnswer(['setStats'], stats[0]);
+          let response = msg.cloneForAnswer(['setStats'], stats);
           respond(response);
         })
         .catch((err) => {
