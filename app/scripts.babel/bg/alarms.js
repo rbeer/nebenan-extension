@@ -44,8 +44,6 @@ define(() => {
      * @this Alarms
      */
     static handleAlarms(alarm) {
-      devlog('Alarm:', alarm);
-
       if (alarm.name === this.statsName) {
         this.fireStats();
       } else {

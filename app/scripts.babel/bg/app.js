@@ -18,18 +18,7 @@ define([
     api: APIClient,
     alarms: null, // -> .init()
     auth: auth,
-    messaging: null, // -> .init()
-    /**
-     * Holds answer data from API requests and their timeout values
-     * @type {object}
-     * @memberOf module:bg/app
-     */
-    requestCaches: {
-      stats: new cache.StatsCache({
-        messages: 0, notifications: 0,
-        users: 0, all: 0
-      }, 0)
-    }
+    messaging: null // -> .init()
   };
 
   /**
@@ -122,57 +111,35 @@ define([
   };
 
   /**
-   * Checks cache timeout for requested data.
-   * - Resolves with cached data if API should be omitted.
-   * @param  {string} cacheName - Must be member of module:bg/app.
-   * @return {Promise}          - Resolves with cached data if still in request timeout
-   */
-  bgApp.getCache = (cacheName) => bgApp.requestCaches[cacheName];
-
-  /**
    * Updates local stats
    * @memberOf module:bg/app
-   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
+   * @return {Promise} - Resolves with an NStatus instance; Rejects with ENOTOKEN if not logged in
    */
-  bgApp.getStats = () => {
+  bgApp.getStats = () => bgApp.api.getCounterStats();
 
-    return bgApp.api.getCounterStats(bgApp.getCache('stats'))
-          .then((counter_stats) => {
-            let statsObj;
-            // not expired cache
-            if (counter_stats.hasExpired === false) {
-              statsObj = counter_stats.data;
-              statsObj.cached = true;
-            } else {
-              // parse JSON string and update cache
-              statsObj = JSON.parse(counter_stats);
-              bgApp.requestCaches.stats.data = statsObj;
-            }
-            return statsObj;
-          });
-  };
-
+  // TODO: a mess, but it works
   bgApp.pushStatsUpdate = (stats) => {
-    // cached data can't have updates, can it?
-    if (stats.cached) {
-      return stats.data;
-    }
-    bgApp.messaging.ping('popup/app').then((res) => {
-      if (!res) {
-        return;
-      }
-      devlog('updating query result');
-      let keys = ['notifications', 'messages'];
-      let updates = { notifications: 0, messages: 0 };
-      let updatedValues = _.pick(stats, keys);
-      let cachedValues = _.pick(bgApp.getCache('stats').data, keys);
-      _.assignWith(updates, updatedValues, cachedValues, (updatedCount, cachedCount) => {
-        let newCount = updatedCount - cachedCount;
-        return newCount < 1 ? 0 : newCount;
+    return new Promise((resolve, reject) => {
+
+      bgApp.messaging.ping('popup/app').then((res) => {
+        if (!res) {
+          let err = new Error('Can\'t push status update. Popup isn\'t open.');
+          err.code = 'ENORECEIVER';
+          return reject(err);
+        }
+        devlog('updating query result');
+        let keys = ['notifications', 'messages'];
+        let updates = { notifications: 0, messages: 0 };
+        let updatedValues = _.pick(stats, keys);
+        let cachedValues = _.pick(bgApp.getCache('stats').data, keys);
+        _.assignWith(updates, updatedValues, cachedValues, (updatedCount, cachedCount) => {
+          let newCount = updatedCount - cachedCount;
+          return newCount < 1 ? 0 : newCount;
+        });
+        bgApp.messaging.send('popup/app', ['updateStats'], updates);
+        resolve(stats.data);
       });
-      bgApp.messaging.send('popup/app', ['updateStats'], updates);
     });
-    return stats.data;
   };
 
   /**
@@ -186,71 +153,37 @@ define([
     n = n || 7;
     lower = lower || 0;
 
-    return bgApp.api.getNotifications(n, lower, null)
-    .then((raw) => {
-      let parsed;
-      if (typeof raw !== 'string') {
-        parsed = raw;
-      } else {
-        parsed = JSON.parse(raw).notifications;
-      }
-
-      /**
-       * strip notifications that defy the standard object layout
-       * e.g. NType.NEWGROUP (501) doesn't have a hood_message
-       * member. Skip everything but some standard messages
-       * @todo proper error/NType handling
-       * @type {Array.<Number>}
-       */
-      let safeTypes = [
-        APIClient.NType.EVENT,
-        APIClient.NType.MARKET,
-        APIClient.NType.ANSWER,
-        APIClient.NType.FEED
-      ];
-      parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id) &&
-                                    !n.hood_message.is_deleted);
-
-      return parsed.map((n) => new APIClient.NItem(n));
+    return bgApp.api.getNotifications(n, lower)
+    .then((nitems) => {
+      devlog(nitems);
+      return nitems;
     });
   };
 
   bgApp.getConversations = () => {
-    return bgApp.api.getConversations(7, 1, null)
-    .then((raw) => {
-      let parsed;
-      if (typeof raw !== 'string') {
-        parsed = raw;
-      } else {
-        parsed = JSON.parse(raw);
-      }
-
-      let conversations = parsed.private_conversations;
-      let linked_users = parsed.linked_users;
-
-      return conversations.map((conversation) => {
-        let partner = _.find(linked_users, [ 'id', conversation.partner_id]);
-        return new APIClient.PCItem(conversation, partner);
-      });
+    return bgApp.api.getConversations(7, 1)
+    .then((conversations) => {
+      devlog(conversations);
+      return conversations;
     });
   };
 
   /**
    * Update browserAction icon and badge
-   * @param {module:bg/app.requestCaches.stats} stats
-   * @return {module:bg/app.requestCaches.stats} Just passing the input through
+   * @param {APIClient.NStatus} status
+   * @return {APIClient.NStatus} Just passing the input through
    * @memberOf module:bg/app
    */
-  bgApp.updateBrowserAction = (stats) => {
-    devlog('Updating browserAction with:', stats);
+  bgApp.updateBrowserAction = (status) => {
+    devlog('Updating browserAction with:', status);
 
-    if (stats === false) {
+    if (status === false) {
       chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
       chrome.browserAction.setBadgeText({ text: '!' });
       return;
     }
 
-    let allNew = stats.messages + stats.notifications;
+    let allNew = status.messages + status.notifications;
     let hasNew = allNew > 0;
 
     let iconPath = `images/icon-${hasNew ? 'unread' : 'read'}_16.png`;
@@ -259,7 +192,7 @@ define([
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
     chrome.browserAction.setBadgeText({ text: hasNew ? allNew + '' : '' });
 
-    return stats;
+    return status;
   };
 
   // fires when extension (i.e. user's profile) starts up

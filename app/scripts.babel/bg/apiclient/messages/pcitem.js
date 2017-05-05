@@ -1,8 +1,9 @@
 define([
   'bg/apiclient/nsubset',
   'bg/apiclient/nuser',
-  'bg/apiclient/messages/pcmessage'
-], (NSubset, NUser, PCMessage) => {
+  'bg/apiclient/messages/pcmessage',
+  'lodash'
+], (NSubset, NUser, PCMessage, _) => {
   'use strict';
 
   class PCItem extends NSubset {
@@ -20,6 +21,16 @@ define([
         'created_at', wrapMessage, 'partner_id', 'unseen', addPartner
       ];
       super(subsetKeys, raw);
+    }
+
+    static wrapRaw(raw) {
+      let conversations = raw.private_conversations;
+      let linked_users = raw.linked_users;
+
+      return conversations.map((conversation) => {
+        let partner = _.find(linked_users, [ 'id', conversation.partner_id]);
+        return new PCItem(conversation, partner);
+      });
     }
 
   }

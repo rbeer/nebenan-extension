@@ -40,6 +40,30 @@ define([
       ];
       super(subsetKeys, raw);
     }
+
+    static wrapRaw(raw) {
+      /**
+       * strip notifications that defy the standard object layout
+       * e.g. NType.NEWGROUP (501) doesn't have a hood_message
+       * member. Skip everything but some standard messages
+       * @todo proper error/NType handling
+       * @type {Array.<Number>}
+       */
+      let safeTypes = [
+        NType.EVENT,
+        NType.MARKET,
+        NType.ANSWER,
+        NType.FEED
+      ];
+
+      let rawNItems = raw.notifications.filter((nitemRaw) => {
+        let isSafe = safeTypes.includes(nitemRaw.notification_type_id);
+        let notDeleted = !nitemRaw.hood_message.is_deleted;
+        return isSafe && notDeleted;
+      });
+
+      return rawNItems.map((nitemRaw) => new NItem(nitemRaw));
+    }
   };
 
   return NItem;

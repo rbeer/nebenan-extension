@@ -52,7 +52,7 @@ define(['lodash'], (_) => {
           to: to,
           payload: 'ping'
         }, (response) => {
-          devlog(response);
+          devlog('Ping response', response);
           if (!response) {
             resolve();
           } else {
