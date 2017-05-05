@@ -118,7 +118,7 @@ define([
   bgApp.getStats = () => bgApp.api.getCounterStats();
 
   // TODO: a mess, but it works
-  bgApp.pushStatsUpdate = (stats) => {
+  /*bgApp.pushStatsUpdate = (stats) => {
     return new Promise((resolve, reject) => {
 
       bgApp.messaging.ping('popup/app').then((res) => {
@@ -140,7 +140,7 @@ define([
         resolve(stats.data);
       });
     });
-  };
+  };*/
 
   /**
    * Updates notifications
