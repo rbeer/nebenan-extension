@@ -1,7 +1,5 @@
-'use strict';
-
-define(() => {
-
+define([ 'lodash' ], (_) => {
+  'use strict';
   /**
    * @class Super class for parsed data from API
    * @memberOf APIClient
@@ -17,6 +15,9 @@ define(() => {
      * @return {NSubset}
      */
     constructor(keys, raw) {
+      // @if DEV=true
+      this._raw = raw;
+      // @endif
 
       keys.forEach((key) => {
         if (typeof key === 'function') {

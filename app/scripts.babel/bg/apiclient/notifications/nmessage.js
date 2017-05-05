@@ -51,7 +51,7 @@ define([
       };
 
       let subsetKeys = [
-        'id', 'created', 'user_id', 'parent_hood_message_id',
+        'id', 'content_updated_timestamp', 'user_id', 'parent_hood_message_id',
         'body', 'subject', 'images',
         'hood_message_type_id', 'hood_group_id',
         'hood_id', 'house_group', slimUser
