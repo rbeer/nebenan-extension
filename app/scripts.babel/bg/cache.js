@@ -13,9 +13,11 @@ define([
    * @module bg/cache
    */
   let cache = {
-    NStatusCache: NStatusCache,
-    NItemCache: NItemCache,
-    PCItemCache: PCItemCache,
+    types: {
+      NStatusCache: NStatusCache,
+      NItemCache: NItemCache,
+      PCItemCache: PCItemCache
+    },
     stores: {
       nstatus: null,
       nitem: null,
@@ -24,19 +26,19 @@ define([
   };
 
   cache.init = () => {
-    return storage.read('caches').then(cache.parseFromStorage);
+    let readParsePromises = Object.keys(cache.types).map((cacheKey) => {
+      return new Promise((resolve) => resolve(storage.read(cacheKey)));
+    });
+    return Promise.all(readParsePromises).then(cache.parseFromStorage);
   };
 
   cache.parseFromStorage = (storeObjs) => {
     devlog('Stored caches:', storeObjs);
-    for (let storeKey in storeObjs) {
-      let storeObj = storeObjs[storeKey];
-      if (cache.hasStore(storeKey)) {
-        console.warn('Overwriting', storeKey, 'with stored version.');
-      }
-      cache.stores[storeKey] = cache[storeObj.CACHE_TYPE].parseFromStorage(storeObj);
-    }
-    devlog('Parsed caches:', cache.stores);
+    storeObjs = storeObjs.filter((store) => !!store);
+    storeObjs.forEach((storeObj) => {
+      let storeKey = storeObj.CACHE_TYPE.replace('Cache', '').toLowerCase();
+      cache.stores[storeKey] = cache.types[storeObj.CACHE_TYPE].parseFromStorage(storeObj);
+    });
   };
 
   cache.persist = (store) => storage.write(store.CACHE_TYPE, store);
@@ -46,15 +48,15 @@ define([
   cache.cacheSubsets = (dataSets) => {
     let workingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
     let dataType = workingSets[0].SUBSET_TYPE;
-    let cacheKey = dataType.toLowerCase();
+    let storeKey = dataType.toLowerCase();
 
     let addCachingPromise = (dataSet) => {
       return new Promise((resolve) => {
-        if (cache.stores[cacheKey]) {
-          let overflown = cache.stores[cacheKey].add(dataSet);
+        if (cache.stores[storeKey]) {
+          let overflown = cache.stores[storeKey].add(dataSet);
           resolve(overflown.length > 0 ? overflown : null);
         } else {
-          cache.stores[cacheKey] = new cache[dataType + 'Cache'](dataSet, Date.now());
+          cache.stores[storeKey] = new cache.types[dataType + 'Cache'](dataSet, Date.now());
           resolve(null);
         }
       });
@@ -72,7 +74,7 @@ define([
     let cachingPromises = workingSets.map(addCachingPromise);
     return Promise.all(cachingPromises)
                   .then(handleOverflow)
-                  .then(() => cache.persist(cache.stores[cacheKey]))
+                  .then(() => cache.persist(cache.stores[storeKey]))
                   .then(() => dataSets);
   };
 

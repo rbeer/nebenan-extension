@@ -13,7 +13,6 @@ define([
   storage.read = (key) => {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(key, (stored) => {
-        devlog('stored type:', typeof stored);
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
