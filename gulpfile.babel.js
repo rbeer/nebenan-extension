@@ -36,6 +36,7 @@ gulp.task('scripts', () => {
 function lint(files, options) {
   return () => {
     return gulp.src(files)
+      .pipe(preprocess({ context: { DEV: DEV } }))
       .pipe($.eslint(options))
       .pipe($.eslint.format());
   };
@@ -115,7 +116,6 @@ gulp.task('manifest', () => {
 
 gulp.task('babel', () => {
   return gulp.src('app/scripts.babel/**/*.js')
-      .pipe(preprocess({ context: { DEV: DEV } }))
       .pipe($.babel({
         presets: ['es2015']
       }))

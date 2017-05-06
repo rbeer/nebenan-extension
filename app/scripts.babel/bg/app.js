@@ -1,5 +1,4 @@
-'use strict';
-
+/* eslint-disable semi */
 define([
   'bg/alarms',
   'bg/apiclient',
@@ -9,7 +8,7 @@ define([
   'messaging',
   'lodash'
 ], (Alarms, APIClient, auth, lreload, cache, Messaging, _) => {
-
+  'use strict';
   /**
    * Background Main App
    * @module bg/app
@@ -32,9 +31,18 @@ define([
 
   // @if DEV=true
   // included in .rjs-dev
+  let awaitDevInit = () => new Promise((resolve) => {
+    let devLoaded = () => {
+      if (bgApp.dev) {
+        window.clearInterval(interval);
+        resolve(bgApp);
+      }
+    };
+    let interval = window.setInterval(devLoaded, 5);
+  });
+
   require(['bg/dev'], (dev) => {
     bgApp.dev = dev;
-    bgApp.dev.init(bgApp);
   });
   // @endif
 
@@ -101,8 +109,16 @@ define([
       }
     }, 'bg/app');
 
-    // init caching
-    cache.init().then(() => {
+    // init chain
+    // @if DEV=true
+    awaitDevInit()
+    .then((app) => app.dev.init(bgApp))
+    .then(cache.init)
+    // @endif
+    // @ifndef DEV
+    cache.init()
+    // @endif
+    .then(() => {
       // init Alarms
       bgApp.alarms = new Alarms(bgApp);
       // activate counter_stats alarm
