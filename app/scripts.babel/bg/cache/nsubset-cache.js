@@ -1,4 +1,7 @@
-define(['bg/apiclient/nsubset'], (NSubset) => {
+define([
+  'bg/apiclient/nsubset',
+  'lodash'
+], (NSubset, _) => {
   'use strict';
   /**
    * @class Cached data from API requests
@@ -53,10 +56,28 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
       return expiresIn <= 0;
     }
 
+    /**
+     * Adds entry on top of list, discards everything beyond `this.CACHE_SIZE`
+     * @param {NSubset} dataSet - Any instance of NSubset
+     */
     add(dataSet) {
-      this.dataSets.unshift(dataSet);
-      this.dataSets.splice(this.CACHE_SIZE);
-      this.lastUpdate = Date.now();
+      if (!this.isDuplicate(dataSet)) {
+        this.dataSets.unshift(dataSet);
+        this.dataSets.splice(this.CACHE_SIZE);
+        this.lastUpdate = Date.now();
+      } else {
+        devlog('Omitting duplicate:', dataSet.SUBSET_TYPE);
+      }
+    }
+
+    /**
+     * Returns `true` if `dataSet` is already in `this` cache
+     * @param  {NSubset} dataSet - Any instance of NSubset
+     * @override
+     * @return {Boolean}
+     */
+    isDuplicate(dataSet) {
+      return !!_.find(this.dataSets, { created_at_timestamp: dataSet.created_at_timestamp });
     }
 
     static parseFromStorage(stored, ExtendingClass, DataSetWrapper) {

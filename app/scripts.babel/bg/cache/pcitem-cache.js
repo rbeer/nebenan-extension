@@ -1,7 +1,8 @@
 define([
   'bg/cache/nsubset-cache',
-  'bg/apiclient/messages/pcitem'
-], (NSubsetCache, PCItem) => {
+  'bg/apiclient/messages/pcitem',
+  'lodash'
+], (NSubsetCache, PCItem, _) => {
   'use strict';
   /**
    * @class Cache for private_conversations.json data

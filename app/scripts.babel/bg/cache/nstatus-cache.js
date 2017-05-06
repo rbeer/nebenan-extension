@@ -11,10 +11,20 @@ define([
   class NStatusCache extends NSubsetCache {
     constructor(dataSet, lastUpdate) {
       super(dataSet, lastUpdate);
+      this.expiresIn = 0;
     }
 
     static parseFromStorage(stored) {
       return NSubsetCache.parseFromStorage(stored, NStatusCache, NStatus);
+    }
+
+    /**
+     * Always returns `false`, as NStatus' have no particular identifier
+     * @implements {module:bg/cache.NSubsetCache#isDuplicate}
+     * @return {Boolean} Always `false`
+     */
+    isDuplicate() {
+      return false;
     }
   }
 

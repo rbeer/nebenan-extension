@@ -26,16 +26,13 @@ define([
      */
     constructor(raw) {
 
-      let wrapNType = function() {
+      let customSetters = function customSetters() {
         this.notification_type_id = new NType(raw.notification_type_id);
-      };
-
-      let extractMessage = function() {
         this.hood_message = new NMessage(raw.hood_message, raw.parent_hood_message);
       };
 
       let subsetKeys = [
-        'id', wrapNType, extractMessage, 'created_at_timestamp', 'seen'
+        'id', 'created_at_timestamp', 'seen', customSetters
       ];
       super(subsetKeys, raw);
     }

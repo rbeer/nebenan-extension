@@ -49,10 +49,8 @@ define([
       let dataType = dataSet.SUBSET_TYPE;
       let cacheKey = dataType.toLowerCase();
       if (cache.stores[cacheKey]) {
-        devlog('Adding to:', dataType);
         cache.stores[cacheKey].add(dataSet);
       } else {
-        devlog('Creating cache for:', dataType);
         cache.stores[cacheKey] = new cache[dataType + 'Cache'](dataSet, Date.now());
       }
     };
