@@ -45,11 +45,11 @@ define([
 
   cache.cacheSubsets = (dataSets) => {
     let workingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
+    let dataType = workingSets[0].SUBSET_TYPE;
+    let cacheKey = dataType.toLowerCase();
 
     let addCachingPromise = (dataSet) => {
-      let dataType = dataSet.SUBSET_TYPE;
-      let cacheKey = dataType.toLowerCase();
-      return new Promise((resolve, reject) => {
+      return new Promise((resolve) => {
         if (cache.stores[cacheKey]) {
           let overflown = cache.stores[cacheKey].add(dataSet);
           resolve(overflown.length > 0 ? overflown : null);
@@ -67,11 +67,13 @@ define([
       } else {
         devlog('No overflown sets to write.');
       }
-      return dataSets;
     };
 
     let cachingPromises = workingSets.map(addCachingPromise);
-    return Promise.all(cachingPromises).then(handleOverflow);
+    return Promise.all(cachingPromises)
+                  .then(handleOverflow)
+                  .then(() => cache.persist(cache.stores[cacheKey]))
+                  .then(() => dataSets);
   };
 
   return cache;
