@@ -58,9 +58,17 @@ define([
   };
 
   storage.writeSubsets = (dataSets) => {
-    let workingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
-    let type = workingSets[0].SUBSET_TYPE;
-    return storage.update(type, workingSets).then(() => dataSets);
+    let storingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
+    // @if DEV=true
+    storingSets = storingSets.map((dataSet) => {
+      if (Object.keys(dataSet).includes('_raw')) {
+        delete dataSet['_raw'];
+      }
+      return dataSet;
+    });
+    // @endif
+    let type = storingSets[0].SUBSET_TYPE;
+    return storage.update(type, storingSets).then(() => dataSets);
   };
 
   return storage;
