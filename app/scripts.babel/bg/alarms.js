@@ -79,6 +79,9 @@ define(() => {
           // stop requesting stats when there is no auth token
           self.stopStats();
           self.parentApp.updateBrowserAction(false);
+        } else {
+          devlog(err);
+          throw err;
         }
       });
     }

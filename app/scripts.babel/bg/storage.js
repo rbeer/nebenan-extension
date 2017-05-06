@@ -1,4 +1,6 @@
-define(() => {
+define([
+  'lodash'
+], (_) => {
   'use strict';
 
   /**
@@ -11,6 +13,7 @@ define(() => {
   storage.read = (key) => {
     return new Promise((resolve, reject) => {
       chrome.storage.local.get(key, (stored) => {
+        devlog('stored type:', typeof stored);
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
@@ -27,6 +30,37 @@ define(() => {
         chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve();
       });
     });
+  };
+
+  storage.update = (key, data) => {
+    return storage.read(key).then((stored) => {
+      let typeofData = typeof data;
+      let typeofStored = typeof stored;
+      let updated;
+
+      switch(true) {
+        case typeofData !== typeofStored && typeofStored !== 'undefined':
+          throw new TypeError(`Type of update data (${typeofData})
+            doesn\'t match stored data ${typeofStored}`);
+        case data instanceof Array:
+          updated = data.concat(stored);
+          break;
+        case typeofData === 'object':
+          updated = stored;
+          _.assign(updated, data);
+          break;
+        default:
+          updated = data;
+          break;
+      }
+      return storage.write(key, updated);
+    });
+  };
+
+  storage.writeSubsets = (dataSets) => {
+    let workingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
+    let type = workingSets[0].SUBSET_TYPE;
+    return storage.update(type, workingSets).then(() => dataSets);
   };
 
   return storage;

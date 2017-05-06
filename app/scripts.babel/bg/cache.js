@@ -39,26 +39,39 @@ define([
     devlog('Parsed caches:', cache.stores);
   };
 
-  cache.persist = () => storage.write('caches', cache.stores);
+  cache.persist = (store) => storage.write(store.CACHE_TYPE, store);
 
   cache.hasStore = (storeKey) => cache.stores[storeKey] instanceof NSubsetCache;
 
   cache.cacheSubsets = (dataSets) => {
+    let workingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
 
-    let addToCache = (dataSet) => {
+    let addCachingPromise = (dataSet) => {
       let dataType = dataSet.SUBSET_TYPE;
       let cacheKey = dataType.toLowerCase();
-      if (cache.stores[cacheKey]) {
-        cache.stores[cacheKey].add(dataSet);
-      } else {
-        cache.stores[cacheKey] = new cache[dataType + 'Cache'](dataSet, Date.now());
-      }
+      return new Promise((resolve, reject) => {
+        if (cache.stores[cacheKey]) {
+          let overflown = cache.stores[cacheKey].add(dataSet);
+          resolve(overflown.length > 0 ? overflown : null);
+        } else {
+          cache.stores[cacheKey] = new cache[dataType + 'Cache'](dataSet, Date.now());
+          resolve(null);
+        }
+      });
     };
 
-    if (dataSets instanceof Array) {
-      return dataSets.forEach(addToCache);
-    }
-    return addToCache(dataSets);
+    let handleOverflow = (results) => {
+      let overflown = results.filter((set) => !!set);
+      if (overflown.length > 0) {
+        storage.writeSubsets(overflown);
+      } else {
+        devlog('No overflown sets to write.');
+      }
+      return dataSets;
+    };
+
+    let cachingPromises = workingSets.map(addCachingPromise);
+    return Promise.all(cachingPromises).then(handleOverflow);
   };
 
   return cache;

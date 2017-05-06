@@ -24,7 +24,7 @@ define([
        * Maximum length of `this.dataSets`
        * @type {Number}
        */
-      this.CACHE_SIZE = 7;
+      this.CACHE_SIZE = 21;
       /**
        * Data, sanitized for internal use; treated
        * @type {Array.<APIClient.NSubset>}
@@ -56,18 +56,24 @@ define([
       return expiresIn <= 0;
     }
 
+    get last() {
+      return this.dataSets[0];
+    }
+
     /**
      * Adds entry on top of list, discards everything beyond `this.CACHE_SIZE`
      * @param {NSubset} dataSet - Any instance of NSubset
      */
     add(dataSet) {
+      let overflownSets = [];
       if (!this.isDuplicate(dataSet)) {
         this.dataSets.unshift(dataSet);
-        this.dataSets.splice(this.CACHE_SIZE);
         this.lastUpdate = Date.now();
+        overflownSets = this.dataSets.splice(this.CACHE_SIZE);
       } else {
         devlog('Omitting duplicate:', dataSet.SUBSET_TYPE);
       }
+      return overflownSets;
     }
 
     /**

@@ -115,11 +115,10 @@ define([
   /**
    * Queries API for counter_stats.json / {@link APIClient.NStatus}
    * @memberOf module:bg/app
-   * @return {Promise.<Array.<APIClient.NStatus>, ENOTOKEN>}
+   * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
    */
   bgApp.getStats = () => {
     return bgApp.api.getCounterStats().then((status) => {
-      cache.cacheSubsets(status);
       return status;
     });
   };
@@ -163,7 +162,6 @@ define([
 
     return bgApp.api.getNotifications(n, lower)
     .then((nitems) => {
-      cache.cacheSubsets(nitems);
       return nitems;
     });
   };
@@ -194,7 +192,6 @@ define([
 
     return bgApp.api.getConversations(perPage, page)
     .then((conversations) => {
-      cache.cacheSubsets(conversations);
       return conversations;
     });
   };

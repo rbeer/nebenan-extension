@@ -2,13 +2,15 @@
 
 define([
   'bg/auth',
+  'bg/cache',
+  'bg/storage',
   'bg/apiclient/nstatus',
   'bg/apiclient/notifications/nitem',
   'bg/apiclient/notifications/nmessage',
   'bg/apiclient/notifications/ntype',
   'bg/apiclient/messages/pcitem',
   'bg/apiclient/messages/pcmessage'
-], (auth, NStatus, NItem, NMessage, NType, PCItem, PCMessage) => {
+], (auth, cache, storage, NStatus, NItem, NMessage, NType, PCItem, PCMessage) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -109,12 +111,14 @@ define([
 
     /**
      * Wraps API call response in Array of NSubsets, as defined by req.WrapperClass
-     * and implemented by req.WrapperClass.wrapRaw(Object: raw).
+     * and implemented by req.WrapperClass.wrapRaw(Object: raw). Also stores
+     * created NSubsets in cache.
      * @param  {APIClient.XHRRequest} req
-     * @return {Array.<APIClient.NStatus|APIClient.NItem|APIClient.PCItem>}
+     * @return {Promise.<Array.<APIClient.NSubset>|APIClient.NSubset, Error>}
      */
     static wrapResponse(req) {
-      return req.WrapperClass.wrapRaw(req.responseData);
+      let wrapped = req.WrapperClass.wrapRaw(req.responseData);
+      return cache.cacheSubsets(wrapped);
     }
 
     static issueRequest(req) {

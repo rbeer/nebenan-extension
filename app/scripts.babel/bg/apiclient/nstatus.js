@@ -25,6 +25,7 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
 
       this.allNew = this.messages + this.notifications;
       this.hasNew = this.allNew > 0;
+      this.created_at_timestamp = Date.now();
 
     }
 

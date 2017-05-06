@@ -35,6 +35,7 @@ define([
         'id', 'created_at_timestamp', 'seen', customSetters
       ];
       super(subsetKeys, raw);
+      this.dismissed = false;
     }
 
     /**
