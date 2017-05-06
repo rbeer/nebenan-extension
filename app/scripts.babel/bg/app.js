@@ -54,7 +54,7 @@ define([
       getStats: (msg, respond) => {
         bgApp.getStats()
         .then((stats) => {
-          cache.cacheSubset(stats);
+          cache.cacheSubsets(stats);
           let response = msg.cloneForAnswer(['setStats'], stats);
           respond(response);
         })
@@ -81,7 +81,7 @@ define([
 
         bgApp.getNotifications(params.n, params.lower)
         .then((nitems) => {
-          cache.cacheSubset(nitems[0]);
+          cache.cacheSubsets(nitems);
           let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
         })
@@ -93,7 +93,7 @@ define([
       getConversations: (msg, respond) => {
         bgApp.getConversations()
         .then((pcItems) => {
-          cache.cacheSubset(pcItems[0]);
+          cache.cacheSubsets(pcItems);
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);
         })

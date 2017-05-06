@@ -19,17 +19,23 @@ define([
     pcitem: null
   };
 
-  cache.cacheSubset = (dataSet) => {
-    if (!(dataSet instanceof NSubset)) {
-      throw new TypeError('Expected 1st parameter to be instanceof StatusCache');
+  cache.cacheSubsets = (dataSets) => {
+
+    let addToCache = (dataSet) => {
+      let dataType = dataSet.SUBSET_TYPE;
+      if (cache[dataType.toLowerCase()]) {
+        devlog('Adding to:', dataType);
+        cache[dataType.toLowerCase()].add(dataSet);
+      } else {
+        devlog('Creating cache for:', dataType);
+        cache[dataType.toLowerCase()] = new cache[dataType + 'Cache'](dataSet, Date.now());
+      }
+    };
+
+    if (dataSets instanceof Array) {
+      return dataSets.forEach(addToCache);
     }
-    let dataType = dataSet.SUBSET_TYPE;
-    devlog('dataSet_TYPE:', dataType);
-    if (cache[dataType.toLowerCase()]) {
-      cache[dataType.toLowerCase()].add(dataSet);
-    } else {
-      cache[dataType.toLowerCase()] = new cache[dataType + 'Cache'](dataSet, Date.now());
-    }
+    return addToCache(dataSets);
   };
 
   return cache;
