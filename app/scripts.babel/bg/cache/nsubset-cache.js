@@ -18,24 +18,29 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
       }
       this.CACHE_TYPE = this.constructor.name;
       /**
+       * Maximum length of `this.dataSets`
+       * @type {Number}
+       */
+      this.CACHE_SIZE = 7;
+      /**
        * Data, sanitized for internal use; treated
        * @type {Array.<APIClient.NSubset>}
        * @memberOf module:bg/cache.NSubsetCache
        */
-      this.dataSet = dataSet;
+      this.dataSets = [ dataSet ];
       /**
-       * UNIX epoch tstamp (in microseconds!) of last successfull API call
+       * UNIX epoch timestamp of last addition
        * @type {Number}
        * @memberOf module:bg/cache.NSubsetCache
        */
-      this.lastUpdate = lastUpdate / 10000000000000 > 0 ? lastUpdate : lastUpdate * 1000;
+      this.lastUpdate = lastUpdate;
 
       /**
-       * Cache expiration timeout in (API compliant) microseconds
+       * Cache expiration timeout in ms
        * @type {Number}
        * @memberOf module:bg/cache.NSubsetCache
        */
-      this.expiresIn = 5 * 60000000;
+      this.expiresIn = 5 * 60000;
     }
 
     /**
@@ -46,6 +51,12 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
       let expires = this.lastUpdate + this.expiresIn;
       let expiresIn = expires - Date.now();
       return expiresIn <= 0;
+    }
+
+    add(dataSet) {
+      this.dataSets.push(dataSet);
+      this.dataSets.splice(this.CACHE_SIZE);
+      this.lastUpdate = Date.now();
     }
   }
 

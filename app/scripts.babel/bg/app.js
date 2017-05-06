@@ -16,8 +16,9 @@ define([
    */
   let bgApp = {
     api: APIClient,
-    alarms: null, // -> .init()
     auth: auth,
+    cache: cache,
+    alarms: null, // -> .init()
     messaging: null // -> .init()
   };
 
@@ -53,6 +54,7 @@ define([
       getStats: (msg, respond) => {
         bgApp.getStats()
         .then((stats) => {
+          cache.cacheSubset(stats);
           let response = msg.cloneForAnswer(['setStats'], stats);
           respond(response);
         })
@@ -79,6 +81,7 @@ define([
 
         bgApp.getNotifications(params.n, params.lower)
         .then((nitems) => {
+          cache.cacheSubset(nitems[0]);
           let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
         })
@@ -90,7 +93,7 @@ define([
       getConversations: (msg, respond) => {
         bgApp.getConversations()
         .then((pcItems) => {
-          devlog('pcItems:', pcItems);
+          cache.cacheSubset(pcItems[0]);
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);
         })
