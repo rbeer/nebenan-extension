@@ -3,8 +3,9 @@ define([
   'bg/cache/nstatus-cache',
   'bg/cache/nitem-cache',
   'bg/cache/pcitem-cache',
-  'bg/apiclient/nsubset'
-], (NStatusCache, NItemCache, PCItemCache, NSubset) => {
+  'bg/apiclient/nsubset',
+  'bg/storage'
+], (NStatusCache, NItemCache, PCItemCache, NSubset, storage) => {
   'use strict';
   /**
    * Cache
@@ -14,21 +15,32 @@ define([
     NStatusCache: NStatusCache,
     NItemCache: NItemCache,
     PCItemCache: PCItemCache,
-    nstatus: null,
-    nitem: null,
-    pcitem: null
+    stores: {
+      nstatus: null,
+      nitem: null,
+      pcitem: null
+    }
   };
+
+  cache.init = () => {
+    return storage.read('caches').then((storeObjs) => {
+      devlog('stored caches:', storeObjs);
+    });
+  };
+
+  cache.persist = () => storage.write('caches', cache.stores);
 
   cache.cacheSubsets = (dataSets) => {
 
     let addToCache = (dataSet) => {
       let dataType = dataSet.SUBSET_TYPE;
-      if (cache[dataType.toLowerCase()]) {
+      let cacheKey = dataType.toLowerCase();
+      if (cache.stores[cacheKey]) {
         devlog('Adding to:', dataType);
-        cache[dataType.toLowerCase()].add(dataSet);
+        cache.stores[cacheKey].add(dataSet);
       } else {
         devlog('Creating cache for:', dataType);
-        cache[dataType.toLowerCase()] = new cache[dataType + 'Cache'](dataSet, Date.now());
+        cache.stores[cacheKey] = new cache[dataType + 'Cache'](dataSet, Date.now());
       }
     };
 
