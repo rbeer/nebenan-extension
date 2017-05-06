@@ -100,14 +100,16 @@ define([
         });
       }
     }, 'bg/app');
-    // start listening for messages
-    bgApp.messaging.listen();
 
-    // init Alarms
-    bgApp.alarms = new Alarms(bgApp);
-    // activate counter_stats alarm
-    bgApp.alarms.startStats();
-
+    // init caching
+    cache.init().then(() => {
+      // init Alarms
+      bgApp.alarms = new Alarms(bgApp);
+      // activate counter_stats alarm
+      bgApp.alarms.startStats();
+      // start listening for messages
+      bgApp.messaging.listen();
+    });
   };
 
   /**

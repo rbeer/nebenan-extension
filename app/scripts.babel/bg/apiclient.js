@@ -76,8 +76,6 @@ define([
         throw new TypeError('First argument must be an XHRRequest object.');
       }
 
-      devlog(request);
-
       return new Promise((resolve, reject) => {
 
         // request object

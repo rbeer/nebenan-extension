@@ -14,7 +14,6 @@ define(() => {
         if (chrome.runtime.lastError) {
           return reject(chrome.runtime.lastError);
         }
-        devlog('GOT:', stored[key]);
         resolve(stored[key]);
       });
     });
@@ -25,7 +24,6 @@ define(() => {
     return new Promise((resolve, reject) => {
       let storing = { [key]: data };
       chrome.storage.local.set(storing, () => {
-        devlog('STORED:', data);
         chrome.runtime.lastError ? reject(chrome.runtime.lastError) : resolve();
       });
     });

@@ -54,9 +54,19 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
     }
 
     add(dataSet) {
-      this.dataSets.push(dataSet);
+      this.dataSets.unshift(dataSet);
       this.dataSets.splice(this.CACHE_SIZE);
       this.lastUpdate = Date.now();
+    }
+
+    static parseFromStorage(stored, ExtendingClass, DataSetWrapper) {
+      let data = stored.dataSets;
+      let restOfCache = data.splice(1);
+      let firstInCache = new DataSetWrapper(data[0]);
+
+      let _cache = new ExtendingClass(firstInCache, stored.lastUpdate);
+      restOfCache.forEach((dataSetObj) => _cache.add(new DataSetWrapper(dataSetObj)));
+      return _cache;
     }
   }
 

@@ -1,4 +1,7 @@
-define(['bg/cache/nsubset-cache'], (NSubsetCache) => {
+define([
+  'bg/cache/nsubset-cache',
+  'bg/apiclient/messages/pcitem'
+], (NSubsetCache, PCItem) => {
   'use strict';
   /**
    * @class Cache for private_conversations.json data
@@ -8,6 +11,10 @@ define(['bg/cache/nsubset-cache'], (NSubsetCache) => {
   class PCItemCache extends NSubsetCache {
     constructor(dataSet, lastUpdate) {
       super(dataSet, lastUpdate);
+    }
+
+    static parseFromStorage(stored) {
+      return NSubsetCache.parseFromStorage(stored, PCItemCache, PCItem);
     }
   }
 
