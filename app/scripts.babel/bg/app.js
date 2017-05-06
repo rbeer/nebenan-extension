@@ -54,7 +54,6 @@ define([
       getStats: (msg, respond) => {
         bgApp.getStats()
         .then((stats) => {
-          cache.cacheSubsets(stats);
           let response = msg.cloneForAnswer(['setStats'], stats);
           respond(response);
         })
@@ -81,7 +80,6 @@ define([
 
         bgApp.getNotifications(params.n, params.lower)
         .then((nitems) => {
-          cache.cacheSubsets(nitems);
           let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
         })
@@ -93,7 +91,6 @@ define([
       getConversations: (msg, respond) => {
         bgApp.getConversations()
         .then((pcItems) => {
-          cache.cacheSubsets(pcItems);
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);
         })
@@ -118,7 +115,12 @@ define([
    * @memberOf module:bg/app
    * @return {Promise.<Array.<APIClient.NStatus>, ENOTOKEN>}
    */
-  bgApp.getStats = () => bgApp.api.getCounterStats();
+  bgApp.getStats = () => {
+    return bgApp.api.getCounterStats().then((status) => {
+      cache.cacheSubsets(status);
+      return status;
+    });
+  };
 
   // TODO: a mess, but it works
   /*bgApp.pushStatsUpdate = (stats) => {
@@ -159,7 +161,7 @@ define([
 
     return bgApp.api.getNotifications(n, lower)
     .then((nitems) => {
-      devlog(nitems);
+      cache.cacheSubsets(nitems);
       return nitems;
     });
   };
@@ -190,7 +192,7 @@ define([
 
     return bgApp.api.getConversations(perPage, page)
     .then((conversations) => {
-      devlog(conversations);
+      cache.cacheSubsets(conversations);
       return conversations;
     });
   };
