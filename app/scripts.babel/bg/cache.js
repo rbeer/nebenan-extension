@@ -99,15 +99,43 @@ define([
     start = !isNaN(start) ? start : 0;
     return cache.stores[storeType].get(n, start);
   };
-
-  cache.getStatus = () => {
+  // @ifdef DEV
+  let cacheReport = (storeKey) => {
+    let store = cache.stores[storeKey];
+    let lines = [
+      store.CACHE_TYPE,
+      `Checking current store with key: ${storeKey}`,
+      `  .hasExpired: ${store.hasExpired}`,
+      `  .MAX_SIZE: ${store.MAX_SIZE}`,
+      `  # dataSets: ${store.dataSets.length}`
+    ];
+    devlog(lines.join('\n'));
+  };
+  // @endif
+  let queryCacheOrAPI = (...args) => {
+    // @ifdef DEV
+    cacheReport.apply(null, args);
+    // @endif
+    let [ storeKey, APIfn, start, n ] = args;
     // request update from API if cache has expired
-    if (!cache.stores['nstatus'] || cache.stores['nstatus'].hasExpired) {
-      return api.getStatus();
+    if (!cache.stores[storeKey] || cache.stores[storeKey].hasExpired) {
+      // translates to
+      // APIClient.getStatus()
+      // APIClient.getNotifications(perPage, lower)
+      // APIClient.getNotifications(perPage, page)
+      return APIfn(n, start);
     } else {
-      return Promise.resolve(cache.getLast('nstatus'));
+      let cached = !isNaN(start) && !isNaN(n) ? cache.get(storeKey, start, n) :
+                                                cache.getLast(storeKey);
+      return Promise.resolve(cached);
     }
   };
+
+  cache.getStatus = () => queryCacheOrAPI('nstatus', api.getStatus);
+
+  cache.getNotifications = (start, n) => queryCacheOrAPI('nitem', api.getNotifications, start, n);
+
+  cache.getConversations = (start, n) => queryCacheOrAPI('pcitem', api.getConversations, start, n);
 
   return cache;
 

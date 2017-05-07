@@ -71,7 +71,7 @@ define([
         });
       },
       getNotifications: (msg, respond) => {
-        let params = msg.payload || {};
+        let params = _.assign({ n: 7, lower: 0 }, msg.payload);
         let answerHandler;
 
         switch (params.type) {
@@ -86,7 +86,7 @@ define([
             answerHandler = 'addNotifications';
         }
 
-        bgApp.getNotifications(params.n, params.lower)
+        cache.getNotifications(params.n, params.lower)
         .then((nitems) => {
           let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
@@ -97,7 +97,7 @@ define([
         });
       },
       getConversations: (msg, respond) => {
-        bgApp.getConversations()
+        cache.getConversations(1, 7)
         .then((pcItems) => {
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);

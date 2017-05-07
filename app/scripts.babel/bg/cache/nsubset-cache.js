@@ -24,7 +24,7 @@ define([
        * Maximum length of `this.dataSets`
        * @type {Number}
        */
-      this.CACHE_SIZE = 21;
+      this.MAX_SIZE = 21;
       /**
        * Data, sanitized for internal use; treated
        * @type {Array.<APIClient.NSubset>}
@@ -61,7 +61,7 @@ define([
     }
 
     /**
-     * Adds entry on top of list, discards everything beyond `this.CACHE_SIZE`
+     * Adds entry on top of list, discards everything beyond `this.MAX_SIZE`
      * @param {NSubset} dataSet - Any instance of NSubset
      */
     add(dataSet) {
@@ -69,7 +69,7 @@ define([
       if (!this.isDuplicate(dataSet)) {
         this.dataSets.unshift(dataSet);
         this.lastUpdate = Date.now();
-        overflownSets = this.dataSets.splice(this.CACHE_SIZE);
+        overflownSets = this.dataSets.splice(this.MAX_SIZE);
       } else {
         devlog('Omitting duplicate:', dataSet.SUBSET_TYPE);
       }
