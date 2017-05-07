@@ -145,7 +145,7 @@ define([
      * @static
      * @return {Promise} - Resolves with an Array of a single NStatus instance
      */
-    static getCounterStats() {
+    static getStatus() {
       let req = APIClient.createRequest('/profile/counter_stats.json', NStatus);
       return APIClient.issueRequest(req);
     }

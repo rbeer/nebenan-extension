@@ -4,9 +4,9 @@ define([
   'bg/cache/nstatus-cache',
   'bg/cache/nitem-cache',
   'bg/cache/pcitem-cache',
-  'bg/apiclient/nsubset',
+  'bg/apiclient',
   'bg/storage'
-], (NSubsetCache, NStatusCache, NItemCache, PCItemCache, NSubset, storage) => {
+], (NSubsetCache, NStatusCache, NItemCache, PCItemCache, api, storage) => {
   'use strict';
   /**
    * Cache
@@ -98,6 +98,18 @@ define([
     n = !isNaN(n) ? n : 7;
     start = !isNaN(start) ? start : 0;
     return cache.stores[storeType].get(n, start);
+  };
+
+  cache.getStatus = () => {
+    // request update from API if cache has expired
+    if (!cache.stores['nitem'] || cache.stores['nitem'].hasExpired) {
+      return api.getStatus().then((status) => {
+        devlog('Cache request nstatus:', 'fromAPI');
+        return status;
+      });
+    } else {
+      return Promise.resolve(cache.getLast('nstatus'));
+    }
   };
 
   return cache;

@@ -59,10 +59,10 @@ define([
 
     // init Messaging
     bgApp.messaging = new Messaging({
-      getStats: (msg, respond) => {
-        bgApp.getStats()
-        .then((stats) => {
-          let response = msg.cloneForAnswer(['setStats'], stats);
+      getStatus: (msg, respond) => {
+        cache.getStatus()
+        .then((status) => {
+          let response = msg.cloneForAnswer(['setStatus'], status);
           respond(response);
         })
         .catch((err) => {
@@ -110,7 +110,7 @@ define([
     }, 'bg/app');
 
     // init chain
-    // @if DEV=true
+    // @ifdef DEV
     awaitDevInit()
     .then((app) => app.dev.init(bgApp))
     .then(cache.init)
@@ -125,17 +125,6 @@ define([
       bgApp.alarms.startStats();
       // start listening for messages
       bgApp.messaging.listen();
-    });
-  };
-
-  /**
-   * Queries API for counter_stats.json / {@link APIClient.NStatus}
-   * @memberOf module:bg/app
-   * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
-   */
-  bgApp.getStats = () => {
-    return bgApp.api.getCounterStats().then((status) => {
-      return status;
     });
   };
 

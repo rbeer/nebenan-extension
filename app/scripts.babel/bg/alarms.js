@@ -1,6 +1,8 @@
 'use strict';
 
-define(() => {
+define([
+  'bg/cache'
+], (cache) => {
 
   /**
    * @class Handles periodical API requests
@@ -70,7 +72,7 @@ define(() => {
     fireStats() {
       devlog(this.statsName, 'is firing.');
       let self = this;
-      this.parentApp.getStats()
+      cache.getStatus()
       .then(this.parentApp.updateBrowserAction)
 //      .then(this.parentApp.pushStatsUpdate)
       .catch((err) => {
