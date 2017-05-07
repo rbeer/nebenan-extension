@@ -46,7 +46,7 @@ define([
       // reference loading animation / background
       ui.elements.loading = document.getElementById('loading');
       // reference statusContainer container element
-      ui.elements.statusContainer = document.getElementById('statusContainer');
+      ui.elements.statusContainer = document.getElementById('status');
       // add status elements
       for (let type in ui.elements.status) {
         let element = ui.elements.status[type] = document.createElement('status-element');
