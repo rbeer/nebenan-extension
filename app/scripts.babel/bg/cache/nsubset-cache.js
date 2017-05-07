@@ -76,6 +76,10 @@ define([
       return overflownSets;
     }
 
+    get(n, start) {
+      return this.dataSets.slice(start, start + n);
+    }
+
     /**
      * Returns `true` if `dataSet` is already in `this` cache
      * @param  {NSubset} dataSet - Any instance of NSubset

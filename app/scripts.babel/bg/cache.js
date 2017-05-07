@@ -78,6 +78,28 @@ define([
                   .then(() => dataSets);
   };
 
+  /**
+   * Returns last entry of a cache
+   * @param  {String} storeType - Key of *Cache instance in cache.stores
+   * @memberOf module:bg/cache
+   * @return {APIClient.NSubset}
+   */
+  cache.getLast = (storeType) => cache.stores[storeType].last;
+
+  /**
+   * Returns `n` sets from a cache of `storeType`, beginning at index `start` (including).
+   * @param  {String} storeType    - Key of *Cache instance in cache.stores
+   * @param  {Number} n=7          - \# of sets to return
+   * @param  {Number} start=0      - Index to start return sets at
+   * @memberOf module:bg/cache
+   * @return {APIClient.NSubset}
+   */
+  cache.get = (storeType, n, start) => {
+    n = !isNaN(n) ? n : 7;
+    start = !isNaN(start) ? start : 0;
+    return cache.stores[storeType].get(n, start);
+  };
+
   return cache;
 
 });
