@@ -102,11 +102,8 @@ define([
 
   cache.getStatus = () => {
     // request update from API if cache has expired
-    if (!cache.stores['nitem'] || cache.stores['nitem'].hasExpired) {
-      return api.getStatus().then((status) => {
-        devlog('Cache request nstatus:', 'fromAPI');
-        return status;
-      });
+    if (!cache.stores['nstatus'] || cache.stores['nstatus'].hasExpired) {
+      return api.getStatus();
     } else {
       return Promise.resolve(cache.getLast('nstatus'));
     }

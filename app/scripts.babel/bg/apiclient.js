@@ -2,7 +2,6 @@
 
 define([
   'bg/auth',
-  'bg/cache',
   'bg/storage',
   'bg/apiclient/nstatus',
   'bg/apiclient/notifications/nitem',
@@ -10,7 +9,7 @@ define([
   'bg/apiclient/notifications/ntype',
   'bg/apiclient/messages/pcitem',
   'bg/apiclient/messages/pcmessage'
-], (auth, cache, storage, NStatus, NItem, NMessage, NType, PCItem, PCMessage) => {
+], (auth, storage, NStatus, NItem, NMessage, NType, PCItem, PCMessage) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -117,8 +116,12 @@ define([
      * @return {Promise.<Array.<APIClient.NSubset>|APIClient.NSubset, Error>}
      */
     static wrapResponse(req) {
-      let wrapped = req.WrapperClass.wrapRaw(req.responseData);
-      return cache.cacheSubsets(wrapped);
+      return new Promise((resolve) => {
+        require(['bg/cache'], (cache) => {
+          let wrapped = req.WrapperClass.wrapRaw(req.responseData);
+          return resolve(cache.cacheSubsets(wrapped));
+        });
+      });
     }
 
     static issueRequest(req) {
