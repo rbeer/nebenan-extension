@@ -37,7 +37,8 @@ define([
         this.partner = new NUser(raw.partner || partner);
 
         // convert created_at ISOString to timestamp Number
-        this.created_at_timestamp = (new Date(raw.created_at)).valueOf();
+        this.created_at_timestamp = raw.created_at_timestamp ||
+                                    (new Date(raw.created_at)).valueOf();
       };
 
       let subsetKeys = [

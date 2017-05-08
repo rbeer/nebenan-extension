@@ -40,8 +40,8 @@ define([ 'lodash' ], (_) => {
        * stash.SUBSET_TYPE === 'ManyThings';
        * true
        */
-      this.SUBSET_TYPE = this.constructor.name;
-      this.IS_CACHED = false;
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || this.constructor.name;
+      this.IS_CACHED = raw.IS_CACHED || false;
     }
   };
 
