@@ -38,7 +38,8 @@ define([
     storeObjs = storeObjs.filter((store) => !!store);
     storeObjs.forEach((storeObj) => {
       let storeKey = storeObj.CACHE_TYPE.replace('Cache', '').toLowerCase();
-      cache.stores[storeKey] = cache.types[storeObj.CACHE_TYPE].parseFromStorage(storeObj);
+      cache.stores[storeKey] = cache.types[storeObj.CACHE_TYPE]
+                                    .parseFromStorage(storeObj);
     });
   };
 
@@ -53,12 +54,13 @@ define([
 
     let addCachingPromise = (dataSet) => {
       return new Promise((resolve) => {
-        if (cache.stores[storeKey]) {
+        let store = cache.stores[storeKey];
+        if (store) {
           devlog('Caching:', dataSet);
-          let overflown = cache.stores[storeKey].add(dataSet);
+          let overflown = store.add(dataSet);
           resolve(overflown.length > 0 ? overflown : null);
         } else {
-          cache.stores[storeKey] = new cache.types[dataType + 'Cache'](dataSet, Date.now());
+          store = new cache.types[dataType + 'Cache'](dataSet, Date.now());
           resolve(null);
         }
       });

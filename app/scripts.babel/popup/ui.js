@@ -55,7 +55,8 @@ define([
       }
 
       // reference selection slider element
-      ui.elements.slider = ui.elements.statusContainer.querySelector('.status-select-slider');
+      ui.elements.slider = ui.elements.statusContainer
+                                      .querySelector('.status-select-slider');
       // init position and size
       ui.moveSelectSlider(ui.elements.statusContainer.querySelector('status-element'));
 

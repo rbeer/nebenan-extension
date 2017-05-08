@@ -1,14 +1,14 @@
 ({
-    baseUrl: '../dist/scripts',
-    name: 'bg/app',
-    out: '../dist/scripts/builds/background.js',
-    include: [
-        '../../node_modules/almond/almond'
-    ],
-    skipModuleInsertion: true,
-    wrap: {
-        start: '',
-        // true = load synchronously. This is a feature of almond.js
-        end: 'require(["bg/app"], null, null, true);'
-    }
+  baseUrl: '../dist/scripts',
+  name: 'bg/app',
+  out: '../dist/scripts/builds/background.js',
+  include: [
+      '../../node_modules/almond/almond'
+  ],
+  skipModuleInsertion: true,
+  wrap: {
+      start: '',
+      // true = load synchronously. This is a feature of almond.js
+      end: 'require(["bg/app"], null, null, true);'
+  }
 })

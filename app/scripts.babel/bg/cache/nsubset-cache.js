@@ -88,7 +88,9 @@ define([
      * @return {Boolean}
      */
     isDuplicate(dataSet) {
-      return !!_.find(this.dataSets, { created_at_timestamp: dataSet.created_at_timestamp });
+      return !!_.find(this.dataSets, {
+        created_at_timestamp: dataSet.created_at_timestamp
+      });
     }
 
     static parseFromStorage(stored, ExtendingClass, DataSetWrapper) {

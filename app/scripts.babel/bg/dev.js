@@ -111,7 +111,8 @@ define(() => {
   };
 
   dev.simulateNewNotifications = () => {
-    dev.bgApp.messaging.send('popup/app', 'updateStats', { messages: 15, notifications: 3 });
+    dev.bgApp.messaging.send('popup/app', 'updateStats',
+                             { messages: 15, notifications: 3 });
   };
 
   return dev;
