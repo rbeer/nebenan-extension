@@ -43,7 +43,9 @@ define([
     });
   };
 
-  cache.persist = (store) => storage.write(store.CACHE_TYPE, store);
+  cache.persist = (store) => {
+    return storage.write(store.CACHE_TYPE, store);
+  };
 
   cache.hasStore = (storeKey) => cache.stores[storeKey] instanceof NSubsetCache;
 
@@ -63,6 +65,7 @@ define([
           store = new cache.types[dataType + 'Cache'](dataSet, Date.now());
           resolve(null);
         }
+        cache.stores[storeKey] = store;
       });
     };
 

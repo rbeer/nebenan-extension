@@ -27,20 +27,6 @@ define([ 'lodash' ], (_) => {
         }
       });
 
-      /**
-       * Name of extending class, i.e. constructor.name;e.g NItem, PCMEssage;
-       * @type {String}
-       * @memberOf APIClient.NSubset
-       * @example
-       * class ManyThings extends NSubset {
-       *   constructor() { super(...); }
-       * }
-       *
-       * let stash = new ManyThings();
-       * stash.SUBSET_TYPE === 'ManyThings';
-       * true
-       */
-      this.SUBSET_TYPE = raw.SUBSET_TYPE || this.constructor.name;
       this.IS_CACHED = raw.IS_CACHED || false;
     }
   };

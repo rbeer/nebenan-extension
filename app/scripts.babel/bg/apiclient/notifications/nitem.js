@@ -36,6 +36,7 @@ define([
       ];
       super(subsetKeys, raw);
       this.dismissed = false;
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || 'NItem';
     }
 
     /**

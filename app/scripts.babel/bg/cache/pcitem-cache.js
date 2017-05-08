@@ -12,6 +12,7 @@ define([
   class PCItemCache extends NSubsetCache {
     constructor(dataSet, lastUpdate) {
       super(dataSet, lastUpdate);
+      this.CACHE_TYPE = dataSet.CACHE_TYPE || 'PCItemCache';
     }
 
     static parseFromStorage(stored) {

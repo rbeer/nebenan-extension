@@ -12,6 +12,7 @@ define([
     constructor(dataSet, lastUpdate) {
       super(dataSet, lastUpdate);
       this.expiresIn = 0;
+      this.CACHE_TYPE = dataSet.CACHE_TYPE || 'NStatusCache';
     }
 
     static parseFromStorage(stored) {

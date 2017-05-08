@@ -19,7 +19,6 @@ define([
       if (!(dataSet instanceof NSubset)) {
         throw new TypeError('First parameter must be an instance of APIClient.NSubset');
       }
-      this.CACHE_TYPE = this.constructor.name;
       /**
        * Maximum length of `this.dataSets`
        * @type {Number}

@@ -45,6 +45,7 @@ define([
         'partner_id', 'unseen', customSetters
       ];
       super(subsetKeys, raw);
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || 'PCItem';
     }
 
     /**

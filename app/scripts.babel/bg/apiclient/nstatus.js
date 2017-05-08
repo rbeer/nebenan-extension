@@ -26,7 +26,7 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
       this.allNew = this.messages + this.notifications;
       this.hasNew = this.allNew > 0;
       this.created_at_timestamp = Date.now();
-
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || 'NStatus';
     }
 
     get hasUpdates() {

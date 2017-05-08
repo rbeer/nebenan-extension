@@ -11,6 +11,7 @@ define([
   class NItemCache extends NSubsetCache {
     constructor(dataSet, lastUpdate) {
       super(dataSet, lastUpdate);
+      this.CACHE_TYPE = dataSet.CACHE_TYPE || 'NItemCache';
     }
 
     static parseFromStorage(stored) {
