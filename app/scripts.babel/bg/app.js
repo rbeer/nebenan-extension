@@ -154,54 +154,6 @@ define([
   };*/
 
   /**
-   * Queries API for notifications.json / {@link APIClient.NItem}
-   * @param {Number} n=7     - \# of notifications to request
-   * @param {Number} lower=0 - Timestamp; query for notifications older than this value
-   * @memberOf module:bg/app
-   * @return {Promise.<Array.<APIClient.NItem>, ENOTOKEN>}
-   */
-  bgApp.getNotifications = (n, lower) => {
-    // defaults to the 7 most recent notifications
-    n = n || 7;
-    lower = lower || 0;
-
-    return bgApp.api.getNotifications(n, lower)
-    .then((nitems) => {
-      return nitems;
-    });
-  };
-
-  /**
-   * Queries API for private_conversations.json / {@link APIClient.PCItem}
-   * @param {Number} perPage=7     - \# of conversations per request page
-   * @param {Number} page=1        - \# of page to request. order of items is DESC date/time
-   * @memberOf module:bg/app
-   * @return {Promise.<Array.<APIClient.PCItem>, ENOTOKEN>}
-   * @example
-   * let pageRanges = (perPage) => {
-   *   for (let page = 1; page <= 7; page++) {
-   *     console.log('Page #' + page);
-   *     console.log('First on page:', (page-1)*perPage);
-   *     console.log('Last on page:', (page-1)*perPage + (perPage-1));
-   *     console.log('-'.repeat(21));
-   *   }
-   * }
-   * pageRanges(15)
-   * pageRanges(1)
-   * pageRanges(0)
-   */
-  bgApp.getConversations = (perPage, page) => {
-    // defaults to first 7 conversations
-    perPage = perPage || 7;
-    page = page || 1;
-
-    return bgApp.api.getConversations(perPage, page)
-    .then((conversations) => {
-      return conversations;
-    });
-  };
-
-  /**
    * Update browserAction icon and badge
    * @param {APIClient.NStatus} status
    * @return {APIClient.NStatus} Just passing the input through

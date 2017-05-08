@@ -131,11 +131,45 @@ define([
     }
   };
 
+  /**
+   * Tries to get counter_stats.json ({@link APIClient.NStatus}) data from cache.
+   * When cache hasExpired, the API will be queried for possible updates.
+   *   - Returning promise resolves with a single NStatus instance, **not* an Array
+   * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
+   */
   cache.getStatus = () => queryCacheOrAPI('nstatus', api.getStatus);
 
-  cache.getNotifications = (start, n) => queryCacheOrAPI('nitem', api.getNotifications, start, n);
+  /**
+   * Tries to get notifications.json ({@link APIClient.NItem}) data from cache.
+   * When cache hasExpired, the API will be queried for possible updates.
+   * @param {Number} n=7     - \# of notifications to request
+   * @param {Number} lower=0 - Timestamp; query for notifications older than this value
+   * @memberOf module:bg/app
+   * @return {Promise.<Array.<APIClient.NItem>, ENOTOKEN>}
+   */
+  cache.getNotifications = (n, lower) => queryCacheOrAPI('nitem', api.getNotifications, n, lower);
 
-  cache.getConversations = (start, n) => queryCacheOrAPI('pcitem', api.getConversations, start, n);
+  /**
+   * Tries to get private_conversations.json ({@link APIClient.PCItem}) data from cache.
+   * When cache hasExpired, the API will be queried for possible updates.
+   * @param {Number} perPage=7     - \# of conversations per request page
+   * @param {Number} page=1        - \# of page to request. order of items is DESC date/time
+   * @memberOf module:bg/app
+   * @return {Promise.<Array.<APIClient.PCItem>, ENOTOKEN>}
+   * @example
+   * let pageRanges = (perPage) => {
+   *   for (let page = 1; page <= 7; page++) {
+   *     console.log('Page #' + page);
+   *     console.log('First on page:', (page-1)*perPage);
+   *     console.log('Last on page:', (page-1)*perPage + (perPage-1));
+   *     console.log('-'.repeat(21));
+   *   }
+   * }
+   * pageRanges(15)
+   * pageRanges(1)
+   * pageRanges(0)
+   */
+  cache.getConversations = (perPage, page) => queryCacheOrAPI('pcitem', api.getConversations, perPage, page);
 
   return cache;
 
