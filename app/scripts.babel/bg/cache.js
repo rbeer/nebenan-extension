@@ -5,8 +5,9 @@ define([
   'bg/cache/nitem-cache',
   'bg/cache/pcitem-cache',
   'bg/apiclient',
-  'bg/storage'
-], (NSubsetCache, NStatusCache, NItemCache, PCItemCache, api, storage) => {
+  'bg/storage',
+  'lodash'
+], (NSubsetCache, NStatusCache, NItemCache, PCItemCache, api, storage, _) => {
   'use strict';
   /**
    * Cache
@@ -53,6 +54,7 @@ define([
     let addCachingPromise = (dataSet) => {
       return new Promise((resolve) => {
         if (cache.stores[storeKey]) {
+          devlog('Caching:', dataSet);
           let overflown = cache.stores[storeKey].add(dataSet);
           resolve(overflown.length > 0 ? overflown : null);
         } else {
@@ -71,7 +73,9 @@ define([
       }
     };
 
-    let cachingPromises = workingSets.map(addCachingPromise);
+    let cachingPromises = _.filter(workingSets, { IS_CACHED: false })
+                          .map(addCachingPromise);
+
     return Promise.all(cachingPromises)
                   .then(handleOverflow)
                   .then(() => cache.persist(cache.stores[storeKey]))
@@ -109,7 +113,8 @@ define([
     let lines = [
       store.CACHE_TYPE,
       `Checking current store with key: ${storeKey}`,
-      `  .hasExpired: ${store.hasExpired} -> ${store.hasExpired ? 'Calling API' : ''}`,
+      `  .hasExpired: ${store.hasExpired} -> ${store.hasExpired ? 'Calling API' :
+                                                                  'Calling Cache'}`,
       `  .MAX_SIZE: ${store.MAX_SIZE}`,
       `  # dataSets: ${store.dataSets.length}`
     ];
@@ -171,7 +176,7 @@ define([
   cache.getStatus = () => {
     return queryCacheOrAPI('nstatus').then((nstatus) => {
       let lastStatus = cache.getLast('nstatus');
-      if (!lastStatus || !nstatus.IS_CACHED && nstatus.isDifferentFrom(lastStatus)) {
+      if (!lastStatus || nstatus.isDifferentFrom(lastStatus)) {
         devlog('New NStatus has updates, caching...');
         return Promise.resolve(cache.cacheSubsets(nstatus));
       }
