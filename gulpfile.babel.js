@@ -10,17 +10,19 @@ import preprocess from 'gulp-preprocess';
 
 const $ = gulpLoadPlugins();
 
+let hasParam = (param) => process.argv.includes(param);
+
 // Sets build into DEV mode
 // - Includes and loads module:bg/dev
 //   Exposing `window.bgApp`, `bgApp.dev`, ...
 // - Watch out for the preprocess() parts in
 //   script files! A search for `// @` over
 //   `/app/scripts.babel/` should reveal them all.
-let DEV = process.argv.includes('--dev');
+let DEV = hasParam('--dev');
 // Whether to include docs generation
-let DOCS = process.argv.includes('--with-docs');
+let DOCS = hasParam('--with-docs');
 // Generate (not just copy existing) lodash library, no matter what
-let LODASH = process.argv.includes('--with-lodash');
+let LODASH = !hasParam('--omit-lodash');
 
 //---------------------------------\
 // The Good, The Bad, The Scritps
@@ -229,9 +231,9 @@ gulp.task('lodash', cb => {
     });
   };
 
-  // try to only copy file in dev mode
+  // try to only copy file
   // (generation takes 10s+)
-  if (DEV && !LODASH) {
+  if (!LODASH) {
     return fs.access(argsObj['-o'], (err) => {
       // file DOES exist
       if (!err) {
@@ -327,6 +329,7 @@ gulp.task('docs', cb => {
 gulp.task('dev', cb => {
   DEV = true;
   DOCS = true;
+  LODASH = false;
   runSequence('clean', 'build', 'watch', cb);
 });
 
