@@ -147,7 +147,10 @@ define([
    * @memberOf module:bg/app
    * @return {Promise.<Array.<APIClient.NItem>, ENOTOKEN>}
    */
-  cache.getNotifications = (n, lower) => queryCacheOrAPI('nitem', api.getNotifications, n, lower);
+  cache.getNotifications = (n, lower) => {
+    return queryCacheOrAPI('nitem', api.getNotifications, n, lower)
+           .then((nitems) => cache.cacheSubsets(nitems));
+  };
 
   /**
    * Tries to get private_conversations.json ({@link APIClient.PCItem}) data from cache.
@@ -169,7 +172,10 @@ define([
    * pageRanges(1)
    * pageRanges(0)
    */
-  cache.getConversations = (perPage, page) => queryCacheOrAPI('pcitem', api.getConversations, perPage, page);
+  cache.getConversations = (perPage, page) => {
+    return queryCacheOrAPI('pcitem', api.getConversations, perPage, page)
+           .then((nitems) => cache.cacheSubsets(nitems));
+  };
 
   return cache;
 

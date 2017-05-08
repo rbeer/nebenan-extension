@@ -116,12 +116,7 @@ define([
      * @return {Promise.<Array.<APIClient.NSubset>|APIClient.NSubset, Error>}
      */
     static wrapResponse(req) {
-      return new Promise((resolve) => {
-        require(['bg/cache'], (cache) => {
-          let wrapped = req.WrapperClass.wrapRaw(req.responseData);
-          return resolve(cache.cacheSubsets(wrapped));
-        });
-      });
+      return req.WrapperClass.wrapRaw(req.responseData);
     }
 
     static issueRequest(req) {
