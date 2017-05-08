@@ -97,7 +97,7 @@ define([
         });
       },
       getConversations: (msg, respond) => {
-        cache.getConversations(1, 7)
+        cache.getConversations(7, 1)
         .then((pcItems) => {
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);

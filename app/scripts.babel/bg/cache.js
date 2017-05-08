@@ -84,7 +84,7 @@ define([
    * @memberOf module:bg/cache
    * @return {APIClient.NSubset}
    */
-  cache.getLast = (storeType) => cache.stores[storeType].last;
+  cache.getLast = (storeType) => (cache.stores[storeType] || { last: null }).last;
 
   /**
    * Returns `n` sets from a cache of `storeType`, beginning at index `start` (including).
@@ -102,6 +102,9 @@ define([
   // @ifdef DEV
   let cacheReport = (storeKey) => {
     let store = cache.stores[storeKey];
+    if (!store) {
+      return devlog(`No cache for ${storeKey} found.`);
+    }
     let lines = [
       store.CACHE_TYPE,
       `Checking current store with key: ${storeKey}`,
@@ -116,7 +119,7 @@ define([
     // @ifdef DEV
     cacheReport.apply(null, args);
     // @endif
-    let [ storeKey, APIfn, start, n ] = args;
+    let [ storeKey, APIfn, n, start ] = args;
     // request update from API if cache has expired
     if (!cache.stores[storeKey] || cache.stores[storeKey].hasExpired) {
       // translates to
@@ -125,7 +128,7 @@ define([
       // APIClient.getNotifications(perPage, page)
       return APIfn(n, start);
     } else {
-      let cached = !isNaN(start) && !isNaN(n) ? cache.get(storeKey, start, n) :
+      let cached = !isNaN(start) && !isNaN(n) ? cache.get(storeKey, n, start) :
                                                 cache.getLast(storeKey);
       return Promise.resolve(cached);
     }
@@ -136,13 +139,13 @@ define([
    * When cache hasExpired, the API will be queried for possible updates. When such
    * an API call returns updated values, their respective caches will be expired to trigger
    * an update request for them.
-   *   - Returning promise resolves with a single NStatus instance, **not* an Array
+   *   - Returning promise resolves with a single NStatus instance, **not** an Array
    * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
    */
   cache.getStatus = () => {
     return queryCacheOrAPI('nstatus', api.getStatus).then((nstatus) => {
       let lastStatus = cache.getLast('nstatus');
-      if (nstatus.isDifferentFrom(lastStatus)) {
+      if (!lastStatus || !nstatus.IS_CACHED && nstatus.isDifferentFrom(lastStatus)) {
         devlog('New NStatus has updates, caching...');
         return Promise.resolve(cache.cacheSubsets(nstatus));
       }
@@ -161,7 +164,7 @@ define([
    */
   cache.getNotifications = (n, lower) => {
     return queryCacheOrAPI('nitem', api.getNotifications, n, lower)
-           .then((nitems) => cache.cacheSubsets(nitems));
+           .then(cache.cacheSubsets);
   };
 
   /**
@@ -186,7 +189,7 @@ define([
    */
   cache.getConversations = (perPage, page) => {
     return queryCacheOrAPI('pcitem', api.getConversations, perPage, page)
-           .then((nitems) => cache.cacheSubsets(nitems));
+           .then((pcitems) => cache.cacheSubsets(pcitems));
   };
 
   return cache;
