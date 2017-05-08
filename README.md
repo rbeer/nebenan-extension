@@ -28,8 +28,8 @@ There are plenty of auxiliary tasks, such as `clean`, `watch`, `requirejs`, ...
 
 |     Task      | depends      | implied flags | does |
 |---------------|--------------|---------------|------|
-| **build**/default | clean        | --with-lodash | Main build chain; *production* |
-| **dev**           | clean, watch | --dev, --with-docs | Build in developement mode and watch /app/; development builds are suffixed by -dev, e.g. 0.2.0-dev |
+| **build**/default | clean    |               | Main build chain; *production* |
+| **dev**           | clean, watch | --dev, --with-docs, --omit-lodash | Build in developement mode and watch /app/; development builds are suffixed by -dev, e.g. 0.2.0-dev |
 | **docs**          |              | --with-docs | Generates jsdoc for current version in /docs/ |
 | **package**       |              |               | Package/Zip /dist/; meant for publication in Chrome Webstore; this does **not** create a valid .crx! |
 
@@ -46,7 +46,7 @@ Sets build into DEV mode
    script files!
 
 ```js
- // @if DEV=true
+ // @ifdef DEV
  // included in .rjs-dev
  require(['bg/dev'], (dev) => {
    bgApp.dev = dev;
@@ -55,13 +55,13 @@ Sets build into DEV mode
  // @endif
 ```
 
-   A search for `// @` over
+   A search for /`@ ifdef|ifndef DEV`/ over
    `/app/scripts.babel/` should reveal them all.
 
 #### --with-docs
  - Includes (js)docs generation
 
-#### --with-lodash
-Generating the [custom lodash library](https://lodash.com/custom-builds) takes up to 5 seconds - waaaay too long
-when `watch`ing (e.g. in `dev` task), so the current (lodash) build will be copied, by default.
-- `--with-lodash` forces gulp to generate the library.
+#### --omit-lodash
+Generating the [custom lodash library](https://lodash.com/custom-builds) takes up several seconds and is rarely needed, actually. To avoid possible confusion, however, generation
+is the default for `build`s.
+- Omits generating the lodash library.

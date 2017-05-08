@@ -13,7 +13,7 @@ define([
    */
   let ui = {
     elements: {
-      stats: {
+      status: {
         notifications: null,
         conversations: null
       },
@@ -22,7 +22,7 @@ define([
         overlay: null,
         prompt: null
       },
-      status: null,
+      statusContainer: null,
       slider: null,
       loading: null
     },
@@ -45,19 +45,20 @@ define([
     return new Promise((resolve) => {
       // reference loading animation / background
       ui.elements.loading = document.getElementById('loading');
-      // reference status container element
-      ui.elements.status = document.getElementById('status');
+      // reference statusContainer container element
+      ui.elements.statusContainer = document.getElementById('status');
       // add status elements
-      for (let type in ui.elements.stats) {
-        let element = ui.elements.stats[type] = document.createElement('status-element');
+      for (let type in ui.elements.status) {
+        let element = ui.elements.status[type] = document.createElement('status-element');
         element.populate(type);
-        ui.elements.status.appendChild(element);
+        ui.elements.statusContainer.appendChild(element);
       }
 
       // reference selection slider element
-      ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
+      ui.elements.slider = ui.elements.statusContainer
+                                      .querySelector('.status-select-slider');
       // init position and size
-      ui.moveSelectSlider(ui.elements.status.querySelector('status-element'));
+      ui.moveSelectSlider(ui.elements.statusContainer.querySelector('status-element'));
 
       // reference login prompt overlay elements
       let loginEls = ui.elements.login;
@@ -124,8 +125,8 @@ define([
    *                                          and toggles updates-item in nlist
    * @memberOf module:popup/ui
    */
-  ui.setStats = (values, update) => {
-    let statusElements = ui.elements.stats;
+  ui.setStatus = (values, update) => {
+    let statusElements = ui.elements.status;
     _.forEach(statusElements, (statusElement, key) => {
       statusElement.value = update ? (statusElement.value += values[key]) : values[key];
       if (update && statusElement.value > 0) {

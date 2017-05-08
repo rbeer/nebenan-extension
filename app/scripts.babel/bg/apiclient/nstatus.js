@@ -25,7 +25,17 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
 
       this.allNew = this.messages + this.notifications;
       this.hasNew = this.allNew > 0;
+      this.created_at_timestamp = Date.now();
 
+    }
+
+    get hasUpdates() {
+      return this.messages > 0 || this.notifications > 0;
+    }
+
+    isDifferentFrom(lastStatus) {
+      return this.messages !== lastStatus.messages ||
+             this.notifications !== lastStatus.notifications;
     }
 
     /**

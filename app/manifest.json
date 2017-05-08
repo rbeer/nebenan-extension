@@ -16,10 +16,11 @@
     "persistent": false
   },
   "permissions": [
-    "tabs",
+    "alarms",
     "cookies",
     "notifications",
-    "alarms",
+    "storage",
+    "tabs",
     "https://api.nebenan.de/*",
     "https://nebenan.de/"
   ],

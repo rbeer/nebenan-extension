@@ -21,15 +21,15 @@ define([
   /**
    * Initializes main app
    * - Initializes messaging
-   * - Queries module:bgApp for initial data (stats, notifications, conversations)
+   * - Queries module:bgApp for initial data (status, notifications, conversations)
    * @memberOf module:popup/app
    */
   popupApp.init = () => {
 
     // init Messaging
     popupApp.messaging = new Messaging({
-      setStats: popupApp.setStats,                           // response for bg/app:getStats
-      updateStats: popupApp.setStats.bind(null, true),       // push message from bg/app:updateStats
+      setStatus: popupApp.setStatus,                         // response for bg/app:getStatus
+      updateStatus: popupApp.setStatus.bind(null, true),      // push message from bg/app:updateStatus
       addNotifications: popupApp.addNotifications,           // response for bg/app:getNotifications
       addNotificationsAtTop: popupApp.addNotificationsAtTop, // response for bg/app:getNotifications {type: 'update' }
       addConversations: popupApp.addConversations,           // response for bg/app:getConversations
@@ -46,8 +46,8 @@ define([
 
     // init UI
     popupApp.ui.init(popupApp).then(() => {
-      // query bgApp for stats
-      popupApp.messaging.send('bg/app', ['getStats']);
+      // query bgApp for status
+      popupApp.messaging.send('bg/app', ['getStatus']);
       // query bgApp for notifications
       popupApp.messaging.send('bg/app', ['getNotifications']);
       // query bgApp for private_conversations
@@ -56,7 +56,7 @@ define([
 
   };
 
-  popupApp.setStats = (update, msg) => {
+  popupApp.setStatus = (update, msg) => {
 
     if (!msg) {
       msg = update;
@@ -64,7 +64,7 @@ define([
     }
 
     // update UI elements
-    popupApp.ui.setStats({
+    popupApp.ui.setStatus({
       conversations: msg.payload.messages || 0,
       notifications: msg.payload.notifications || 0
     }, update);

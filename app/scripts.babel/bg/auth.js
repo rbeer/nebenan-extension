@@ -1,4 +1,4 @@
-// @if DEV=true
+// @ifdef DEV
 /* global bgApp */
 // @endif
 'use strict';
@@ -31,7 +31,7 @@ define(() => {
     canAuthenticate() {
       devlog('Probing auth token value ...');
       let self = this;
-      // @if DEV=true
+      // @ifdef DEV
       if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
         err.code = 'ENOTOKEN';

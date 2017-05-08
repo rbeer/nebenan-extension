@@ -15,7 +15,7 @@ define([ 'lodash' ], (_) => {
      * @return {NSubset}
      */
     constructor(keys, raw) {
-      // @if DEV=true
+      // @ifdef DEV
       this._raw = raw;
       // @endif
 
@@ -40,7 +40,8 @@ define([ 'lodash' ], (_) => {
        * stash.SUBSET_TYPE === 'ManyThings';
        * true
        */
-      this.SUBSET_TYPE = this.constructor.name;
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || this.constructor.name;
+      this.IS_CACHED = raw.IS_CACHED || false;
     }
   };
 
