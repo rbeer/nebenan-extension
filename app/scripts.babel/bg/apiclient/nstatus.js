@@ -29,6 +29,15 @@ define(['bg/apiclient/nsubset'], (NSubset) => {
 
     }
 
+    get hasUpdates() {
+      return this.messages > 0 || this.notifications > 0;
+    }
+
+    isDifferentFrom(lastStatus) {
+      return this.messages !== lastStatus.messages ||
+             this.notifications !== lastStatus.notifications;
+    }
+
     /**
      * Takes an API response and returns an {@link APIClient.NStatus} instance
      * @param  {Object} raw - {@link APIClient.XHRRequest}.responseData

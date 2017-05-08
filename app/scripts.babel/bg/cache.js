@@ -120,7 +120,7 @@ define([
     // request update from API if cache has expired
     if (!cache.stores[storeKey] || cache.stores[storeKey].hasExpired) {
       // translates to
-      // APIClient.getStatus()
+      // APIClient.getStatus(void 0, void 0)
       // APIClient.getNotifications(perPage, lower)
       // APIClient.getNotifications(perPage, page)
       return APIfn(n, start);
@@ -133,11 +133,23 @@ define([
 
   /**
    * Tries to get counter_stats.json ({@link APIClient.NStatus}) data from cache.
-   * When cache hasExpired, the API will be queried for possible updates.
+   * When cache hasExpired, the API will be queried for possible updates. When such
+   * an API call returns updated values, their respective caches will be expired to trigger
+   * an update request for them.
    *   - Returning promise resolves with a single NStatus instance, **not* an Array
    * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
    */
-  cache.getStatus = () => queryCacheOrAPI('nstatus', api.getStatus);
+  cache.getStatus = () => {
+    return queryCacheOrAPI('nstatus', api.getStatus).then((nstatus) => {
+      let lastStatus = cache.getLast('nstatus');
+      if (nstatus.isDifferentFrom(lastStatus)) {
+        devlog('New NStatus has updates, caching...');
+        return Promise.resolve(cache.cacheSubsets(nstatus));
+      }
+      devlog('New NStatus has no updates. Not caching...');
+      return nstatus;
+    });
+  };
 
   /**
    * Tries to get notifications.json ({@link APIClient.NItem}) data from cache.

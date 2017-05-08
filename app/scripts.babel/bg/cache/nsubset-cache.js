@@ -67,6 +67,7 @@ define([
     add(dataSet) {
       let overflownSets = [];
       if (!this.isDuplicate(dataSet)) {
+        dataSet.IS_CACHED = true;
         this.dataSets.unshift(dataSet);
         this.lastUpdate = Date.now();
         overflownSets = this.dataSets.splice(this.MAX_SIZE);

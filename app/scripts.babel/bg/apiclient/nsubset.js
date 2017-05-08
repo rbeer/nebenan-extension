@@ -41,6 +41,7 @@ define([ 'lodash' ], (_) => {
        * true
        */
       this.SUBSET_TYPE = this.constructor.name;
+      this.IS_CACHED = false;
     }
   };
 
