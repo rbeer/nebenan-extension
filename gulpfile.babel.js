@@ -36,7 +36,6 @@ gulp.task('scripts', () => {
 function lint(files, options) {
   return () => {
     return gulp.src(files)
-      .pipe(preprocess({ context: { DEV: DEV } }))
       .pipe($.eslint(options))
       .pipe($.eslint.format());
   };
@@ -47,6 +46,15 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
     es6: true
   }
 }));
+
+gulp.task('babel', () => {
+  return gulp.src('app/scripts.babel/**/*.js')
+      .pipe(preprocess({ context: DEV ? { DEV: DEV } : {} }))
+      .pipe($.babel({
+        presets: ['es2015']
+      }))
+      .pipe(gulp.dest('app/scripts'));
+});
 //---------------------------/
 
 //---------------------------\
@@ -100,6 +108,7 @@ gulp.task('manifest', () => {
           if (DEV) {
             let d = new Date();
             let dString = [
+
               (d.getFullYear() + '').slice(2),
               d.getMonth(),
               d.getDay(),
@@ -112,14 +121,6 @@ gulp.task('manifest', () => {
           return manifest;
         }))
         .pipe(gulp.dest('dist'));
-});
-
-gulp.task('babel', () => {
-  return gulp.src('app/scripts.babel/**/*.js')
-      .pipe($.babel({
-        presets: ['es2015']
-      }))
-      .pipe(gulp.dest('app/scripts'));
 });
 
 gulp.task('size', () => {
@@ -295,7 +296,6 @@ gulp.task('watch-docs', cb => {
 //             a valid .crx!
 
 gulp.task('build', cb => {
-  DOCS = DOCS || process.argv.includes('--with-docs');
 
   let buildTasks = [
     'lint', 'babel', 'scripts', 'lodash', 'manifest',

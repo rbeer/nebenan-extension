@@ -15,7 +15,7 @@ define([ 'lodash' ], (_) => {
      * @return {NSubset}
      */
     constructor(keys, raw) {
-      // @if DEV=true
+      // @ifdef DEV
       this._raw = raw;
       // @endif
 

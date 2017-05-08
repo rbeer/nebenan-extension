@@ -105,7 +105,7 @@ define([
     let lines = [
       store.CACHE_TYPE,
       `Checking current store with key: ${storeKey}`,
-      `  .hasExpired: ${store.hasExpired}`,
+      `  .hasExpired: ${store.hasExpired} -> ${store.hasExpired ? 'Calling API' : ''}`,
       `  .MAX_SIZE: ${store.MAX_SIZE}`,
       `  # dataSets: ${store.dataSets.length}`
     ];

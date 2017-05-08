@@ -29,7 +29,7 @@ define(['lodash'], (_) => {
                 'Messaging needs a parentId to identify itself (Message.sender).',
                 'ENOPARENTID');
       this.handlers = handlers;
-      // @if DEV=true
+      // @ifdef DEV
       this.handlers.dev = (message, respond) => {
         devlog('Receiving message:', message);
       };
@@ -88,7 +88,7 @@ define(['lodash'], (_) => {
           self.handlers[handler].call(self, msg, respond);
         });
 
-        // @if DEV=true
+        // @ifdef DEV
         this.handlers.dev.call(this, msg);
         // @endif
       }

@@ -29,7 +29,7 @@ define([
   // noop when not in dev mode
   window.devlog = () => void 0;
 
-  // @if DEV=true
+  // @ifdef DEV
   // included in .rjs-dev
   let awaitDevInit = () => new Promise((resolve) => {
     let devLoaded = () => {

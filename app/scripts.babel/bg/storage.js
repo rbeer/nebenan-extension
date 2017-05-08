@@ -58,7 +58,7 @@ define([
 
   storage.writeSubsets = (dataSets) => {
     let storingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
-    // @if DEV=true
+    // @ifdef DEV
     storingSets = storingSets.map((dataSet) => {
       if (Object.keys(dataSet).includes('_raw')) {
         delete dataSet['_raw'];
