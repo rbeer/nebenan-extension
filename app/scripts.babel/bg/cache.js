@@ -99,6 +99,7 @@ define([
     start = !isNaN(start) ? start : 0;
     return cache.stores[storeType].get(n, start);
   };
+
   // @ifdef DEV
   let cacheReport = (storeKey) => {
     let store = cache.stores[storeKey];
@@ -115,23 +116,48 @@ define([
     devlog(lines.join('\n'));
   };
   // @endif
+
   let queryCacheOrAPI = (...args) => {
     // @ifdef DEV
     cacheReport.apply(null, args);
     // @endif
-    let [ storeKey, APIfn, n, start ] = args;
+    let getSuffix, apiPromise, cacheFn;
+    let [ storeKey, n, start ] = args;
+
+    switch (storeKey) {
+      case 'nstatus':
+        getSuffix = 'Status';
+        break;
+      case 'nitem':
+        getSuffix = 'Notifications';
+        break;
+      case 'pcitem':
+        getSuffix = 'Conversations';
+        break;
+    }
+
+    apiPromise = api[`get${getSuffix}`];
+    cacheFn = cache[`getCached${getSuffix}`];
+
     // request update from API if cache has expired
     if (!cache.stores[storeKey] || cache.stores[storeKey].hasExpired) {
       // translates to
       // APIClient.getStatus(void 0, void 0)
       // APIClient.getNotifications(perPage, lower)
       // APIClient.getNotifications(perPage, page)
-      return APIfn(n, start);
+      return apiPromise(n, start);
     } else {
-      let cached = !isNaN(start) && !isNaN(n) ? cache.get(storeKey, n, start) :
-                                                cache.getLast(storeKey);
-      return Promise.resolve(cached);
+      return Promise.resolve(cacheFn(n, start));
     }
+  };
+
+  cache.getCachedNotifications = (n, lower) => cache.get('nitem', n, lower);
+
+  cache.getCachedStatus = () => cache.getLast('nstatus');
+
+  cache.getCachedConversations = (perPage, page) => {
+    let start = (page - 1) * perPage;
+    return cache.get('pcitem', perPage, start);
   };
 
   /**
@@ -143,7 +169,7 @@ define([
    * @return {Promise.<APIClient.NStatus, ENOTOKEN>}
    */
   cache.getStatus = () => {
-    return queryCacheOrAPI('nstatus', api.getStatus).then((nstatus) => {
+    return queryCacheOrAPI('nstatus').then((nstatus) => {
       let lastStatus = cache.getLast('nstatus');
       if (!lastStatus || !nstatus.IS_CACHED && nstatus.isDifferentFrom(lastStatus)) {
         devlog('New NStatus has updates, caching...');
@@ -163,7 +189,7 @@ define([
    * @return {Promise.<Array.<APIClient.NItem>, ENOTOKEN>}
    */
   cache.getNotifications = (n, lower) => {
-    return queryCacheOrAPI('nitem', api.getNotifications, n, lower)
+    return queryCacheOrAPI('nitem', n, lower)
            .then(cache.cacheSubsets);
   };
 
@@ -188,8 +214,8 @@ define([
    * pageRanges(0)
    */
   cache.getConversations = (perPage, page) => {
-    return queryCacheOrAPI('pcitem', api.getConversations, perPage, page)
-           .then((pcitems) => cache.cacheSubsets(pcitems));
+    return queryCacheOrAPI('pcitem', perPage, page)
+           .then(cache.cacheSubsets);
   };
 
   return cache;
