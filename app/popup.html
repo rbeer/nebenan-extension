@@ -19,10 +19,24 @@
         </div>
       </div>
       <div class="n-list-container">
-        <n-list class="n-list" type="notifications"></n-list>
-        <n-list class="n-list" type="conversations"></n-list>
+        <n-list class="n-list" type="notifications">
+          <div class="updates-item" type="notifications" aria-role="button" action="update.notifications">
+            <span>Neue Benachrichtigungen</span>
+          </div>
+        </n-list>
+        <n-list class="n-list" type="conversations">
+          <div class="updates-item" type="messages" aria-role="button" action="update.conversations">
+            <span>Neue Nachrichten</span>
+          </div>
+        </n-list>
       </div>
       <div class="n-list-scrollthumb-overlay"></div>
+      <div id="loading" class="loading-animation">
+        <div class="cell-spinner">
+          <div class="c-loading-spinner"><i></i></div>
+        </div>
+        <div class="cell-flowers"></div>
+      </div>
     </div>
 
     <div class="login-prompt hidden">

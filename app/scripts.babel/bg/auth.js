@@ -1,4 +1,4 @@
-// @if DEV=true
+// @ifdef DEV
 /* global bgApp */
 // @endif
 'use strict';
@@ -31,7 +31,7 @@ define(() => {
     canAuthenticate() {
       devlog('Probing auth token value ...');
       let self = this;
-      // @if DEV=true
+      // @ifdef DEV
       if (bgApp.dev.forceLoggedOut) {
         let err = new Error('Simulated ENOTOKEN!');
         err.code = 'ENOTOKEN';
@@ -40,14 +40,12 @@ define(() => {
       }
       // @endif
       if (this.token.length > 0) {
-        devlog('Token available:', this.token.substr(0, 10));
-        return new Promise((resolve) => resolve(true));
+        return new Promise((resolve) => resolve(this.token));
       } else {
-        devlog('No token value in memory. Asking chrome API ...');
         return Auth.getToken().then((token) => {
           self.token = token;
           devlog('Token available:', self.token.substr(0, 10));
-          return true;
+          return token;
         });
       }
     }
@@ -68,18 +66,6 @@ define(() => {
             reject(err);
           }
         });
-      });
-    }
-
-    /**
-     * Deletes cookie with auth token (a/k/a logout)
-     * - **NOTE:** This also affects visiting the website directly.
-     * @memberOf Auth
-     * @return {Promise}
-     */
-    static removeToken() {
-      return new Promise((resolve) => {
-        chrome.cookies.remove(Auth.tokenCookieIdentifier, resolve);
       });
     }
   }

@@ -1,6 +1,8 @@
 'use strict';
 
-define(() => {
+define([
+  'bg/cache'
+], (cache) => {
 
   /**
    * @class Handles periodical API requests
@@ -44,8 +46,6 @@ define(() => {
      * @this Alarms
      */
     static handleAlarms(alarm) {
-      devlog('Alarm:', alarm);
-
       if (alarm.name === this.statsName) {
         this.fireStats();
       } else {
@@ -72,17 +72,18 @@ define(() => {
     fireStats() {
       devlog(this.statsName, 'is firing.');
       let self = this;
-      this.parentApp.getStats()
+      cache.getStatus()
       .then(this.parentApp.updateBrowserAction)
+//      .then(this.parentApp.pushStatsUpdate)
       .catch((err) => {
         if (err.code === 'ENOTOKEN') {
           devlog(err.message);
           // stop requesting stats when there is no auth token
           self.stopStats();
-          // set browserAction badge into error state
-          // TODO: refactor into module:ui or so? (net yet implemented!)
-          chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
-          chrome.browserAction.setBadgeText({ text: '!' });
+          self.parentApp.updateBrowserAction(false);
+        } else {
+          devlog(err);
+          throw err;
         }
       });
     }

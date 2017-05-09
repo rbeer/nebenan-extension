@@ -29,7 +29,7 @@ define(['lodash'], (_) => {
                 'Messaging needs a parentId to identify itself (Message.sender).',
                 'ENOPARENTID');
       this.handlers = handlers;
-      // @if DEV=true
+      // @ifdef DEV
       this.handlers.dev = (message, respond) => {
         devlog('Receiving message:', message);
       };
@@ -46,6 +46,22 @@ define(['lodash'], (_) => {
       chrome.runtime.onMessage.addListener(this.receive.bind(this));
     }
 
+    ping(to) {
+      return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({
+          to: to,
+          payload: 'ping'
+        }, (response) => {
+          devlog('Ping response', response);
+          if (!response) {
+            resolve();
+          } else {
+            resolve('pong');
+          }
+        });
+      });
+    }
+
     /**
      * Receives message
      * @param  {Object}     message - Message object (not yet an instance!), received
@@ -58,6 +74,10 @@ define(['lodash'], (_) => {
       if (message.to === this.parentId) {
         let self = this;
 
+        if (message.payload === 'ping') {
+          return respond('pong');
+        }
+
         // create Message instance
         let msg = new Message(message);
 
@@ -68,7 +88,7 @@ define(['lodash'], (_) => {
           self.handlers[handler].call(self, msg, respond);
         });
 
-        // @if DEV=true
+        // @ifdef DEV
         this.handlers.dev.call(this, msg);
         // @endif
       }

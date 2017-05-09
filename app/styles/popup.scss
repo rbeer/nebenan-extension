@@ -1,28 +1,30 @@
 /** VARIABLES **/
 $BG_LIGHT: rgb(237, 237, 233);
-$BG_DARK: #393939;
+$BG_DARK: rgb(57, 57, 57);
+$BG_ATTENTION: rgb(238, 158, 45);
 
-$TEXT_GREEN: #b2ca06;
-$TEXT_WHITE: #fff;
+$TEXT_GREEN: rgb(178, 202, 6);
+$TEXT_WHITE: rgb(255, 255, 255);
+$TEXT_INACTIVE: rgb(136, 136, 136);
 
-$BTN_GREEN_BG: #b2ca06;
-$BTN_GREEN_HOVER_BG: #bad306;
-$BTN_GREEN_TEXT: #131;
+$BTN_GREEN_BG: rgb(178, 202, 6);
+$BTN_GREEN_HOVER_BG: rgb(186, 211, 6);
+$BTN_GREEN_TEXT: rgb(17, 51, 17);
 
-$BTN_GRAY_BG: #393939;
-$BTN_GRAY_HOVER_BG: #414239;
-$BTN_GRAY_TEXT: #fff;
+$BTN_GRAY_BG: rgb(57, 57, 57);
+$BTN_GRAY_HOVER_BG: rgb(65, 66, 57);
+$BTN_GRAY_TEXT: rgb(255, 255, 255);
 
 $SCROLLBAR_GRADIENT_1: $BTN_GREEN_BG;
 $SCROLLBAR_GRADIENT_2: $BTN_GREEN_HOVER_BG;
 
 $HEADER_HEIGHT: 46px;
 
-$CARD_BORDER: 1px solid rgba(0, 0, 0, .5);
-$CARD_SHADOW: 1px 1px 0.3px rgba(0, 0, 0, .3);
-$CARD_BG: rgb(237, 237, 233);
-$BUBBLE_SENT_BG: #e7f498;
-$BUBBLE_RECEIVED_BG: #edede9;
+$CARD_BORDER: none;
+$CARD_SHADOW: 0.6px 0.6px 3px rgba(0, 0, 0, 0.5);
+$CARD_BG: rgb(242, 242, 242);
+$BUBBLE_SENT_BG: rgb(231, 244, 152);
+$BUBBLE_RECEIVED_BG: rgb(237, 237, 233);
 /** --------- **/
 
 /** MAIN LAYOUT **/
@@ -37,11 +39,11 @@ body {
 }
 
 a, a:visited {
-  color: #799189;
+  color: rgb(121, 145, 137);
   text-decoration: none;
 }
 a:hover {
-  color: #575757;
+  color: rgb(87, 87, 87);
 }
 
 @font-face {
@@ -91,6 +93,8 @@ a:hover {
 @import 'popup/header';
 /** Login Prompt; showing when user is not logged in **/
 @import 'popup/login-prompt';
+/** Loading animation **/
+@import 'popup/loading-animation';
 /** Notification List **/
 @import 'popup/custom-elements/n-list';
 /** Status Elements */

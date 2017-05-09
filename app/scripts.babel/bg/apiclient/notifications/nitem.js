@@ -13,9 +13,8 @@ define([
   class NItem extends NSubset {
     /**
      * Takes a raw notification object from the API and creates a subset with
-     * only the members of interest to the extension.
-     * @param {Object}   raw - Raw notification object as it comes from the API. The subset
-     *                         will consist of:
+     * members of interest to the extension. Only those subset members are documented.
+     * @param {Object}   raw
      * @param {Number}   raw.id
      * @param {Object}   raw.hood_message          - Message that triggered the notification
      * @param {Number}   raw.created_at_timestamp  - UNIX epoch timestamp, millisecond precision
@@ -27,18 +26,48 @@ define([
      */
     constructor(raw) {
 
-      let wrapNType = function() {
+      let customSetters = function customSetters() {
         this.notification_type_id = new NType(raw.notification_type_id);
-      };
-
-      let extractMessage = function() {
         this.hood_message = new NMessage(raw.hood_message, raw.parent_hood_message);
       };
 
       let subsetKeys = [
-        'id', wrapNType, extractMessage, 'created_at_timestamp', 'seen'
+        'id', 'created_at_timestamp', 'seen', customSetters
       ];
       super(subsetKeys, raw);
+      this.dismissed = false;
+      this.SUBSET_TYPE = raw.SUBSET_TYPE || 'NItem';
+    }
+
+    /**
+     * Takes an API response and returns an Array of {@link APIClient.NItem}
+     * @param  {Object} raw - {@link APIClient.XHRRequest}.responseData
+     * @see APIClient.wrapResponse
+     * @see APIClient.XHRRequest
+     * @return {Array.<APIClient.NItem>}
+     */
+    static wrapRaw(raw) {
+      /**
+       * strip notifications that defy the standard object layout
+       * e.g. NType.NEWGROUP (501) doesn't have a hood_message
+       * member. Skip everything but some standard messages
+       * @todo proper error/NType handling
+       * @type {Array.<Number>}
+       */
+      let safeTypes = [
+        NType.EVENT,
+        NType.MARKET,
+        NType.ANSWER,
+        NType.FEED
+      ];
+
+      let rawNItems = raw.notifications.filter((nitemRaw) => {
+        let isSafe = safeTypes.includes(nitemRaw.notification_type_id);
+        let notDeleted = !nitemRaw.hood_message.is_deleted;
+        return isSafe && notDeleted;
+      });
+
+      return rawNItems.map((nitemRaw) => new NItem(nitemRaw));
     }
   };
 

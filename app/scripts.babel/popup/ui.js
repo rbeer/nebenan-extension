@@ -13,18 +13,18 @@ define([
    */
   let ui = {
     elements: {
-      stats: {
+      status: {
         notifications: null,
-        messages: null,
-        users: null
+        conversations: null
       },
       login: {
         blur: null,
         overlay: null,
         prompt: null
       },
-      status: null,
-      slider: null
+      statusContainer: null,
+      slider: null,
+      loading: null
     },
     nlists: {
       notifications: null,
@@ -35,46 +35,56 @@ define([
 
   /**
    * I don't know... what could .init be doing? Hmmm...
+   * @param {module:bgApp} _app
+   * @return {Promise} For flow control, only
+   * @see module:popup/app.init
    * @memberOf module:popup/ui
    */
-  ui.init = () => {
+  ui.init = (_app) => {
 
-    // reference status container element
-    // and selection slider
-    ui.elements.status = document.getElementById('status');
-    ui.elements.slider = ui.elements.status.querySelector('.status-select-slider');
+    return new Promise((resolve) => {
+      // reference loading animation / background
+      ui.elements.loading = document.getElementById('loading');
+      // reference statusContainer container element
+      ui.elements.statusContainer = document.getElementById('status');
+      // add status elements
+      for (let type in ui.elements.status) {
+        let element = ui.elements.status[type] = document.createElement('status-element');
+        element.populate(type);
+        ui.elements.statusContainer.appendChild(element);
+      }
 
-    // reference login prompt overlay elements
-    let loginEls = ui.elements.login;
-    for (let name in loginEls) {
-      loginEls[name] = document.querySelector(`.login-${name}`);
-    }
+      // reference selection slider element
+      ui.elements.slider = ui.elements.statusContainer
+                                      .querySelector('.status-select-slider');
+      // init position and size
+      ui.moveSelectSlider(ui.elements.statusContainer.querySelector('status-element'));
 
-    // reference private_conversation list
-    ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
+      // reference login prompt overlay elements
+      let loginEls = ui.elements.login;
+      for (let name in loginEls) {
+        loginEls[name] = document.querySelector(`.login-${name}`);
+      }
 
-    // reference notification list
-    ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
+      // reference private_conversation list
+      ui.nlists.conversations = document.querySelector('n-list[type="conversations"]');
 
-    // hook clickable elements
-    clickables.init(ui);
-    // detect and automatically hook new [aria-role=button][action] elements
-    clickables.watch(ui.nlists.notifications);
-    clickables.watch(ui.nlists.conversations);
+      // reference notification list
+      ui.nlists.notifications = document.querySelector('n-list[type="notifications"]');
 
-    // add status elements
-    let statsEls = ui.elements.stats;
-    for (let type in statsEls) {
-      statsEls[type] = document.createElement('status-element');
-      statsEls[type].populate(type);
-      clickables.hook(statsEls[type]);
-      ui.elements.status.appendChild(statsEls[type]);
-    }
+      // hook clickable elements
+      clickables.init(_app);
+      // detect and automatically hook new [aria-role=button][action] elements
+      clickables.watch(ui.nlists.notifications);
+      clickables.watch(ui.nlists.conversations);
 
-    // hook scroll event to show/hide scrollbar
-    let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-    ui.nlists.notifications.parentElement.addEventListener('scroll',
-      ui.showScrollbar.bind(null, overlay));
+      // hook scroll event to show/hide scrollbar
+      let overlay = document.querySelector('.n-list-scrollthumb-overlay');
+      ui.nlists.notifications.parentElement.addEventListener('scroll',
+        ui.showScrollbar.bind(null, overlay));
+
+      resolve();
+    });
   };
 
   ui.showScrollbar = (overlay, evt) => {
@@ -86,41 +96,69 @@ define([
 
   /**
    * Adds a new n-listitem to the n-list
-   *   - Hooks the link of that new n-listitem
    * @param  {APIClient.NItem|NListItem} nItem - Either an APIClient.NItem to build an
-   *                                             NListeItem from; or a fully prepared,
-   *                                             as in .populate called, NListItem.
+   *                                             NListeItem from | a fully prepared,
+   *                                             as in .populate called, NListItem
+   * @return {NListItem} Added NListItem
    * @memberOf module:popup/ui
-   * @see module:popup/ui/clickables.handleClicks
    * @see NList.add
    */
-  ui.addNotification = (nItem) => {
-    ui.nlists.notifications.add(nItem);
-  };
+  ui.addNotification = (nItem, atTop) => ui.nlists.notifications.add(nItem, atTop);
 
-  ui.addConversation = (pcItem) => {
-    ui.nlists.conversations.add(pcItem);
-  };
+  /**
+   * Adds a new n-listitem to the n-list
+   * @param  {APIClient.PCItem|PCListItem} pcItem - Either an APIClient.PCItem to build an
+   *                                                PCListeItem from | a fully prepared,
+   *                                                as in .populate called, PCListItem
+   * @return {PCListItem} Added PCListItem
+   * @memberOf module:popup/ui
+   * @see NList.add
+   */
+  ui.addConversation = (pcItem) => ui.nlists.conversations.add(pcItem);
 
   /**
    * Sets status counter values
-   * @param {!Object} values
-   * @param {!String} values.notifications - \# of notifications
-   * @param {!String} values.messages      - \# of new messages
-   * @param {!String} values.users         - \# of hood users (kinda YAGNI)
+   * @param {!Object}  values
+   * @param {!String}  values.notifications - \# of notifications
+   * @param {!String}  values.conversations - \# of new conversations
+   * @param {?Boolean} update               - Treat values as addends, rather than absolute values
+   *                                          and toggles updates-item in nlist
    * @memberOf module:popup/ui
    */
-  ui.setStats = (values) => {
-    let statsEls = ui.elements.stats;
-    _.forEach(statsEls, (el, key) => (el.value = values[key]));
+  ui.setStatus = (values, update) => {
+    let statusElements = ui.elements.status;
+    _.forEach(statusElements, (statusElement, key) => {
+      statusElement.value = update ? (statusElement.value += values[key]) : values[key];
+      if (update && statusElement.value > 0) {
+        ui.toggleUpdatesItem(key, values[key], true);
+      }
+    });
+  };
+
+  ui.toggleUpdatesItem = (type, n, show) => {
+    let element = document.querySelector('n-list[type="' + type + '"] .updates-item');
+    show = show !== void 0 ? show : !element.hasAttribute('active');
+    element.setAttribute('n', n);
+    show ? element.setAttribute('active', '') : element.removeAttribute('active');
   };
 
   ui.movePanels = (n) => _.forEach(ui.nlists, (nlist) => nlist.setLeft(-n));
 
   ui.moveSelectSlider = (target) => {
     let sliderStyle = ui.elements.slider.style;
+    let firstLeft = target.parentElement.querySelector('status-element').offsetLeft;
     sliderStyle.width = target.offsetWidth + 'px';
-    sliderStyle.left = `${target.offsetLeft - 208}px`;
+    sliderStyle.left = `${target.offsetLeft - firstLeft}px`;
+  };
+
+  ui.setLoadingDone = () => {
+    return new Promise((resolve) => {
+      if (ui.elements.loading.hasAttribute('done')) {
+        return resolve();
+      }
+      ui.elements.loading.addEventListener('transitionend', resolve);
+      ui.elements.loading.setAttribute('done', '');
+    });
   };
 
   /**

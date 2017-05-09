@@ -2,11 +2,36 @@
 
 n-listitem {
   position: relative;
-  transition: right 0.3s ease-out;
   right: 0;
+  top: 0;
+  transition: all 0.3s ease-out;
+
+  .n-list-slot {
+    opacity: 1;
+    transition: all 0.3s ease-out;
+    transition-delay: inherit;
+  }
+
+  &.init {
+    top: -50px;
+
+    .n-list-slot {
+      opacity: 0;
+      height: 0;
+    }
+  }
 
   &.out {
-    right: -350px;
+    box-shadow: none;
+    top: 200px;
+
+    .n-list-slot {
+      opacity: 0;
+      height: 0;
+    }
+    .content {
+      box-shadow: none;
+    }
   }
 
   .content {
@@ -18,12 +43,14 @@ n-listitem {
     background: $CARD_BG;
     border: $CARD_BORDER;
     box-shadow: $CARD_SHADOW;
+    transition: box-shadow 0.3s ease-out;
+    transition-delay: inherit;
 
     .thumb {
       width: 50px;
       height: 50px;
       float: left;
-      border: $CARD_BORDER;
+      border: 1px inset rgb(204, 204, 204);
       /* background-image: url  --- Set in NListItem.setThumb */
       background-size: cover;
       background-position: 0 0;

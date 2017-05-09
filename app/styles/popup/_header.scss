@@ -1,4 +1,4 @@
-@import 'custom-elements/status';
+@import 'status';
 
 .header {
   position: absolute;
@@ -15,8 +15,8 @@
     display: inline-block;
     color: $TEXT_WHITE;
   }
-}
 
+}
 
 .logo {
   float: none;

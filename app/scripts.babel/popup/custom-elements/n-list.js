@@ -28,9 +28,10 @@ define([
      * @param {APIClient.NSubset|HTMLLIElement} setOrElement - Either an APIClient.NSubset to build from;
      *                                                         or a fully prepared, as in .populate
      *                                                         called, *ListItem.
+     * @param {Boolean}                         atTop      - Insert ListItem at the top of the list
      * @returns {NListItem|PCListItem} - ListItem that has actually been added
      */
-    add(setOrElement) {
+    add(setOrElement, atTop) {
 
       let listItem, elementName;
 
@@ -61,7 +62,13 @@ define([
                             'APIClient.NSubset or HTMLLIElement');
       }
 
-      this.append(listItem);
+      // add updates (at top) after .updates-item div
+      if (atTop) {
+        this.querySelector('.updates-item').insertAdjacentElement('afterend', listItem);
+      } else {
+        this.appendChild(listItem);
+      }
+
       return listItem;
     }
 

@@ -16,10 +16,11 @@
     "persistent": false
   },
   "permissions": [
-    "tabs",
+    "alarms",
     "cookies",
     "notifications",
-    "alarms",
+    "storage",
+    "tabs",
     "https://api.nebenan.de/*",
     "https://nebenan.de/"
   ],
@@ -40,6 +41,7 @@
   },
   "web_accessible_resources": [
     "images/icon_128.png",
-    "images/thumb_dummy.jpg"
+    "images/thumb_dummy.jpg",
+    "images/flower.png"
   ]
 }

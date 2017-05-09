@@ -43,6 +43,9 @@ define([
       let tpl = document.getElementById('n-listitem');
       this.appendChild(document.importNode(tpl.content, true));
 
+      // apply init class
+      this.classList.add('init');
+
       // set element's attributes
       let nMsg = nItem.hood_message;
       let _typeId = nItem.notification_type_id.id;
@@ -61,8 +64,14 @@ define([
       this.body = nMsg.body;
 
       // set attributes for/on clickable elements
-      this.querySelector('.body').setAttribute('action', 'newtab.feed/' + linkId);
-      this.querySelector('.body').setAttribute('aria-role', 'button');
+      let bodyElement = this.querySelector('.body');
+      bodyElement.setAttribute('action', 'newtab.feed/' + linkId);
+      bodyElement.setAttribute('aria-role', 'button');
+
+      let dismissElement = this.querySelector('.dismiss');
+      dismissElement.setAttribute('action',
+                                  `dismiss.${this.tagName.toLowerCase()}:${nItem.id}`);
+      dismissElement.setAttribute('aria-role', 'button');
 
       // set thumbnail
       this.setThumb(nMsg);
@@ -128,7 +137,22 @@ define([
       return this.slideOut().then(this.remove.bind(this));
     }
 
-    slideIn() {}
+    slideIn(delay) {
+      let self = this;
+      delay = delay || 0;
+      return new Promise((resolve) => {
+        self.style.transitionDelay = delay + 's';
+        self.addEventListener('transitionend', () => {
+          let zeroSeconds = '0s';
+          self.style.transitionDelay = zeroSeconds;
+          self.firstElementChild.style.transitionDelay = zeroSeconds;
+          self.firstElementChild.firstElementChild.style.transitionDelay = zeroSeconds;
+          resolve();
+        });
+        self.classList.remove('init');
+      });
+    }
+
     slideOut() {
       let self = this;
       return new Promise((resolve) => {

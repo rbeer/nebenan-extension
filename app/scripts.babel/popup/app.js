@@ -20,62 +20,78 @@ define([
 
   /**
    * Initializes main app
-   * - Gets references to DOM Elements
-   * - Sets hooks on Elements (clicks, etc.)
-   * - Sends stats-data request to module:bgApp
+   * - Initializes messaging
+   * - Queries module:bgApp for initial data (status, notifications, conversations)
    * @memberOf module:popup/app
    */
   popupApp.init = () => {
 
-    // init UI
-    // better safe than sorry mode
-    document.addEventListener('DOMContentLoaded', popupApp.ui.init);
-
     // init Messaging
     popupApp.messaging = new Messaging({
-      setStats: popupApp.setStats,                 // response for bg/app:getStats
-      addNotifications: popupApp.addNotifications, // response for bg/app:getNotifications
-      addConversations: popupApp.addConversations, // response for bg/app:getConversations
+      setStatus: popupApp.setStatus,                         // response for bg/app:getStatus
+      updateStatus: popupApp.setStatus.bind(null, true),      // push message from bg/app:updateStatus
+      addNotifications: popupApp.addNotifications,           // response for bg/app:getNotifications
+      addNotificationsAtTop: popupApp.addNotificationsAtTop, // response for bg/app:getNotifications {type: 'update' }
+      addConversations: popupApp.addConversations,           // response for bg/app:getConversations
       error: handleErrorMessages
     }, 'popup/app');
 
     popupApp.messaging.listen();
 
-    // query bgApp for stats
-    popupApp.messaging.send('bg/app', ['getStats']);
+    // finish init when DOM is loaded
+    document.addEventListener('DOMContentLoaded', initWithDOMLoaded);
+  };
 
-    // query bgApp for notifications
-    popupApp.messaging.send('bg/app', ['getNotifications']);
-    // query bgApp for private_conversations
-    popupApp.messaging.send('bg/app', ['getConversations']);
+  let initWithDOMLoaded = () => {
+
+    // init UI
+    popupApp.ui.init(popupApp).then(() => {
+      // query bgApp for status
+      popupApp.messaging.send('bg/app', ['getStatus']);
+      // query bgApp for notifications
+      popupApp.messaging.send('bg/app', ['getNotifications']);
+      // query bgApp for private_conversations
+      popupApp.messaging.send('bg/app', ['getConversations']);
+    }).catch((err) => console.error('popupApp.ui failed!', err));
 
   };
 
-  popupApp.setStats = (msg) => {
-    let users = (userCount => {
-      // abbreviate user counts > 999 to "1k+", "2k+", so on...
-      // (current location of status elements forces "newline" when value is > 3 chars)
-      return userCount < 1000 ? userCount : `${Math.floor(userCount / 1000)}k+`;
-    })(msg.payload.users);
+  popupApp.setStatus = (update, msg) => {
+
+    if (!msg) {
+      msg = update;
+      update = false;
+    }
 
     // update UI elements
-    popupApp.ui.setStats({
-      messages: msg.payload.messages || 0,
-      notifications: msg.payload.notifications || 0,
-      users: users
-    });
+    popupApp.ui.setStatus({
+      conversations: msg.payload.messages || 0,
+      notifications: msg.payload.notifications || 0
+    }, update);
   };
 
-  popupApp.addNotifications = (msg) => {
+  popupApp.addNotifications = (msg, atTop) => {
+    let items = [];
     msg.payload.forEach((nItemObject) => {
       let nitem = new NItem(nItemObject);
-      devlog(nitem);
-      popupApp.ui.addNotification(nitem);
+      items.push(popupApp.ui.addNotification(nitem, atTop));
+    });
+    popupApp.ui.setLoadingDone().then(() => {
+      // TODO: 'init' class is taken off too quickly; delay
+      let _show = () => {
+        items.forEach((item, i) => item.slideIn(i / 10));
+      };
+      if (atTop) {
+        window.setTimeout(_show, 250);
+      } else {
+        _show();
+      }
     });
   };
 
+  popupApp.addNotificationsAtTop = (msg) => popupApp.addNotifications(msg, true);
+
   popupApp.addConversations = (msg) => {
-    devlog(msg);
     msg.payload.forEach((pcItemObject) => {
       let pcItem = new PCItem(pcItemObject);
       popupApp.ui.addConversation(pcItem);

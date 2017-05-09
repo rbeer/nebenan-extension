@@ -1,15 +1,18 @@
 status-element {
   display: inline-block;
   float: left;
+  color: rgb(255, 255, 255);
+  transition: color 0.3s ease-out;
+
+  &[active] {
+    color: $TEXT_GREEN;
+  }
 
   &[type="notifications"] i:before {
     content: '\e807';
   }
-  &[type="messages"] i:before {
+  &[type="conversations"] i:before {
     content: '\e828';
-  }
-  &[type="users"] i:before {
-    content: '\e83a';
   }
 
   i {

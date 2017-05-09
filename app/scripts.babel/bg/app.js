@@ -1,35 +1,24 @@
-'use strict';
-
+/* eslint-disable semi */
 define([
   'bg/alarms',
   'bg/apiclient',
   'bg/auth',
   'bg/livereload',
-  'bg/request-cache',
+  'bg/cache',
   'messaging',
   'lodash'
-], (Alarms, APIClient, auth, lreload, RequestCache, Messaging, _) => {
-
+], (Alarms, APIClient, auth, lreload, cache, Messaging, _) => {
+  'use strict';
   /**
    * Background Main App
    * @module bg/app
    */
   let bgApp = {
     api: APIClient,
-    alarms: null, // -> .init()
     auth: auth,
-    messaging: null, // -> .init()
-    /**
-     * Holds answer data from API requests and their timeout values
-     * @type {object}
-     * @memberOf module:bg/app
-     */
-    requestCaches: {
-      stats: new RequestCache.StatsCache({
-        messages: 0, notifications: 0,
-        users: 0, all: 0
-      }, 0)
-    }
+    cache: cache,
+    alarms: null, // -> .init()
+    messaging: null // -> .init()
   };
 
   /**
@@ -40,11 +29,20 @@ define([
   // noop when not in dev mode
   window.devlog = () => void 0;
 
-  // @if DEV=true
+  // @ifdef DEV
   // included in .rjs-dev
+  let awaitDevInit = () => new Promise((resolve) => {
+    let devLoaded = () => {
+      if (bgApp.dev) {
+        window.clearInterval(interval);
+        resolve(bgApp);
+      }
+    };
+    let interval = window.setInterval(devLoaded, 5);
+  });
+
   require(['bg/dev'], (dev) => {
     bgApp.dev = dev;
-    bgApp.dev.init(bgApp);
   });
   // @endif
 
@@ -61,10 +59,10 @@ define([
 
     // init Messaging
     bgApp.messaging = new Messaging({
-      getStats: (msg, respond) => {
-        bgApp.getStats()
-        .then((stats) => {
-          let response = msg.cloneForAnswer(['setStats'], stats);
+      getStatus: (msg, respond) => {
+        cache.getStatus()
+        .then((status) => {
+          let response = msg.cloneForAnswer(['setStatus'], status);
           respond(response);
         })
         .catch((err) => {
@@ -73,10 +71,24 @@ define([
         });
       },
       getNotifications: (msg, respond) => {
-        bgApp.getNotifications()
+        let params = _.assign({ n: 7, lower: 0 }, msg.payload);
+        let answerHandler;
+
+        switch (params.type) {
+          case 'update':
+            // get only new notifications - MUST have params.n
+            answerHandler = 'addNotificationsAtTop';
+            break;
+          case 'loadAfter':
+            // scrolling event - MUST have params.lower
+            break;
+          default:
+            answerHandler = 'addNotifications';
+        }
+
+        cache.getNotifications(params.n, params.lower)
         .then((nitems) => {
-          devlog('nitems:', nitems);
-          let response = msg.cloneForAnswer(['addNotifications'], nitems);
+          let response = msg.cloneForAnswer([answerHandler], nitems);
           respond(response);
         })
         .catch((err) => {
@@ -85,9 +97,8 @@ define([
         });
       },
       getConversations: (msg, respond) => {
-        bgApp.getConversations()
+        cache.getConversations(7, 1)
         .then((pcItems) => {
-          devlog('pcItems:', pcItems);
           let response = msg.cloneForAnswer(['addConversations'], pcItems);
           respond(response);
         })
@@ -97,128 +108,74 @@ define([
         });
       }
     }, 'bg/app');
-    // start listening for messages
-    bgApp.messaging.listen();
 
-    // init Alarms
-    bgApp.alarms = new Alarms(bgApp);
-    // activate counter_stats alarm
-    bgApp.alarms.startStats();
-
-  };
-
-  /**
-   * Checks cache timeout for requested data.
-   * - Resolves with cached data if API should be omitted.
-   * @param  {string} cacheName - Must be member of module:bg/app.
-   * @return {Promise}          - Resolves with cached data if still in request timeout
-   */
-  bgApp.getCachedDataFor = (cacheName) => {
-    if (bgApp.requestCaches[cacheName].hasExpired) {
-      devlog(`Cache for ${cacheName} has expired.`);
-      return void 0;
-    } else {
-      devlog(`Serving cached data for ${cacheName}`);
-      return bgApp.requestCaches[cacheName].data;
-    }
-  };
-
-  /**
-   * Updates local stats
-   * @memberOf module:bg/app
-   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in   * @return {Promise}
-   */
-  bgApp.getStats = () => {
-
-    // bgApp.api.getCounterStats passes its first paremeter
-    // (possible cache object) to resolve, when valid/not expired.
-    return bgApp.api.getCounterStats(bgApp.getCachedDataFor('stats'))
-          .then((counter_stats) => {
-            // not a string? cached data!
-            if (typeof counter_stats !== 'string') {
-              return counter_stats;
-            } else {
-              // parse JSON string and update cache
-              let statsObj = JSON.parse(counter_stats);
-              bgApp.requestCaches.stats.data = statsObj;
-              return statsObj;
-            }
-          });
-  };
-
-  /**
-   * Updates notifications
-   * @memberOf module:bg/app
-   * @return {Promise} - Resolves with Array of {@link APIClient.NItem|NItems}; Rejects with ENOTOKEN if not logged in
-   */
-  bgApp.getNotifications = () => {
-    return bgApp.api.getNotifications(7, 0, null)
-    .then((raw) => {
-      let parsed;
-      if (typeof raw !== 'string') {
-        parsed = raw;
-      } else {
-        parsed = JSON.parse(raw).notifications;
-      }
-
-      /**
-       * strip notifications that defy the standard object layout
-       * e.g. NType.NEWGROUP (501) doesn't have a hood_message
-       * member. Skip everything but some standard messages
-       * @todo proper error/NType handling
-       * @type {Array.<Number>}
-       */
-      let safeTypes = [
-        APIClient.NType.EVENT,
-        APIClient.NType.MARKET,
-        APIClient.NType.ANSWER,
-        APIClient.NType.FEED
-      ];
-      parsed = parsed.filter((n) => safeTypes.includes(n.notification_type_id) &&
-                                    !n.hood_message.is_deleted);
-
-      return parsed.map((n) => new APIClient.NItem(n));
+    // init chain
+    // @ifdef DEV
+    awaitDevInit()
+    .then((app) => app.dev.init(bgApp))
+    .then(cache.init)
+    // @endif
+    // @ifndef DEV
+    cache.init()
+    // @endif
+    .then(() => {
+      // init Alarms
+      bgApp.alarms = new Alarms(bgApp);
+      // activate counter_stats alarm
+      bgApp.alarms.startStats();
+      // start listening for messages
+      bgApp.messaging.listen();
     });
   };
 
-  bgApp.getConversations = () => {
-    return bgApp.api.getConversations(7, 1, null)
-    .then((raw) => {
-      let parsed;
-      if (typeof raw !== 'string') {
-        parsed = raw;
-      } else {
-        parsed = JSON.parse(raw);
-      }
+  // TODO: a mess, but it works
+  /*bgApp.pushStatsUpdate = (stats) => {
+    return new Promise((resolve, reject) => {
 
-      let conversations = parsed.private_conversations;
-      let linked_users = parsed.linked_users;
-
-      return conversations.map((conversation) => {
-        let partner = _.find(linked_users, [ 'id', conversation.partner_id]);
-        return new APIClient.PCItem(conversation, partner);
+      bgApp.messaging.ping('popup/app').then((res) => {
+        if (!res) {
+          let err = new Error('Can\'t push status update. Popup isn\'t open.');
+          err.code = 'ENORECEIVER';
+          return reject(err);
+        }
+        devlog('updating query result');
+        let keys = ['notifications', 'messages'];
+        let updates = { notifications: 0, messages: 0 };
+        let updatedValues = _.pick(stats, keys);
+        let cachedValues = _.pick(bgApp.getCache('stats').data, keys);
+        _.assignWith(updates, updatedValues, cachedValues, (updatedCount, cachedCount) => {
+          let newCount = updatedCount - cachedCount;
+          return newCount < 1 ? 0 : newCount;
+        });
+        bgApp.messaging.send('popup/app', ['updateStats'], updates);
+        resolve(stats.data);
       });
     });
-  };
+  };*/
 
   /**
    * Update browserAction icon and badge
-   * @param {module:bg/app.requestCaches.stats} stats
+   * @param {APIClient.NStatus} status
+   * @return {APIClient.NStatus} Just passing the input through
+   * @see Alarms#fireStats
    * @memberOf module:bg/app
    */
-  bgApp.updateBrowserAction = (stats) => {
-    devlog('Updating browserAction with:', stats);
+  bgApp.updateBrowserAction = (status) => {
+    devlog('Updating browserAction with:', status);
 
-    let allNew = stats.messages + stats.notifications;
-    let hasNew = allNew > 0;
+    if (status === false) {
+      chrome.browserAction.setBadgeBackgroundColor({ color: [ 255, 0, 0, 255 ] });
+      chrome.browserAction.setBadgeText({ text: '!' });
+      return;
+    }
 
-    let iconPath = `images/icon-${hasNew ? 'unread' : 'read'}_16.png`;
+    let iconPath = `images/icon-${status.hasNew ? 'unread' : 'read'}_16.png`;
     chrome.browserAction.setIcon({ path: iconPath });
 
     chrome.browserAction.setBadgeBackgroundColor({ color: [ 28, 150, 6, 128 ] });
-    chrome.browserAction.setBadgeText({ text: hasNew ? allNew + '' : '' });
+    chrome.browserAction.setBadgeText({ text: status.hasNew ? status.allNew + '' : '' });
 
-    return stats;
+    return status;
   };
 
   // fires when extension (i.e. user's profile) starts up

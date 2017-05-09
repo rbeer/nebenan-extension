@@ -2,12 +2,14 @@
 
 define([
   'bg/auth',
+  'bg/storage',
+  'bg/apiclient/nstatus',
   'bg/apiclient/notifications/nitem',
   'bg/apiclient/notifications/nmessage',
   'bg/apiclient/notifications/ntype',
   'bg/apiclient/messages/pcitem',
   'bg/apiclient/messages/pcmessage'
-], (auth, NItem, NMessage, NType, PCItem, PCMessage) => {
+], (auth, storage, NStatus, NItem, NMessage, NType, PCItem, PCMessage) => {
   /**
    * @class Client to nebenan.de API
    */
@@ -18,6 +20,9 @@ define([
     }
 
     // sub classes
+    static get NStatus() {
+      return NStatus;
+    }
     static get NItem() {
       return NItem;
     }
@@ -35,22 +40,26 @@ define([
     }
 
     /**
-     * @typedef XHROptions
+     * @typedef XHRRequest
      * @memberOf APIClient
      * @static
      * @property {string} method - Request method, e.g. `'GET', 'POST'`
      * @property {string} url    - API endpoint URL to call
      * @property {string} token  - Auth token to send with request
+     * @property {APIClient.NStatus|APIClient.NItem|APIClient.PCItem} WrapperClass - Class to wrap response in
+     * @property {Object} responseData - JSON parsed response body
      */
 
     /**
-     * Default XHROptions
+     * Default XHRRequest
      */
     static get XHR_DEFAULTS() {
       return {
         method: 'GET',
         url: 'https://api.nebenan.de/api/v2',
-        token: ''
+        token: '',
+        WrapperClass: void 0,
+        responseData: void 0
       };
     }
 
@@ -58,14 +67,14 @@ define([
      * Executes XMLHttpRequest
      * @memberOf APIClient
      * @static
-     * @param  {!APIClient.XHROptions} options - Options passed to XMLHttpRequest
-     * @throws {TypeError} if (!options)
+     * @param  {!APIClient.XHRRequest} request - Options passed to XMLHttpRequest
+     * @throws {TypeError} if (!request)
      * @return {Promise}                       - Resolves with response body
      */
-    static callAPI(options) {
+    static callAPI(request) {
 
-      if (!options) {
-        throw new TypeError('First argument must be an XHROptions object.');
+      if (!request) {
+        throw new TypeError('First argument must be an XHRRequest object.');
       }
 
       return new Promise((resolve, reject) => {
@@ -76,7 +85,8 @@ define([
         // response handler
         xhr.onreadystatechange = function() {
           if (this.readyState === 4) {
-            resolve(this.response);
+            request.responseData = JSON.parse(this.response);
+            resolve(request);
           }
         };
 
@@ -87,11 +97,11 @@ define([
         };
 
         // open connection
-        xhr.open(options.method, options.url);
+        xhr.open(request.method, request.url);
 
         // set request headers
         xhr.setRequestHeader('Accept', 'application/json');
-        xhr.setRequestHeader('X-AUTH-TOKEN', options.token);
+        xhr.setRequestHeader('X-AUTH-TOKEN', request.token);
 
         // send
         xhr.send();
@@ -99,30 +109,48 @@ define([
     }
 
     /**
+     * Wraps API call response in Array of NSubsets, as defined by req.WrapperClass
+     * and implemented by req.WrapperClass.wrapRaw(Object: raw). Also stores
+     * created NSubsets in cache.
+     * @param  {APIClient.XHRRequest} req
+     * @return {Promise.<Array.<APIClient.NSubset>|APIClient.NSubset, Error>}
+     */
+    static wrapResponse(req) {
+      return req.WrapperClass.wrapRaw(req.responseData);
+    }
+
+    static issueRequest(req) {
+      return auth.canAuthenticate()
+      .then((token) => {
+        req.token = token;
+        return APIClient.callAPI(req);
+      })
+      .then(APIClient.wrapResponse);
+    }
+
+    static createRequest(path, WrapperClass) {
+      let xhrRequest = APIClient.XHR_DEFAULTS;
+      xhrRequest.url += path;
+      xhrRequest.WrapperClass = WrapperClass;
+      xhrRequest.token = auth.token;
+      return xhrRequest;
+    }
+
+    /**
      * Requests counter_stats.json
-     * @property {?object} cached - Cached data; undefined if API should be called
      * @see APIClient.callAPI
      * @memberOf APIClient
      * @static
-     * @return {Promise} - Resolves with response body from APIClient.callAPI
+     * @return {Promise} - Resolves with an Array of a single NStatus instance
      */
-    static getCounterStats(cached) {
-      if (cached) {
-        return auth.canAuthenticate().then(() => cached);
-      }
-      return auth.canAuthenticate()
-      .then(() => {
-        let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/profile/counter_stats.json';
-        xhrOptions.token = auth.token;
-        return xhrOptions;
-      })
-      .then(APIClient.callAPI);
+    static getStatus() {
+      let req = APIClient.createRequest('/profile/counter_stats.json', NStatus);
+      return APIClient.issueRequest(req);
     }
 
     /**
      * Requests notifications.json
-     * @param {?Number} perPage=7 - # of notifications to request
+     * @param {?Number} perPage=7 - \# of notifications to request
      * @param {?Number} lower     - UNIX epoch timestamp, ms precision; request only
      *                              notifications older than this value
      * @memberOf APIClient
@@ -130,36 +158,24 @@ define([
      * @see APIClient.callAPI
      * @return {Promise} - Resolves with the response body APIClient.callAPI resolved with
      */
-    static getNotifications(perPage, lower, cached) {
-      if (cached || typeof lower === 'object') {
-        return auth.canAuthenticate().then(() => cached || lower);
-      }
+    static getNotifications(perPage, lower) {
       perPage = perPage || 7;
-      return auth.canAuthenticate().then(() => {
-        let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/notifications.json?per_page=' + perPage;
-        if (lower) {
-          xhrOptions.url += '&lower=' + lower;
-        }
-        xhrOptions.token = auth.token;
-        return xhrOptions;
-      }).then(APIClient.callAPI);
+      let path = '/notifications.json?per_page=' + perPage;
+      if (lower) {
+        path += '&lower=' + lower;
+      }
+      let req = APIClient.createRequest(path, NItem);
+      return APIClient.issueRequest(req);
     }
 
-    static getConversations(perPage, page, cached) {
-      if (cached || typeof page === 'object') {
-        return auth.canAuthenticate().then(() => cached || page);
-      }
+    static getConversations(perPage, page) {
       perPage = perPage || 7;
-      return auth.canAuthenticate().then(() => {
-        let xhrOptions = APIClient.XHR_DEFAULTS;
-        xhrOptions.url += '/private_conversations.json?per_page=' + perPage;
-        if (page) {
-          xhrOptions.url += '&page=' + page;
-        }
-        xhrOptions.token = auth.token;
-        return xhrOptions;
-      }).then(APIClient.callAPI);
+      let path = '/private_conversations.json?per_page=' + perPage;
+      if (page) {
+        path += '&page=' + page;
+      }
+      let req = APIClient.createRequest(path, PCItem);
+      return APIClient.issueRequest(req);
     }
   };
 
