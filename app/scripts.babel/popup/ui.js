@@ -46,7 +46,7 @@ define([
       // reference loading animation / background
       ui.elements.loading = document.getElementById('loading');
       // reference statusContainer container element
-      ui.elements.statusContainer = document.getElementById('status');
+      ui.elements.statusContainer = document.querySelector('nav');
       // add status elements
       for (let type in ui.elements.status) {
         let element = ui.elements.status[type] = document.createElement('status-element');
@@ -56,7 +56,7 @@ define([
 
       // reference selection slider element
       ui.elements.slider = ui.elements.statusContainer
-                                      .querySelector('.status-select-slider');
+                                      .querySelector('.nav-select-slider');
       // init position and size
       ui.moveSelectSlider(ui.elements.statusContainer.querySelector('status-element'));
 

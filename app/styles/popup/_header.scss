@@ -1,6 +1,11 @@
-@import 'status';
+@import 'nav';
 
-.header {
+header {
+  /* display: subgrid; :weary: */
+  display: grid;
+  grid-template-columns: 150px auto;
+  grid-template-rows: 1;
+  grid-template-areas: "logo status";
   position: absolute;
   z-index: 1;
   top: 0;
@@ -16,44 +21,43 @@
     color: $TEXT_WHITE;
   }
 
-}
-
-.logo {
-  float: none;
-  color: $TEXT_WHITE;
-  cursor: pointer;
-  width: 150px;
-}
-.logo:hover {
-  color: $TEXT_GREEN;
-}
-
-.logo-icon {
-  margin: 3px;
-  float: left;
-  width: 30px;
-  height: 30px;
-  font-size: 30px;
-  line-height: 30px;
-  vertical-align: middle;
-  padding: 5px;
-  border-radius: 12px;
-
-  > i.na-icon:before {
-    font-size: 32px;
-    content: '\e82d';
+  .logo {
+    grid-area: logo;
+    float: none;
+    color: $TEXT_WHITE;
+    cursor: pointer;
+    width: 150px;
   }
-}
+  .logo:hover {
+    color: $TEXT_GREEN;
+  }
 
+  .logo-icon {
+    margin: 3px;
+    float: left;
+    width: 30px;
+    height: 30px;
+    font-size: 30px;
+    line-height: 30px;
+    vertical-align: middle;
+    padding: 5px;
+    border-radius: 12px;
 
-.logo-text {
-  padding-top: 5px;
-  height: 32px;
-  text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+    > i.na-icon:before {
+      font-size: 32px;
+      content: '\e82d';
+    }
+  }
 
-  > i.na-icon:before {
-    content: '\e82e';
-    font-size: 100px;
-    line-height: 36px;
+  .logo-text {
+    padding-top: 5px;
+    height: 32px;
+    text-shadow: 0.3px 0.6px 0.3px rgba(66, 66, 66, 0.6);
+
+    > i.na-icon:before {
+      content: '\e82e';
+      font-size: 100px;
+      line-height: 36px;
+    }
   }
 }
