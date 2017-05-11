@@ -29,13 +29,22 @@ $BUBBLE_RECEIVED_BG: rgb(237, 237, 233);
 
 /** MAIN LAYOUT **/
 body {
+  display: grid;
+  grid-template-rows: $HEADER_HEIGHT auto;
+  grid-template-areas:
+    "header"
+    "main";
   margin: 0;
-  padding: 46px 3px 0px 3px;
+  padding: 0 3px;
   width: 350px;
   background: $BG_LIGHT;
   font: 400 14px/20px 'Open Sans','Helvetica Neue',Arial,sans-serif;
   font-size: 14px;
   line-height: 20px;
+}
+
+main {
+  grid-area: main;
 }
 
 a, a:visited {

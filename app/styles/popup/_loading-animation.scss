@@ -5,9 +5,9 @@ $FLOWERS_HEIGHT: 214px;
 
 .loading-animation {
   display: grid;
-  grid-template-columns: 100%;
+  grid-area: main;
   grid-template-rows: $HEADER_HEIGHT 15% $CONTAINER_HEIGHT 10% $FLOWERS_HEIGHT;
-  grid-column-gap: 7px;
+  grid-template-areas: "space" "space" "spinner" "space2" "flowers";
   position: absolute;
   z-index: -1;
   left: 0;
@@ -16,16 +16,14 @@ $FLOWERS_HEIGHT: 214px;
   width: 100%;
   overflow: hidden;
 
-  .cell-spinner {
-    grid-row: 3;
-    grid-column: 1;
+  .area-spinner {
+    grid-area: spinner;
     opacity: 1;
     text-align: center;
     transition: opacity 0.3s ease-in;
   }
-  .cell-flowers {
-    grid-row: 5;
-    grid-column: 1;
+  .area-flowers {
+    grid-area: flowers;
     background: url(../images/flowers.png);
     background-repeat: no-repeat;
     opacity: 1;
@@ -33,10 +31,10 @@ $FLOWERS_HEIGHT: 214px;
   }
 
   &[done] {
-    .cell-flowers {
+    .area-flowers {
       opacity: 0.1;
     }
-    .cell-spinner {
+    .area-spinner {
       opacity: 0;
     }
   }

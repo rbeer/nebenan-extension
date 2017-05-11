@@ -4,56 +4,57 @@
     <link href="styles/popup.css" rel="stylesheet">
   </head>
   <body>
-    <div class="login-blur">
-      <div class="header">
-        <div class="logo" aria-role="button" action="newtab.feed">
-          <div class="logo-icon">
-            <i class="na-icon"></i>
-          </div>
-          <div class="logo-text">
-            <i class="na-icon"></i>
-          </div>
+    <header class="login-blur">
+      <div class="logo" aria-role="button" action="newtab.feed">
+        <div class="logo-icon">
+          <i class="na-icon"></i>
         </div>
-        <div id="status" class="status">
-          <div class="status-select-slider"></div>
+        <div class="logo-text">
+          <i class="na-icon"></i>
         </div>
       </div>
+      <nav>
+        <div class="nav-select-slider"></div>
+      </div>
+    </header>
+    <main class="login-blur">
       <div class="n-list-container">
         <n-list class="n-list" type="notifications">
           <div class="updates-item" type="notifications" aria-role="button" action="update.notifications">
             <span>Neue Benachrichtigungen</span>
           </div>
+          <div class="n-list-scrollthumb-overlay"></div>
         </n-list>
         <n-list class="n-list" type="conversations">
           <div class="updates-item" type="messages" aria-role="button" action="update.conversations">
             <span>Neue Nachrichten</span>
           </div>
+          <div class="n-list-scrollthumb-overlay"></div>
         </n-list>
       </div>
-      <div class="n-list-scrollthumb-overlay"></div>
+
       <div id="loading" class="loading-animation">
-        <div class="cell-spinner">
+        <div class="area-spinner">
           <div class="c-loading-spinner"><i></i></div>
         </div>
-        <div class="cell-flowers"></div>
+        <div class="area-flowers"></div>
       </div>
-    </div>
-
-    <div class="login-prompt hidden">
-      <div class="login-icon">
-        <i class="na-icon"></i>
-      </div>
-      <div class="login-buttons">
-        <div class="btn btn-green" aria-role="button" action="newtab.login">
-          <span>Einloggen</span>
+      <div class="login-prompt hidden">
+        <div class="login-icon">
+          <i class="na-icon"></i>
         </div>
-        <div class="btn btn-gray" aria-role="button" action="newtab.register">
-          <span>Registrieren</span>
+        <div class="login-buttons">
+          <div class="btn btn-green" aria-role="button" action="newtab.login">
+            <span>Einloggen</span>
+          </div>
+          <div class="btn btn-gray" aria-role="button" action="newtab.register">
+            <span>Registrieren</span>
+          </div>
         </div>
       </div>
-    </div>
 
-    <div class="login-overlay hidden"></div>
+      <div class="login-overlay hidden"></div>
+    </main>
 
     <!-- Custom Elements Templates -->
     <template id="status-element">
