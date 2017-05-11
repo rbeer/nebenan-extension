@@ -79,9 +79,10 @@ define([
       clickables.watch(ui.nlists.conversations);
 
       // hook scroll event to show/hide scrollbar
-      let overlay = document.querySelector('.n-list-scrollthumb-overlay');
-      ui.nlists.notifications.parentElement.addEventListener('scroll',
-        ui.showScrollbar.bind(null, overlay));
+      _.forEach(ui.nlists, (nlist) => {
+        let overlay = nlist.querySelector('.n-list-scrollthumb-overlay');
+        nlist.addEventListener('scroll', ui.showScrollbar.bind(null, overlay));
+      });
 
       resolve();
     });

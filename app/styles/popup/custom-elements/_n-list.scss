@@ -1,45 +1,23 @@
 
 .n-list-container {
   display: grid;
-  grid-template-columns: repeat(2, 340px);
+  grid-template-columns: repeat(2, 350px);
   grid-template-rows: 100%;
+  grid-template-areas:
+    "notifications conversations";
   grid-column-gap: 7px;
   position: relative;
   left: 0;
   top: 0;
   max-height: 350px;
   min-height: 350px;
-  overflow-x: hidden;
-  overflow-y: overlay;
-
-  &::-webkit-scrollbar {
-    width: .4em;
-  }
-  &::-webkit-scrollbar-track {
-    background: $BG_LIGHT;
-    border-radius: 3px;
-  }
-  &::-webkit-scrollbar-thumb {
-    background: -webkit-linear-gradient(45deg, $SCROLLBAR_GRADIENT_2 0%, $SCROLLBAR_GRADIENT_1 100%);
-  }
-  &::-webkit-scrollbar, &::-webkit-scrollbar-thumb {
-    overflow: visible;
-    border-radius: 3px;
-  }
-
-  &:hover .n-list-scrollthumb-overlay {
-    opacity: 0;
-  }
+  overflow: hidden;
 
   .n-list[type="notifications"] {
-    grid-column-start: 1;
-    grid-column-end: 2;
-    grid-row: 1;
+    grid-area: notifications;
   }
   .n-list[type="conversations"] {
-    grid-column-start: 2;
-    grid-column-end: 3;
-    grid-row: 1;
+    grid-area: conversations;
   }
 
   .updates-item {
@@ -77,21 +55,6 @@
   }
 }
 
-.n-list-scrollthumb-overlay {
-  position: absolute;
-  top: $HEADER_HEIGHT;
-  right: 0;
-  height: 100%;
-  width: .6em;
-  background: $BG_LIGHT;
-  opacity: 1;
-  transition: opacity 0.3s ease-out;
-
-  &.scrolling {
-    opacity: 0;
-  }
-}
-
 .n-list {
   -webkit-padding-start: 0;
   -webkit-margin-before: 0;
@@ -100,12 +63,44 @@
   position: relative;
   left: 0;
   transition: left 0.3s ease-out;
+  overflow-x: hidden;
+  overflow-y: overlay;
+
+  .n-list-scrollthumb-overlay {
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 100%;
+    width: .8em;
+    background: $BG_LIGHT;
+    opacity: 1;
+    transition: opacity 0.3s ease-out;
+
+    &.scrolling {
+      opacity: 0;
+    }
+  }
 
   .n-list-slot {
     position: relative;
     margin: 7px;
     height: 60px;
     width: 325px;
+  }
+
+  &::-webkit-scrollbar {
+    width: .4em;
+  }
+  &::-webkit-scrollbar-track {
+    background: $BG_LIGHT;
+    border-radius: 3px;
+  }
+  &::-webkit-scrollbar-thumb {
+    background: -webkit-linear-gradient(45deg, $SCROLLBAR_GRADIENT_2 0%, $SCROLLBAR_GRADIENT_1 100%);
+  }
+  &::-webkit-scrollbar, &::-webkit-scrollbar-thumb {
+    overflow: visible;
+    border-radius: 3px;
   }
 }
 
