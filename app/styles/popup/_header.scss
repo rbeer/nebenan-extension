@@ -3,9 +3,9 @@
 header {
   /* display: subgrid; :weary: */
   display: grid;
+  grid-area: header;
   grid-template-columns: 150px auto;
-  grid-template-rows: 1;
-  grid-template-areas: "logo status";
+  grid-template-areas: "logo nav";
   position: absolute;
   z-index: 1;
   top: 0;

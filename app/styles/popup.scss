@@ -30,11 +30,10 @@ $BUBBLE_RECEIVED_BG: rgb(237, 237, 233);
 /** MAIN LAYOUT **/
 body {
   display: grid;
-  grid-template-columns: 150px auto;
   grid-template-rows: $HEADER_HEIGHT auto;
   grid-template-areas:
-    "logo status"
-    "main main";
+    "header"
+    "main";
   margin: 0;
   padding: 0 3px;
   width: 350px;
