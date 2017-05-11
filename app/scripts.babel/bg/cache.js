@@ -28,7 +28,7 @@ define([
 
   cache.init = () => {
     let readParsePromises = Object.keys(cache.types).map((cacheKey) => {
-      return new Promise((resolve) => resolve(storage.read(cacheKey)));
+      return new Promise((resolve) => resolve(storage.local.read(cacheKey)));
     });
     return Promise.all(readParsePromises).then(cache.parseFromStorage);
   };
@@ -44,7 +44,7 @@ define([
   };
 
   cache.persist = (store) => {
-    return storage.write(store.CACHE_TYPE, store);
+    return storage.local.write(store.CACHE_TYPE, store);
   };
 
   cache.hasStore = (storeKey) => cache.stores[storeKey] instanceof NSubsetCache;
