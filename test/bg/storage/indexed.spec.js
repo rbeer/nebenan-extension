@@ -78,7 +78,7 @@ define(['app/scripts/bg/storage/indexed'], (indexedStorage) => {
         });
         it('resolves with key of written data', (done) => {
           writePromise.then((key) => {
-            expect(typeof key).to.equal(typeof SETUP.data.write.id);
+            expect(key).to.equal(SETUP.data.write[indexedStorage.getObjectStore('notifications').keyPath]);
             done();
           });
         });
@@ -105,6 +105,7 @@ define(['app/scripts/bg/storage/indexed'], (indexedStorage) => {
           });
         });
       });
+
     });
   };
 });
