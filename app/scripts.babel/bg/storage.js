@@ -1,7 +1,8 @@
 define([
   'bg/storage/chrome',
+  'bg/storage/indexed',
   'lodash'
-], (chromeStorage, _) => {
+], (chromeStorage, indexedStorage, _) => {
   'use strict';
 
   /**
@@ -9,8 +10,11 @@ define([
    * @module bg/storage
    */
   let storage = {
-    local: chromeStorage
+    local: chromeStorage,
+    indexed: indexedStorage
   };
+
+  window['idxed'] = storage.indexed;
 
   storage.writeSubsets = (dataSets) => {
     let storingSets = dataSets instanceof Array ? dataSets : [ dataSets ];
@@ -22,8 +26,9 @@ define([
       return dataSet;
     });
     // @endif
-    let type = storingSets[0].SUBSET_TYPE;
-    return storage.local.update(type, storingSets).then(() => dataSets);
+    //let type = storingSets[0].SUBSET_TYPE;
+    //return storage.local.update(type, storingSets).then(() => dataSets);
+    return dataSets;
   };
 
   return storage;
