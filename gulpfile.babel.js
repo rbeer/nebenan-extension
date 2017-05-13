@@ -272,14 +272,16 @@ gulp.task('watch', cb => {
   FLAGS.LODASH = false;
   FLAGS.DEV = true;
   runSequence('build', () => {
-    $.livereload.listen(35729);
-    gulp.watch('app/**/*.*', ['build']);
+    $.livereload.listen();
+    gulp.watch('app/scripts.babel/**/*.*', () => {
+      runSequence('clean', 'build', 'reload');
+    });
     cb();
   });
 });
 
 gulp.task('reload', () => {
-  $.livereload.reload($.livereload.options.reloadPage);
+  $.livereload.reload('app');
 });
 
 gulp.task('watch-docs', cb => {
@@ -293,18 +295,20 @@ gulp.task('watch-tests', ['watch'], () => {
   FLAGS.LODASH = false;
   FLAGS.DEV = true;
   runSequence('test', () => {
-    $.livereload.listen(35730);
+    $.livereload.listen();
     gulp.watch([
       'dist/scripts/builds/background.js',
       'test/**/*.spec.js',
       'test/setup.js'
-    ], [ 'test' ]);
+    ], () => {
+      runSequence('test', 'reload-tests');
+    });
   });
 });
 
 gulp.task('reload-tests', () => {
   if ($.livereload.server) {
-    $.livereload.reload($.livereload.options.reloadPage);
+    $.livereload.reload('tests');
   }
 });
 
@@ -326,7 +330,7 @@ gulp.task('build', ['clean'], cb => {
   let buildTasks = [
     'lint', 'babel', 'scripts', 'lodash', 'manifest',
     ['html', 'styles', 'extras'],
-    'requirejs', 'size', 'reload', cb
+    'requirejs', 'size', cb
   ];
   // build with docs
   if (FLAGS.DOCS) {
@@ -369,7 +373,7 @@ gulp.task('test', cb => {
   FLAGS.DEV = true;
   FLAGS.TEST = true;
   FLAGS.LODASH = false;
-  runSequence('rjs-tests', 'reload-tests', cb);
+  runSequence('rjs-tests', cb);
 });
 
 //---------------------------\

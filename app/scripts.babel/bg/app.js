@@ -121,7 +121,7 @@ define([
     .then(() => {
       // @ifndef DEV
       // listen to livereload
-      livereload.connect(35729);
+      livereload.connect();
       // @endif
       // init Alarms
       bgApp.alarms = new Alarms(bgApp);

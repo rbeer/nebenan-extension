@@ -4,42 +4,36 @@ define(() => {
   let livereload;
   // @ifdef DEV
   livereload = {
-    test: {
-      host: 'localhost',
-      port: 35730,
-      connection: null
-    },
-    debug: {
-      host: 'localhost',
-      port: 35729,
-      connection: null
-    }
+    host: 'localhost',
+    port: 35729,
+    connection: null
   };
 
-  livereload.connect = (portOrAlias, host) => {
-    let wsckHost = '';
-    let wsckPort = 0;
-    let reloadFn = chrome.runtime.reload;
-    if (typeof portOrAlias === 'string') {
-      let { host, port } = livereload[portOrAlias];
-      wsckHost = host;
-      wsckPort = port;
-      if (portOrAlias === 'test') {
-        reloadFn = location.reload;
-      }
+  livereload.connect = (port, host) => {
+    if (typeof port === 'string') {
+      livereload.host = port;
     } else {
-      wsckHost = host = host || livereload.debug.host;
-      wsckPort = portOrAlias || livereload.debug.port;
+      livereload.host = host || livereload.host;
+      livereload.port = port || livereload.port;
     }
 
-    let wsck = livereload.connection = new WebSocket(`ws://${wsckHost}:${wsckPort}/livereload`);
+    let wsck = livereload.connection = new WebSocket(`ws://${livereload.host}:${livereload.port}/livereload`);
     wsck.onerror = evt => devlog('Reload connection got error:', evt);
     wsck.onmessage = evt => {
       devlog(evt);
       if (evt.data) {
         const data = JSON.parse(evt.data);
         if (data && data.command === 'reload') {
-          reloadFn();
+          switch (data.path) {
+            case 'app':
+              chrome.runtime.reload();
+              break;
+            case 'tests':
+              location.reload();
+              break;
+            default:
+              console.warn('Unknown livereload command received:', data);
+          }
         }
       }
     };

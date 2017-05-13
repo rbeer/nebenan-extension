@@ -4,15 +4,7 @@ define([
   'test/bg/storage/indexed.spec'
 ], (dev, livereload, idbSpec) => {
   window.devlog = dev.log;
-  livereload.connect('test');
-  livereload.onmessage = evt => {
-    if (evt.data) {
-      const data = JSON.parse(evt.data);
-      if (data && data.command === 'reload') {
-        location.reload();
-      }
-    }
-  };
+  livereload.connect();
   let chai = require('node_modules/chai/chai');
   window.expect = chai.expect;
   mocha.setup('bdd');
