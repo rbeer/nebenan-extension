@@ -25,7 +25,6 @@ const FLAGS = {
   // Generate (not just copy existing) lodash library, no matter what
   LODASH: !hasParam('--omit-lodash'),
   // test port or not for livereload
-  TEST: false,
   VERBOSE: hasParam('--verbose')
 };
 
@@ -358,7 +357,8 @@ gulp.task('dev', cb => {
   FLAGS.DEV = true;
   FLAGS.DOCS = true;
   FLAGS.LODASH = false;
-  runSequence('clean', 'build', 'watch', cb);
+  FLAGS.VERBOSE = true;
+  runSequence('watch-tests', cb);
 });
 
 gulp.task('package', () => {
@@ -371,7 +371,6 @@ gulp.task('package', () => {
 
 gulp.task('test', cb => {
   FLAGS.DEV = true;
-  FLAGS.TEST = true;
   FLAGS.LODASH = false;
   runSequence('rjs-tests', cb);
 });
