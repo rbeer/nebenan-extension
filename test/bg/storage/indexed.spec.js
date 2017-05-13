@@ -91,6 +91,20 @@ define(['app/scripts/bg/storage/indexed'], (indexedStorage) => {
           });
         });
       });
+
+      describe('.read', () => {
+        let readPromise;
+        it('returns a Promise', () => {
+          readPromise = indexedStorage.read('notifications', SETUP.data.write.id);
+          expect(readPromise).to.be.an.instanceof(Promise);
+        });
+        it('resolves with data for provided key', (done) => {
+          readPromise.then((data) => {
+            expect(data).to.eql(SETUP.data.write);
+            done();
+          });
+        });
+      });
     });
   };
 });

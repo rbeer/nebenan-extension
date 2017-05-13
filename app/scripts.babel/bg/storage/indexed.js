@@ -35,13 +35,15 @@ define(() => {
   };
   indexedStorage.getObjectStore = (name) => indexedStorage.getObjectStores(name)[name];
 
-  indexedStorage.write = (storeName, data) => {
-    return promiseRequest(indexedStorage.getObjectStore(storeName), data);
-  };
+  indexedStorage.write = (storeName, data) =>
+    promiseRequest(indexedStorage.getObjectStore(storeName), data);
+
+  indexedStorage.read = (storeName, key) =>
+    promiseRequest(indexedStorage.getObjectStore(storeName), key);
 
   let promiseRequest = (objectStore, data) => {
     return new Promise((resolve, reject) => {
-      let request = objectStore.add(data);
+      let request = typeof data === 'object' ? objectStore.add(data) : objectStore.get(data);
       request.onsuccess = (evt) => {
         resolve(evt.target.result);
       };
