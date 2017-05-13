@@ -1,0 +1,18 @@
+({
+  baseUrl: '../',
+  name: 'test/setup',
+  out: '../test/.build.js',
+  include: [
+    'node_modules/almond/almond',
+    'node_modules/mocha/mocha',
+    'node_modules/chai/chai',
+    'dist/scripts/bg/dev'
+  ],
+  skipModuleInsertion: true,
+  optimize: "none",
+  wrap: {
+    start: '',
+    // true = load synchronously. This is a feature of almond.js
+    end: 'require(["test/setup"], null, null, true);'
+  }
+})

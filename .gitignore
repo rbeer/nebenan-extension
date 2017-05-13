@@ -8,6 +8,7 @@ app/lodash.js
 dist/
 docs/
 package/
+test/.build.js
 
 # misc dev files, e.g. dummy data .json
 # logs

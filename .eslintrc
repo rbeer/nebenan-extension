@@ -23,7 +23,8 @@
     "unescape": false,
     "window": false,
     "devlog": true,
-    "chrome": true
+    "chrome": true,
+    "expect": true
   },
 
   "rules": {

@@ -12,17 +12,22 @@ const $ = gulpLoadPlugins();
 
 let hasParam = (param) => process.argv.includes(param);
 
-// Sets build into DEV mode
-// - Includes and loads module:bg/dev
-//   Exposing `window.bgApp`, `bgApp.dev`, ...
-// - Watch out for the preprocess() parts in
-//   script files! A search for `// @` over
-//   `/app/scripts.babel/` should reveal them all.
-let DEV = hasParam('--dev');
-// Whether to include docs generation
-let DOCS = hasParam('--with-docs');
-// Generate (not just copy existing) lodash library, no matter what
-let LODASH = !hasParam('--omit-lodash');
+const FLAGS = {
+  // Sets build into DEV mode
+  // - Includes and loads module:bg/dev
+  //   Exposing `window.bgApp`, `bgApp.dev`, ...
+  // - Watch out for the preprocess() parts in
+  //   script files! A search for `// @` over
+  //   `/app/scripts.babel/` should reveal them all.
+  DEV: hasParam('--dev'),
+  // Whether to include docs generation
+  DOCS: hasParam('--with-docs'),
+  // Generate (not just copy existing) lodash library, no matter what
+  LODASH: !hasParam('--omit-lodash'),
+  // test port or not for livereload
+  TEST: false,
+  VERBOSE: hasParam('--verbose')
+};
 
 //---------------------------------\
 // The Good, The Bad, The Scritps
@@ -30,7 +35,7 @@ let LODASH = !hasParam('--omit-lodash');
 gulp.task('scripts', () => {
   return gulp.src('app/scripts/**/*.js')
         .pipe($.sourcemaps.init())
-        .pipe($.if(!DEV, $.uglify(), gutil.noop()))
+        .pipe($.if(!FLAGS.DEV, $.uglify(), gutil.noop()))
         .pipe($.sourcemaps.write('.'))
         .pipe(gulp.dest('dist/scripts'));
 });
@@ -49,9 +54,19 @@ gulp.task('lint', lint('app/scripts.babel/**/*.js', {
   }
 }));
 
+let getPreProcessContext = () => {
+  let ctxObj = {};
+  Object.keys(FLAGS).forEach((FLAG) => {
+    if (FLAGS[FLAG]) {
+      ctxObj[FLAG] = FLAGS[FLAG];
+    }
+  });
+  return { context: ctxObj };
+};
+
 gulp.task('babel', () => {
   return gulp.src('app/scripts.babel/**/*.js')
-      .pipe(preprocess({ context: DEV ? { DEV: DEV } : {} }))
+      .pipe(preprocess(getPreProcessContext()))
       .pipe($.babel({
         presets: ['es2015']
       }))
@@ -76,7 +91,7 @@ gulp.task('extras', () => {
     '!app/*.html'
   ];
 
-  if (DEV) {
+  if (FLAGS.DEV) {
     paths.unshift('app/.devdata/**');
   }
   return gulp.src(paths, {
@@ -94,7 +109,7 @@ gulp.task('html', () => {
 gulp.task('styles', () => {
   return gulp.src('app/styles/**/*.scss')
     .pipe($.sourcemaps.init())
-    .pipe($.sass({ outputStyle: DEV ? 'expanded' : 'compressed'}).on('error', $.sass.logError))
+    .pipe($.sass({ outputStyle: FLAGS.DEV ? 'expanded' : 'compressed'}).on('error', $.sass.logError))
     //.pipe($.cleanCss({compatibility: '*'}))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest('dist/styles'));
@@ -107,7 +122,7 @@ gulp.task('manifest', () => {
           // add '-dev' to version_name, if in DEV mode
           manifest.version = pkg.version;
           manifest.version_name = pkg.version;
-          if (DEV) {
+          if (FLAGS.DEV) {
             let d = new Date();
             let dString = [
 
@@ -140,7 +155,7 @@ gulp.task('clean', (cb) => {
   let latestLink = `docs/${pkg.name}/latest`;
 
   let delPaths = ['dist', 'app/scripts', docPath, latestLink];
-  if (LODASH) {
+  if (FLAGS.LODASH) {
     delPaths.push('app/lodash.js');
   }
   del(delPaths).then(() => {
@@ -163,11 +178,11 @@ gulp.task('clean-docs', (cb) => {
 // Bundling
 
 let runProcess = (cmd, args, cb) => {
-  let log = (data) => {
+  let log = FLAGS.VERBOSE ? (data) => {
     data.toString()
         .split('\n')
         .forEach((line) => line !== '' ? gutil.log(line) : void 0);
-  };
+  } : () => void 0;
   let proc = require('child_process').spawn(cmd, args);
   proc.stdout.on('data', log);
   proc.stderr.on('data', log);
@@ -175,23 +190,24 @@ let runProcess = (cmd, args, cb) => {
 };
 
 // require.js
-let requirejsTask = (type, cb) => {
-  let rjsConfig = `.rjs/${type}-${DEV ? 'dev' : 'build'}`;
-  runProcess('r.js', [ '-o', rjsConfig ], cb);
-};
-
 gulp.task('requirejs', cb => runSequence('rjs-background', 'rjs-popup', cb));
 
-gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
+let getRequireJsConfig = (type) => `.rjs/${type}-${FLAGS.DEV ? 'dev' : 'build'}`;
+let requirejsTask = (type, cb) => runProcess('r.js', [
+  '-o',
+  getRequireJsConfig(type)
+], cb);
 
 gulp.task('rjs-background', requirejsTask.bind(null, 'background'));
+gulp.task('rjs-popup', requirejsTask.bind(null, 'popup'));
+gulp.task('rjs-tests', requirejsTask.bind(null, 'tests'));
 
+// lodash
 let copyLodash = (path) => {
   return gulp.src(path)
              .pipe(gulp.dest('dist/scripts'));
 };
 
-// lodash
 gulp.task('lodash', cb => {
 
   const fs = require('fs');
@@ -206,7 +222,7 @@ gulp.task('lodash', cb => {
     let args = ['strict'];
     // dev = output only non-minified
     // production = output only minified
-    args.push(DEV ? '-d' : '-p');
+    args.push(FLAGS.DEV ? '-d' : '-p');
 
     // add to spawn() args array from required object
     for (let arg in argsObj) {
@@ -233,7 +249,7 @@ gulp.task('lodash', cb => {
 
   // try to only copy file
   // (generation takes 10s+)
-  if (!LODASH) {
+  if (!FLAGS.LODASH) {
     return fs.access(argsObj['-o'], (err) => {
       // file DOES exist
       if (!err) {
@@ -253,28 +269,17 @@ gulp.task('lodash', cb => {
 // watchers
 
 gulp.task('watch', cb => {
-
-  let building = false;
-
-  $.livereload.listen();
-
-  gulp.watch([ 'app/**/*.*' ], (evt) => {
-    if (!building) {
-      let buildTasks = [
-        'clean', 'build',
-        () => {
-          building = false;
-          $.livereload.reload(evt.path);
-        }
-      ];
-      if (DOCS) {
-        buildTasks.splice(buildTasks.length - 2, 'docs');
-      }
-      building = true;
-      runSequence.apply(null, buildTasks);
-    }
+  FLAGS.LODASH = false;
+  FLAGS.DEV = true;
+  runSequence('build', () => {
+    $.livereload.listen(35729);
+    gulp.watch('app/**/*.*', ['build']);
+    cb();
   });
-  cb();
+});
+
+gulp.task('reload', () => {
+  $.livereload.reload($.livereload.options.reloadPage);
 });
 
 gulp.task('watch-docs', cb => {
@@ -282,6 +287,25 @@ gulp.task('watch-docs', cb => {
     gulp.watch('app/scripts.babel/**/*.js', ['clean-docs', 'docs']);
     cb();
   });
+});
+
+gulp.task('watch-tests', ['watch'], () => {
+  FLAGS.LODASH = false;
+  FLAGS.DEV = true;
+  runSequence('test', () => {
+    $.livereload.listen(35730);
+    gulp.watch([
+      'dist/scripts/builds/background.js',
+      'test/**/*.spec.js',
+      'test/setup.js'
+    ], [ 'test' ]);
+  });
+});
+
+gulp.task('reload-tests', () => {
+  if ($.livereload.server) {
+    $.livereload.reload($.livereload.options.reloadPage);
+  }
 });
 
 //-------------------------------------\
@@ -297,16 +321,16 @@ gulp.task('watch-docs', cb => {
 //             This does **not** create
 //             a valid .crx!
 
-gulp.task('build', cb => {
+gulp.task('build', ['clean'], cb => {
 
   let buildTasks = [
     'lint', 'babel', 'scripts', 'lodash', 'manifest',
     ['html', 'styles', 'extras'],
-    'requirejs', 'size', cb
+    'requirejs', 'size', 'reload', cb
   ];
   // build with docs
-  if (DOCS) {
-    buildTasks.splice(buildTasks.length - 2, 0, 'docs');
+  if (FLAGS.DOCS) {
+    buildTasks.splice(buildTasks.length - 3, 0, 'docs');
   }
 
   runSequence.apply(null, buildTasks);
@@ -314,7 +338,7 @@ gulp.task('build', cb => {
 
 gulp.task('docs', cb => {
   let config = require('./.jsdoc.json');
-  if (DOCS) {
+  if (FLAGS.DOCS) {
     config.opts.verbose = false;
   }
   let pkg = require('./package.json');
@@ -327,9 +351,9 @@ gulp.task('docs', cb => {
 });
 
 gulp.task('dev', cb => {
-  DEV = true;
-  DOCS = true;
-  LODASH = false;
+  FLAGS.DEV = true;
+  FLAGS.DOCS = true;
+  FLAGS.LODASH = false;
   runSequence('clean', 'build', 'watch', cb);
 });
 
@@ -339,6 +363,13 @@ gulp.task('package', () => {
       .pipe($.if(manifest.version_name.endsWaith('-dev'), $.prompt.confirm('Package DEV version?'), gutil.noop()))
       .pipe($.zip('nebenan-' + manifest.version_name + '.zip'))
       .pipe(gulp.dest('package'));
+});
+
+gulp.task('test', cb => {
+  FLAGS.DEV = true;
+  FLAGS.TEST = true;
+  FLAGS.LODASH = false;
+  runSequence('rjs-tests', 'reload-tests', cb);
 });
 
 //---------------------------\

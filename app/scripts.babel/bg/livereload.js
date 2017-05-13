@@ -1,25 +1,51 @@
 'use strict';
 
 define(() => {
-  let connection = null;
+  let livereload;
   // @ifdef DEV
-  const LIVERELOAD_HOST = 'localhost:';
-  const LIVERELOAD_PORT = 35729;
-  connection = new WebSocket('ws://' + LIVERELOAD_HOST + LIVERELOAD_PORT + '/livereload');
-
-  connection.onerror = err => devlog('Reload connection got error:', err);
-
-  connection.onmessage = evt => {
-    devlog(evt);
-    if (evt.data) {
-      const data = JSON.parse(evt.data);
-      if (data && data.command === 'reload') {
-        chrome.runtime.reload();
-      }
+  livereload = {
+    test: {
+      host: 'localhost',
+      port: 35730,
+      connection: null
+    },
+    debug: {
+      host: 'localhost',
+      port: 35729,
+      connection: null
     }
+  };
+
+  livereload.connect = (portOrAlias, host) => {
+    let wsckHost = '';
+    let wsckPort = 0;
+    let reloadFn = chrome.runtime.reload;
+    if (typeof portOrAlias === 'string') {
+      let { host, port } = livereload[portOrAlias];
+      wsckHost = host;
+      wsckPort = port;
+      if (portOrAlias === 'test') {
+        reloadFn = location.reload;
+      }
+    } else {
+      wsckHost = host = host || livereload.debug.host;
+      wsckPort = portOrAlias || livereload.debug.port;
+    }
+
+    let wsck = livereload.connection = new WebSocket(`ws://${wsckHost}:${wsckPort}/livereload`);
+    wsck.onerror = evt => devlog('Reload connection got error:', evt);
+    wsck.onmessage = evt => {
+      devlog(evt);
+      if (evt.data) {
+        const data = JSON.parse(evt.data);
+        if (data && data.command === 'reload') {
+          reloadFn();
+        }
+      }
+    };
   };
   // @endif
 
-  return connection;
+  return livereload;
 
 });

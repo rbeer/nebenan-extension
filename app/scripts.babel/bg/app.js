@@ -7,7 +7,7 @@ define([
   'bg/cache',
   'messaging',
   'lodash'
-], (Alarms, APIClient, auth, lreload, cache, Messaging, _) => {
+], (Alarms, APIClient, auth, livereload, cache, Messaging, _) => {
   'use strict';
   /**
    * Background Main App
@@ -119,6 +119,10 @@ define([
     cache.init()
     // @endif
     .then(() => {
+      // @ifndef DEV
+      // listen to livereload
+      livereload.connect(35729);
+      // @endif
       // init Alarms
       bgApp.alarms = new Alarms(bgApp);
       // activate counter_stats alarm
