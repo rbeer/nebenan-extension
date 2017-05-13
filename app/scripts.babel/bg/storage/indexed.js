@@ -33,6 +33,23 @@ define(() => {
     }, {});
     return stores;
   };
+  indexedStorage.getObjectStore = (name) => indexedStorage.getObjectStores(name)[name];
+
+  indexedStorage.write = (storeName, data) => {
+    return promiseRequest(indexedStorage.getObjectStore(storeName), data);
+  };
+
+  let promiseRequest = (objectStore, data) => {
+    return new Promise((resolve, reject) => {
+      let request = objectStore.add(data);
+      request.onsuccess = (evt) => {
+        resolve(evt.target.result);
+      };
+      request.onerror = (evt) => {
+        reject(evt.target.error);
+      };
+    });
+  };
 
   let onUpgradeNeeded = function onUpgradeNeeded(evt) {
     devlog(evt);

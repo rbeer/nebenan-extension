@@ -2,17 +2,39 @@ define(['app/scripts/bg/storage/indexed'], (indexedStorage) => {
 
   let SETUP = {
     testDB: 'na_test',
-    storeNames: ['notifications', 'conversations']
+    storeNames: ['notifications', 'conversations'],
+    data: {
+      noKeyPathWrite: {
+        some: 'arbitrary',
+        data: false,
+        compatible_with: 'https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm'
+      },
+      write: {
+        id: 1,
+        some: 'valid',
+        data: true
+      }
+    }
   };
 
   return () => {
+
     describe('bg/storage/indexed', () => {
+
+      after(() => {
+        let stores = indexedStorage.getObjectStores(SETUP.storeNames);
+        for (let storeName in stores) {
+          stores[storeName].clear();
+        }
+      });
+
       describe('.init', () => {
-        let initPromise, writePromise, readPromise, _db;
+        let initPromise;
         it('returns a Promise', () => {
           initPromise = indexedStorage.init(SETUP.testDB);
-          expect(initPromise).to.be.instanceof(Promise);
+          expect(initPromise).to.be.an.instanceof(Promise);
         });
+        let _db;
         it('resolves with an open connection to a database...', (done) => {
           initPromise.then((db) => {
             _db = db;
@@ -36,6 +58,37 @@ define(['app/scripts/bg/storage/indexed'], (indexedStorage) => {
             expect(stores[storeName]).to.be.instanceof(IDBObjectStore);
           }
           done();
+        });
+      });
+
+      describe('.write', () => {
+        let writePromise;
+        it('returns a Promise', () => {
+          writePromise = indexedStorage.write('notifications', SETUP.data.write);
+          expect(writePromise).to.be.an.instanceof(Promise);
+        });
+        it('rejects, if `data` doesn\'t provide the keyPath member', (done) => {
+          indexedStorage.write('notifications', SETUP.data.noKeyPathWrite)
+          .catch((err) => {
+            expect(err).to.be.instanceof(DOMException);
+            expect(err.name).to.equal('DataError');
+            expect(err.code).to.equal(0);
+            done();
+          });
+        });
+        it('resolves with key of written data', (done) => {
+          writePromise.then((key) => {
+            expect(typeof key).to.equal(typeof SETUP.data.write.id);
+            done();
+          });
+        });
+        it('rejects, if key is already in store', (done) => {
+          indexedStorage.write('notifications', SETUP.data.write).catch((err) => {
+            expect(err).to.be.instanceof(DOMException);
+            expect(err.name).to.equal('ConstraintError');
+            expect(err.code).to.equal(0);
+            done();
+          });
         });
       });
     });
